@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunt.dao.SysDeviceRecordMapper">
+	<resultMap type="com.hunt.model.entity.SysDeviceRecord" id="baseResultMap">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="call_log_id" property="callLogId" jdbcType="BIGINT"/>
+		<result column="device_id" property="deviceId" jdbcType="BIGINT"/>
+		<result column="reco_file_path" property="recoFilePath" jdbcType="VARCHAR"/>
+		<result column="reco_real_file_name" property="recoRealFileName" jdbcType="VARCHAR"/>
+		<result column="reco_absolute_file_path" property="recoAbsoluteFilePath" jdbcType="VARCHAR"/>
+		<result column="reco_audio_length" property="recoAudioLength" jdbcType="BIGINT"/>
+		<result column="reco_phone_size" property="recoPhoneSize" jdbcType="BIGINT"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+		<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+		<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+		<result column="description" property="description" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<insert id="insert" parameterType="SysDeviceRecord" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_device_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="callLogId!=null">
+				call_log_id,
+			</if>
+			<if test="deviceId!=null">
+				device_id,
+			</if>
+			<if test="recoFilePath!=null and recoFilePath.length()!=0">
+				reco_file_path,
+			</if>
+			<if test="recoRealFileName!=null and recoRealFileName.length()!=0">
+				reco_real_file_name,
+			</if>
+			<if test="recoAbsoluteFilePath!=null and recoAbsoluteFilePath.length()!=0">
+				reco_absolute_file_path,
+			</if>
+			<if test="recoAudioLength!=null">
+				reco_audio_length,
+			</if>
+			<if test="recoPhoneSize!=null">
+				reco_phone_size,
+			</if>
+			<if test="createBy!=null">
+				create_by,
+			</if>
+			<if test="updateBy!=null">
+				update_by,
+			</if>
+			<if test="status!=null">
+				status,
+			</if>
+			<if test="isFinal!=null">
+				is_final,
+			</if>
+			<if test="description!=null and description.length()!=0">
+				description,
+			</if>
+		</trim>
+		
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="callLogId!=null">
+				#{callLogId},
+			</if>
+			<if test="deviceId!=null">
+				#{deviceId},
+			</if>
+			<if test="recoFilePath!=null and recoFilePath.length()!=0">
+				#{recoFilePath},
+			</if>
+			<if test="recoRealFileName!=null and recoRealFileName.length()!=0">
+				#{recoRealFileName},
+			</if>
+			<if test="recoAbsoluteFilePath!=null and recoAbsoluteFilePath.length()!=0">
+				#{recoAbsoluteFilePath},
+			</if>
+			<if test="recoAudioLength!=null">
+				#{recoAudioLength},
+			</if>
+			<if test="recoPhoneSize!=null">
+				#{recoPhoneSize},
+			</if>
+			<if test="createBy!=null">
+				#{createBy},
+			</if>
+			<if test="updateBy!=null">
+				#{updateBy},
+			</if>
+			<if test="status!=null">
+				#{status},
+			</if>
+			<if test="isFinal!=null">
+				#{isFinal},
+			</if>
+			<if test="description!=null and description.length()!=0">
+				#{description},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="update" parameterType="SysDeviceRecord" useGeneratedKeys="true" keyProperty="id">
+		update sys_device_record
+		<set>
+			<if test="recoFilePath!=null">
+				reco_file_path=#{recoFilePath},
+			</if>
+			<if test="recoRealFileName!=null and recoRealFileName.length()!=0">
+				reco_real_file_name=#{recoRealFileName},
+			</if>
+			<if test="recoAbsoluteFilePath!=null and recoAbsoluteFilePath.length()!=0">
+				reco_absolute_file_path=#{recoAbsoluteFilePath},
+			</if>
+			<if test="recoAudioLength!=null">
+				reco_audio_length=#{recoAudioLength},
+			</if>
+			<if test="recoPhoneSize!=null">
+				reco_phone_size=#{recoPhoneSize},
+			</if>
+			<if test="updateBy!=null">
+				update_by=#{updateBy},
+			</if>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="description!=null and description.length()!=0">
+				description=#{description},
+			</if>
+		</set>
+		where call_log_id=#{callLogId} 
+	</update>
+	
+	
+	
+	
+	<select id="selectByCallLogId" resultType="SysDeviceRecord">
+		SELECT * FROM sys_device_record WHERE call_log_id=#{callLogId};
+	</select>
+	
+	
+	
+	
+ 
+</mapper>

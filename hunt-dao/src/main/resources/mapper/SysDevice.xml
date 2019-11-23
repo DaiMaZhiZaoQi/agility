@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunt.dao.SysDeviceMapper">
+	<resultMap id="baseResultMap" type="com.hunt.model.entity.SysDevice">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="device_name" property="deviceName" jdbcType="VARCHAR"/>
+		<result column="device_pwd" property="devicePwd" jdbcType="VARCHAR"/>
+		<result column="device_serial" property="deviceSerial" jdbcType="VARCHAR"/>
+		<result column="rank" property="rank" jdbcType="BIGINT"/>
+		<result column="device_status" property="deviceStatus" jdbcType="INTEGER"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+		<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+		<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+		<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+		<result column="description" property="description" jdbcType="VARCHAR"/>
+		<result column="device_msg" property="deviceMsg" jdbcType="VARCHAR"/>
+		<result column="device_time" property="deviceTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<!-- 	/**排序字段,常用 create_time*/
+	private String sort;
+	/**排序方式，一般用 DESC*/
+	private String order;
+	private Integer page;
+	private Integer rows;
+	 -->
+	
+	
+<!-- 	<parameterMap type="com.hunt.model.dto.PageDto" id="pageDto">
+		<parameter property="sort" javaType=""/>
+	</parameterMap> -->
+	
+	<resultMap type="com.hunt.model.dto.SysDeviceOrgDto" id="sysDeviceOrgDto">
+			<id column="id" property="id" jdbcType="INTEGER"/> 
+			<result column="device_name" property="deviceName" jdbcType="VARCHAR"/>
+			<result column="device_pwd" property="devicePwd" jdbcType="VARCHAR"/>
+			<result column="device_serial" property="deviceSerial" jdbcType="VARCHAR"/>
+			<result column="rank" property="rank" jdbcType="BIGINT"/>
+			<result column="device_status" property="deviceStatus" jdbcType="INTEGER"/>
+			<result column="status" property="status" jdbcType="INTEGER"/>
+			<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+			<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+			<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+			<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+			<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+			<result column="description" property="description" jdbcType="VARCHAR"/>
+			<result column="device_msg" property="deviceMsg" jdbcType="VARCHAR"/>
+			<result column="device_time" property="deviceTime" jdbcType="TIMESTAMP"/>
+			<result column="name" property="orgName" jdbcType="VARCHAR"/> 
+			<result column="user_id" property="userId" jdbcType="BIGINT"/>
+			<result column="login_name" property="loginName" jdbcType="VARCHAR"/>
+		<!-- <association property="sysDevice" javaType="com.hunt.model.entity.SysDevice">
+		</association> -->
+	</resultMap>
+	
+	<sql id="pageSql">
+	 ORDER BY sys_device.`${pageDto.sort}` ${pageDto.order} limit ${(pageDto.page-1)*pageDto.rows},${pageDto.rows}
+	</sql>
+	
+	<insert id="insert" parameterType="SysDevice" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_device
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="deviceName!=null and deviceName.length()!=0">
+				device_name,
+			</if>
+			<if test="devicePwd!=null and devicePwd.length()!=0">
+				device_pwd,
+			</if>
+			<if test="deviceSerial!=null and deviceSerial.length()!=0">
+				device_serial,
+			</if>
+			<if test="rank!=null">
+				rank,
+			</if>
+			<if test="deviceStatus!=null">
+				device_status,
+			</if>
+			<if test="status!=null">
+				status,
+			</if>
+			<if test="createBy!=null">
+				create_by,
+			</if>
+			<if test="updateBy!=null">
+				update_by,
+			</if>
+			<if test="isFinal!=null">
+				is_final,
+			</if>
+			<if test="description!=null and description.length()!=0">
+				description,
+			</if>
+			<if test="deviceMsg!=null and deviceMsg.length()!=0">
+				device_msg,
+			</if>
+			<if test="deviceTime!=null">
+				device_time,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			
+			<if test="deviceName!=null and deviceName.length()!=0">
+				#{deviceName},
+			</if>
+			<if test="devicePwd!=null and devicePwd.length()!=0">
+				#{devicePwd},
+			</if>
+			<if test="deviceSerial!=null and deviceSerial.length()!=0">
+				#{deviceSerial},
+			</if>
+			<if test="rank!=null">
+				#{rank},
+			</if>
+			<if test="deviceStatus!=null">
+				#{deviceStatus},
+			</if>
+			<if test="status!=null">
+				#{status},
+			</if>
+			<if test="createBy!=null">
+				#{createBy},
+			</if>
+			<if test="updateBy!=null">
+				#{updateBy},
+			</if>
+			<if test="isFinal!=null">
+				#{isFinal},
+			</if>
+			<if test="description!=null and description.length()!=0">
+				#{description},
+			</if>
+			<if test="deviceMsg!=null and deviceMsg.length()!=0">
+				#{deviceMsg},
+			</if>
+			<if test="deviceTime!=null">
+				#{deviceTime},
+			</if>
+		</trim>
+	</insert>
+	
+	
+	<select id="isExistDevice" resultType="java.lang.Boolean">
+		SELECT 
+		EXISTS (SELECT * FROM sys_device WHERE device_serial=#{deviceSerial} AND STATUS=1)
+	</select>
+	
+
+	
+	<!-- 查询设备数量  -->
+	<select id="selectCounts" resultType="Integer">
+	    SELECT COUNT(*) FROM sys_device WHERE STATUS!=2;
+	</select>
+	
+	
+	<select id="selectAll" resultType="SysDevice">
+	 	select * 
+	 	from sys_device 
+	 	where status!=2
+	 	<if test="deviceName!=null and deviceName.length()!=0">
+	 		AND device_name LIKE concat('%',#{deviceName},'%')
+	 	</if>
+	 	<if test="deviceSerial!=null and deviceSerial.length()!=0">
+	 		AND device_serial LIKE concat('%',#{deviceSerial},'%')
+	 	</if>
+	 	<if test="sort!=null and sort.length()!=0">
+	 		order by ${sort}
+	 	</if>
+	 	<if test="order!=null and order.length()!=0">
+	 		${order}
+	 	</if>
+	 
+	 
+	</select>
+	
+	<update id="update" parameterType="SysDevice" useGeneratedKeys="true" keyProperty="id">
+		update sys_device
+		<set>
+			<if test="deviceName!=null and deviceName.length()!=0">
+				device_name=#{deviceName},
+			</if>
+			<if test="devicePwd!=null and devicePwd.length()!=0">
+				device_pwd=#{devicePwd},
+			</if>
+			<if test="deviceSerial!=null and deviceSerial.length()!=0">
+				device_serial=#{deviceSerial},
+			</if>
+			<if test="rank!=null">
+				rank=#{rank},
+			</if>
+			<if test="deviceStatus!=null">
+				device_status=#{deviceStatus},
+			</if>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="description!=null and description.length()!=0">
+				description=#{description},
+			</if>
+			<if test="deviceMsg!=null and deviceMsg.length()!=0">
+				device_msg=#{deviceMsg},
+			</if>
+			<if test="updateBy!=null">
+				update_by=#{updateBy},
+			</if>
+			<if test="isFinal!=null">
+				is_final=#{isFinal},
+			</if>
+			<if test="deviceTime!=null">
+				device_time=#{deviceTime}
+			</if>
+			
+		</set>
+		where id=#{id}
+		
+	</update>
+	
+	<update id="updateDeviceTimeById" useGeneratedKeys="true" keyProperty="true">
+		update sys_device 
+		<set>
+			device_time=now(),
+			<if test="deviceMsg">
+				device_msg=#{deviceMsg}
+			</if>
+		</set>
+		where device_serial=#{deviceSerial}
+	</update>
+	
+	<select id="selectById" resultType="SysDevice"> 
+		SELECT * FROM sys_device WHERE id=#{id};
+	</select>
+
+	<select id="selectByDeviceSerial" resultType="SysDevice">
+		SELECT * FROM sys_device WHERE device_serial=#{deviceSerial}
+	</select>
+	
+	<select id="selectBindByDeviceSerial" resultType="sysDevice">
+		SELECT * FROM sys_device WHERE device_serial=#{deviceSerial} AND status=1
+	</select>
+	 
+	
+	<select id="selectUnRegisDevice" parameterType="com.hunt.model.dto.PageDto" resultType="SysDevice">
+		SELECT * FROM sys_device WHERE sys_device.`status`=0 
+		<include refid="pageSql"/>
+	</select>
+	
+	<select id="selectUnRegisCount" resultType="java.lang.Long">
+		SELECT COUNT(*) FROM sys_device WHERE sys_device.`status`=0;
+	</select>
+	
+	<select id="selectRegisCount" resultType="java.lang.Long">
+		SELECT COUNT(*) FROM sys_device_role_org
+		LEFT JOIN sys_device ON sys_device.`id`=sys_device_role_org.`sys_device_id`
+		LEFT JOIN sys_organization ON sys_organization.`id`=sys_device_role_org.`sys_org_id`
+		WHERE sys_device_role_org.`sys_org_id` 
+		IN
+		<foreach collection="set" item="orgId" open="(" close=")" separator=",">
+			#{orgId}
+		</foreach>
+		AND sys_device_role_org.`status`=1
+		AND sys_organization.`status`=1
+		AND sys_device.`status`=1
+	</select>
+	
+	<select id="selectDevRegis" resultMap="sysDeviceOrgDto">
+		SELECT sys_device.*,sys_organization.`name`,sys_user.`id` user_id,sys_user.`login_name` login_name 
+		FROM sys_device_role_org
+		LEFT JOIN sys_device ON sys_device.`id`=sys_device_role_org.`sys_device_id`
+		LEFT JOIN sys_organization ON sys_organization.`id`=sys_device_role_org.`sys_org_id`
+		LEFT JOIN sys_user ON sys_user.`id`=sys_device_role_org.`sys_user_id`
+		WHERE sys_device_role_org.`sys_org_id` 
+		IN
+		<foreach collection="set" item="orgId" open="(" close=")" separator=",">
+			#{orgId}
+		</foreach>
+		AND sys_device_role_org.`status`=1 
+		AND sys_organization.`status`=1
+		AND sys_device.`status`=1
+		<include refid="pageSql"/>
+	</select>
+
+</mapper>

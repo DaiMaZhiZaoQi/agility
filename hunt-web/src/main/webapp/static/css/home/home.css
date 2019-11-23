@@ -1,0 +1,176 @@
+ html, body {
+	 height: 100%;
+	 font-weight:400;
+ }
+ 
+ .h1, .h2, .h3, .h4, .h5, .h6, a, abbr, body, cite, dd, dl, dt, h1, h2, h3, h4, h5, h6, iframe, input, li, object, ol, p, pre, span, ul {
+    font-family: "Microsoft YaHei","SF Pro Display",Roboto,Noto,Arial,"PingFang SC",sans-serif;
+}
+ 
+ .clearfix:before,
+        .clearfix:after {
+            display: table;
+            content: "";    /*不用有内容也可以*/
+        }
+
+        .clearfix:after {
+            clear: both;
+        }
+
+        .clearfix {
+            *zoom: 1;
+        }
+.mediaContainer{
+    min-width: 90%;
+    max-width: 95%;
+    margin: 0px auto;
+}
+
+#img_head_left{
+    height: 80px;
+    line-height: 60px;
+    font-size: 24px;
+    font-weight: bold;
+    float:left;
+}
+
+a{
+	color:	black;
+	text-decoration:none;
+	font-size: 19px;
+}
+
+#menu table{
+	padding-top:10px;
+	padding-bottom: 10px;
+
+}
+/* 选中时的颜色 */
+.tree-node-selected{
+	background: #88d8ff;
+}
+/* 选中时的颜色 */
+.datagrid-row-selected{
+	background: #88d8ff;
+}
+
+/*id选择器与标签选择器混合用 */
+#menu a{
+	color:	white;
+	text-decoration:none;
+	font-size: 19px;
+}
+
+#menu img{
+	height:20px;
+	width: 20px;
+	margin-right: 6px;
+	vertical-align: top;
+}
+.deviceHeadImg{
+	height:40px;
+	width: 40px;
+	margin-right: 6px;
+}
+
+
+/* 树形样式 */
+.tree-node {
+    height: 18px;
+    white-space: nowrap;
+    cursor: pointer;
+  /*   padding-top: 10px; */
+    padding-bottom: 20px;
+}
+#tt .tree-title,#tt .tree-title a{   
+	font-size: 18px;
+	padding-top:10px;
+	padding-bottom:10px;
+}
+#tt li{font-size:18px;}
+
+#orgList .tree-title,#orgList .tree-title a{
+	font-size: 22px;
+	padding-top:10px;
+	padding-bottom:10px;
+}
+#orgList li{
+	font-size: 18px;
+}
+
+.device-item{
+	padding-bottom:10px;
+	margin-top: 20px;
+    border-left: 5px solid #007ad5;
+	background-color: #fafafa;
+	}
+#sp_device_title{
+	font-size: 25px;
+
+}
+
+
+.ul_device_list{
+	padding-left: 0;
+}
+.gray_text{
+	margin-left:5px;
+	margin-right:40px;
+	text-align:center;
+	color: #8A8A8A;
+    font-size: 20px;
+}
+.device-item_title_child{
+	padding-left: 30px;
+}
+#sp_device_state{
+	font-size: 18px;
+	background-color:#c0c0c0;
+	padding:3px 15px 3px 15px;
+	color: #8A8A8A;
+	margin-left: 35px;
+}
+.div_item_child{
+	margin-top:10px;
+	margin-bottom: 10px;
+	padding-left: 30px;
+}
+.table-options{
+	display:inline-block;
+}
+
+	.deviceCallLog td{
+			height: 40px;
+			padding-top:4px;
+			padding-bottom:4px;
+			height: 40px;
+			/* line-height: 40px; */
+			text-align: center;
+			font-size:14px;
+			padding-left: 25px;
+    		padding-right: 25px;
+    		white-space: nowrap;
+	}
+	
+	.deviceCallLog .changeTd{
+		overflow: hidden;
+		max-width: 80px;
+		min-width: 80px;
+	}
+	
+	.deviceCallLog .bigTd{
+		vertical-align: middle;
+		max-width: 130px;
+		min-width: 130px;
+	}
+	
+  .deviceCallLog th {
+			height: 40px;
+			line-height: 40px;
+			width: auto;
+			padding-top:5px;
+			padding-bottom:5px;
+			margin-right: 5px;
+			font-size:15px;
+		}
+

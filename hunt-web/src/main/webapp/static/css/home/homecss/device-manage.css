@@ -1,0 +1,40 @@
+@charset "UTF-8";
+.panel-title{
+			    height: 30px;
+    			line-height: 30px;
+				font-size: 18px;
+		}
+		.panel-tool a{
+		
+		}
+		
+	 	.l-btn-text{
+			font-size: 18px;
+		}
+		.dialog-button{
+			height: 45px;
+		}
+		.l-btn{
+			height: 30px;
+    		line-height: 30px;
+    		margin-left: 15px;
+    		margin-top: 5px;
+		}
+		.l-btn-left{
+		    display: block;
+		    position: relative;
+		   /*  top: -25%; */
+		    right: 10%;
+		}
+		#device_edit_form p{
+			font-size: 18px;
+		}
+		.datagrid-header .datagrid-cell span{
+			font-size: 16px;
+		}
+		.datagrid-cell{
+			font-size: 16px;
+		}
+		.datagrid-cell span{
+			font-size: 14px;
+		}

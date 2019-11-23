@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!-- 未注册 -->
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<!-- <link rel="stylesheet" type="text/css" href="static/css/home/homecss/device-manage.css"/> -->
+
+<script type="text/javascript" src="static/css/home/js/noRegister.js"></script>
+</head>
+<body>
+ 	<table id="noRegisdevice" class="deviceCallLog"
+		style="margin-left:10px; border:0;cellpadding:0; cellspacing:0; width:94%;background-color: #ffffff;">
+			<thead id="noRegThead">
+				<tr style="background-color: #f3f3f3;" >
+					<th>序号</th>
+					<th>序列号</th>
+					<th>设备名称</th>
+					<!-- <th>通话号码</th> -->
+					<!-- <th onclick='recordCommon.clickChangeData(this,"call_duration")'>通话时长<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 10px;"/></th>
+					<th onclick='recordCommon.clickChangeData(this,"reco_audio_length")'>录音时长<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 10px;"/></th> -->
+					<th onclick="pageTool.clickChangeData(this,'create_time')">添加时间<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 10px;"/></th>
+					<th>备注</th>
+					<!-- <th>录音</th> -->
+					<th>操作</th>
+				</tr>
+			</thead>
+			
+	</table>
+	<div id="noRegisPageTool" class="myPage" align="center" style="margin: 20px 0px 20px 0px; height: 30px;line-height: 30px;">
+				<select id="iEveryCount" style="height: 40px;margin-right: 10px;font-size: 20px;" onchange="pageTool.changePages()">
+					<option>15</option>
+					<option>10</option>
+					<option>30</option>
+				</select>
+				<span class="pageDisplay" id="currentPage">当前 1/2 页</span>
+				<span class="pageDisplay" id="totalPage">共21条</span>
+				&nbsp;&nbsp;
+				<a class="pageOption" href="javascript:void(0)" onclick="pageTool.firstPage()">首页</a>
+				&nbsp;
+				<a class="pageOption" href="javascript:void(0)" id="ipreviousPage" onclick="pageTool.prePage()">上一页</a>
+				<a class="pageOption" href="javascript:void(0)" id="inextPage" onclick="pageTool.nextPage()">下一页</a>
+				&nbsp;
+				<a class="pageOption" href="javascript:void(0)" onclick="pageTool.endPage()">尾页</a>
+				&nbsp;&nbsp;
+				<span class="pageDisplay">转到</span>
+				&nbsp;
+				<input type="text" maxlength="4" size="1" style="height: 30px;font-size: 20px;">
+				&nbsp;
+				<span class="pageDisplay">页</span>				
+				<a class="pageOption" href="javascript:void(0)" onclick="pageTool.jumpPage()">跳转</a>
+	</div>
+	
+	
+<!-- 添加或修改设备的对话框   必填参数  userId roleOrgId(这两个参数在绑定人员时可以拿到) deviceName deviceSerial description createBy -->
+<div id="device_manage_dialog" style="display: none;">
+	<form id="device_edit_form" >
+		<div style="float: left;width:270px;">
+            <input type="hidden" name="id" id="iddevice">
+            <div style="padding: 5px">
+            	<div>&nbsp;设备名称:</div>
+	            <input name="deviceName" id="deviceName" 
+            		style="width: 300px;height: 35px;margin:5px 0px 0px 10px;font-size: 18px;" 
+            		data-options="required:true"
+					class="easyui-textbox easyui-validatebox">
+			</div>
+                                                          
+            <div style="padding: 5px;">
+            	<div>&nbsp;设备序列号:</div>
+               <input name="deviceSerial" id="deviceSerial"
+                      style="pointer-events:none;background-color:#e3e3e3;margin:5px 0px 0px 10px;width: 300px;height: 35px;font-size: 18px;"
+					  data-options="required:true"
+					  class="easyui-textbox easyui-validatebox">
+			</div>                                           
+            <div style="padding: 5px;"> 
+            	<div>&nbsp;设备描述:</div>
+            	<textarea name="description" id="description"
+					  style="width: 300px;height: 130px;margin:5px 0px 0px 10px; font-size: 18px;text-align: top;resize: none;color:#000000;font-family: unset;"
+					  data-options="required:true,multiline:true"
+					  class="easyui-textbox easyui-validatebox"></textarea>
+            </div>
+			
+        </div>
+        
+         <!-- html 使用方式见device.jsp -->
+          <div style="float: right;width: 360px;height: 100%;pointer-events:none;">
+            <table id="deviceJobs" class="easyui-treegrid">
+            </table>
+        </div>
+        
+        <div style="float: right; width:270px;height: 100%;">
+            <table id="device_user_list" class="easyui-datagrid">
+          
+            </table>
+        </div>
+      
+	</form>
+
+</div>
+	
+</body>
+</html>

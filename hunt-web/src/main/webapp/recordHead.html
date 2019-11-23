@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+
+	 <table id="deviceCallLog" class="deviceCallLog"
+		style="border:0; width:100%;overflow-x:scroll; background-color: #ffffff;">
+			<thead >
+				<tr style="background-color: #f3f3f3;" >
+					<th>序号</th>
+					<th>部门</th>
+					<th>通话类型</th>
+					<th>联系人</th>
+					<th>通话号码</th>
+					<th onclick='recordCommon.clickChangeData(this,"call_duration")'>通话时长<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 5px;"/></th>
+					<th onclick='recordCommon.clickChangeData(this,"reco_audio_length")'>录音时长<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 5px;"/></th>
+					<th onclick="recordCommon.clickChangeData(this,'call_date')">通话时间<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 5px;"/></th>
+					<!-- <th>备注</th> -->
+					<th>设备号</th>
+					<th>录音</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+	</table>
+</body>
+</html>

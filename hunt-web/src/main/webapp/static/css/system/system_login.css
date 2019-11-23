@@ -1,0 +1,32 @@
+.gt_holder .gt_slider{
+	left: 0px;
+}
+.window .window-header{
+	padding: 15px 0px 15px 0px;
+}
+.panel-title{
+	font-size: 18px;
+}
+.panel-body{
+	font-size: 18px;
+}
+.gt_widget{
+	margin-left: 15px;
+}
+.dialog-button{
+	height: 50px;
+	line-height: 50px;
+	padding-top: 15px;
+}
+
+.l-btn-text{
+	font-size: 20px;	
+}
+
+/* a > .l-btn .l-btn-small{
+	width: 120px;
+	height:40px;
+} */
+.gt_holder .gt_guide_tip{
+	font-size: 14px !important;
+}

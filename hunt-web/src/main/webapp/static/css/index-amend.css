@@ -1,0 +1,106 @@
+@charset "UTF-8";
+.panel-title{
+			    height: 30px;
+    			line-height: 30px;
+				font-size: 18px;
+		}
+		.panel-tool a{
+		
+		}
+		.tabs-title{
+			font-size:18px;
+		}
+	 	.l-btn-text{
+			font-size: 18px;
+		}
+		.user-l-btn-text{
+			font-size:15px;
+			margin: 5px 0px 0px 20px;
+		}
+		.datagrid-group-title{
+			font-size:14px;
+		}
+		.l-btn-icon-left .l-btn-icon {
+		    left: 9px;
+		}
+		.dialog-button .l-btn-icon-left .l-btn-icon {
+		    left: 20px;
+		}
+		.panel-body{
+			font-size:18px;
+		}
+		.dialog-button{
+			height: 37px;
+			padding-top: 10px;
+		}
+		.l-btn{
+			height: 30px;
+		    line-height: 30px;
+		    margin-left: 0px;
+		    margin-top: 0px;
+		}
+		.datagrid-row-selected{
+			background: #c4e4ff;
+		}
+		.l-btn-left .l-btn-icon-left{
+			margin-top: 3px;
+		}
+		
+		.tabs-inner{
+			width: 85px;
+		}
+		.l-btn-left{
+		    display: block;
+		    position: relative;
+		   /*  top: -25%; */
+		    right: 10%;
+		}
+	
+		#organization_form .textbox .textbox-text{
+			font-size: 18px;
+		}
+	
+		#user_edit_dialog .textbox .textbox-text{
+			font-size: 18px;
+		}
+		#role_edit_dialog .textbox .textbox-text{
+			font-size: 18px;
+		}
+
+		#device_edit_dialog .textbox .textbox-text{
+			font-size: 18px;
+		}
+	
+	/* 	#_easyui_textbox_input1 .textbox-text .validatebox-text input{
+			font-size: 18px;
+		} */
+		 #save-permission-dialog .textbox .textbox-text{
+			font-size: 18px;
+		}
+		 #save-data-dialog .textbox .textbox-text{
+			font-size: 18px;
+		}
+		 p{ 
+			font-size: 18px;
+		}
+		
+		/* #save-data-dialog .textbox .textbox-text{
+			font-size: 18px;
+		}
+		#save-data-dialog p{
+			font-size: 18px;
+		} */
+		#job_form .textbox .textbox-text{
+			font-size: 18px;
+		}
+		
+		
+		.datagrid-header .datagrid-cell span{
+			font-size: 16px;
+		}
+		.datagrid-cell{
+			font-size: 16px;
+		}
+		.datagrid-cell span{
+			font-size: 16px;
+		}

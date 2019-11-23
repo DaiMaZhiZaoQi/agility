@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="csxAudio.css"/> 
+		<script type="text/javascript" src="csxAudio.js"></script>
+		<title></title>
+	</head>
+	<body>
+		<div class="audiosx" id="1">
+			<button class="play" id="play"></button>
+			<div class="scroll" id="scrollBar"></div>
+			<div class="bar"></div> 
+			<div class="mask"></div> 
+			<span class="currTime" id="currTime">00:00&nbsp;/&nbsp;</span>
+			<span class="time" id="time">00:00</span>
+			<button class="down" id="down"></button>
+			<audio id="audio" src=" http://www.largesound.com/ashborytour/sound/AshboryBU.mp3" controls="controls" style="visibility: hidden;" ></audio>
+		</div>
+		  
+		 <div>
+			 <div class="audiosx" id="2">  <!-- audiosx-->
+			 	<button class="play" id="play"></button>
+			 	<div class="scroll" id="scrollBar"></div>
+			 	<div class="bar"></div> 
+			 	<div class="mask"></div> 
+			 	<span class="currTime" id="currTime">00:00&nbsp;/&nbsp;</span>
+			 	<span class="time" id="time">00:00</span>
+			 	<button class="down" id="down"></button>
+			 	<audio id="audio" src=" http://www.largesound.com/ashborytour/sound/AshboryBYU.mp3" controls="controls" style="visibility: hidden;" ></audio>
+			 </div>
+		 </div>  
+		<script type="text/javascript">
+			csxAudio.init("audiosx");
+		</script>
+		
+		
+	</body>
+</html>

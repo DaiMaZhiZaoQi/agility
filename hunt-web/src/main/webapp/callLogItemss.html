@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style type="text/css">
+	body{margin:0; padding:0;}
+	.titleChild{
+		font-size: 20px;
+		color: black;
+	}
+</style> 
+<link rel="stylesheet" type="text/css" href="static/css/home/home.css">
+<link rel="stylesheet" type="text/css" href="static/css/home/homecss/commonLabel.css">
+
+<script type="text/javascript" src="static/js/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="static/js/system/common.js"></script>
+<title>Insert title here</title>
+
+</head>
+<body>
+	<div class="device-item_title_child"><span id="sp_device_title" style="font-size: 24px;"></span></div>
+	<table id="deviceCallLog" class="deviceCallLog"
+		style="border:0;cellpadding:0; cellspacing:0; width:90%;background-color: #ffffff;">
+			<thead >
+				<tr style="background-color: #f3f3f3;" >
+					<th>序号</th>
+					<th >通话类型</th>
+					<th>通话号码</th>
+					<th onclick='deviceCallLog.clickChangeData(this,"call_duration")'>通话时长<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 10px;"/></th>
+					<th onclick='deviceCallLog.clickChangeData(this,"reco_audio_length")'>录音时长<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 10px;"/></th>
+					<th onclick="deviceCallLog.clickChangeData(this,'call_date')">通话时间<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 10px;"/></th>
+					<th>备注</th>
+					<th>录音</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+	</table>
+	
+	<div id="pageTool" class="myPage" align="center" style="margin: 20px 0px 20px 0px; height: 30px;line-height: 30px;">
+				<select id="iEveryCount" style="height: 40px;margin-right: 10px;font-size: 20px;" onchange="deviceCallLog.changePages()">
+					<option>3</option>
+					<option>6</option>
+					<option>12</option>
+				</select>
+				<span class="pageDisplay" id="currentPage">当前 1/2 页</span>
+				<span class="pageDisplay" id="totalPage">共21条</span>
+				&nbsp;&nbsp;
+				<a class="pageOption" href="javascript:void(0)" onclick="deviceCallLog.firstPage()">首页</a>
+				&nbsp;
+				<a class="pageOption" href="javascript:void(0)" id="ipreviousPage" onclick="deviceCallLog.prePage()">上一页</a>
+				<a class="pageOption" href="javascript:void(0)" id="inextPage" onclick="deviceCallLog.nextPage()">下一页</a>
+				&nbsp;
+				<a class="pageOption" href="javascript:void(0)" onclick="deviceCallLog.endPage()">尾页</a>
+				&nbsp;&nbsp;
+				<span class="pageDisplay">转到</span>
+				&nbsp;
+				<input type="text" maxlength="4" size="1" style="height: 30px;font-size: 20px;">
+				&nbsp;
+				<span class="pageDisplay">页</span>				
+				<a class="pageOption" href="javascript:void(0)" onclick="deviceCallLog.jumpPage()">跳转</a>
+	</div>
+	
+	
+	<script type="text/javascript">
+	
+	recordCommon={
+			/**毫秒数转时间*/
+			getMoth:function(str){  
+				var dateTime=new Date(str);
+				var year=dateTime.getFullYear();
+				var month=dateTime.getMonth() + 1;
+				var day=dateTime.getDate();
+				var hour=dateTime.getHours();
+				var minute=dateTime.getMinutes();
+				var second=dateTime.getSeconds(); 
+				return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;
+		    },
+		    
+		    callType:function(type){
+				switch (type) {
+				case 0:
+					return "未接电话";
+				case 1:
+					return "呼入";
+				case 2:
+					return "呼出";
+				case 3:
+					return "拒接";
+				case 4:
+					return "未接留言";
+				default:
+					return "未知";
+				}
+		    },
+		    /**验证是否为毫秒数，毫秒数转换为秒数*/
+		    secondIsValid:function(second){
+		    	var regex=/^\d{13}$/;
+		    	return regex.test(second);
+		    	
+		    },
+			/**秒数转分钟*/    
+		    secondToMinute:function(callDuration){
+		    	
+		    	if(callDuration<60){
+		    		return "00:"+(callDuration<10?("0"+callDuration):(callDuration));
+		    	}else{
+		    		if(callDuration>60&&callDuration<3600){
+		    			var minute=callDuration/60;
+		    			var second=callDuration%60;
+		    			var mi=Math.floor(minute);
+		    			var sec=Math.floor(second);
+		    			return (mi<10?("0"+mi):mi)+":"+(sec<10?("0"+sec):sec);
+		    		}else{
+		    			var hour=callDuration/3600;
+		    			var m=callDuration%3600;
+		    			var minute=recordCommon.secondToMinute(m);
+		    			return Math.floor(hour)+":"+minute;
+		    		}
+		    	}
+		    },
+		 
+		    
+	},
+	
+		recordModult={
+				fillTable:function(data){
+					function getRow(row,i) {
+						if(i%2==0){
+						    var tr = $('<tr style="background-color: #ffffff;"></tr>');
+						}else{
+						    var tr = $('<tr style="background-color: #f3f3f3;"></tr>');
+						}
+					    var type=recordCommon.callType(row.callType);
+					    var callLogId=row.id;
+					    var callNumber=row.callNumber==""?"无":row.callNumber;
+					    
+					    var description=row.callDescription=(row.callDescription==null||row.callDescription=="")?"无":row.callDescription;
+					    var callHasRecord=row.callHasRecord==-1?"无":"下载录音";
+					    var callDate=recordCommon.getMoth(row.callDate);
+					    var callDuration=row.callDuration==0?"无通话时间":row.callDuration;
+					    var secondIsValid=recordCommon.secondIsValid(callDuration);
+					    var callDuration=recordCommon.secondToMinute(111111);
+						var recoAudioLength=recordCommon.secondToMinute(111111);
+						tr.append("<td>"+(i+1)+"</td>");
+					    tr.append('<td>'+type+'</td>');
+					    tr.append('<td>'+callNumber+'</td>');
+					    
+					    tr.append('<td>'+callDuration+'</td>');
+					    tr.append('<td>'+recoAudioLength+'</td>');
+					 
+					    tr.append('<td>'+callDate+'</td>');
+					    tr.append('<td id=description'+callLogId+'>'+description+'</td>');
+					    
+					    var recoFilePath;
+			  			if(callHasRecord=="下载录音"){
+					    	if(row.sysDeviceRecord!=null){			//  可能会有多条录音，要求前端合成音频后上传。href='+recoFilePath+';  download='+recoFilePath+';   注意这个经典写法  <a onclick="deviceCallLog.playAudio('+fileType+');"><img src="static/image/play.png;" width="25px;" height="25px;" /></a>
+					    		recoFilePath=getRootPath()+row.sysDeviceRecord.recoFilePath;
+					    		var record=getRootPath()+"/deviceRecord/audio?callLogId="+callLogId;
+						    	tr.append('<td style="vertical-align: middle;"><audio style="width:260px;height: 32px;" id="audioPlay;"src='+record+' controls="controls">Your browser does not support the audio element.</audio></th>');
+					    	}else{
+					    		tr.append('<td>'+"无录音文件"+'</td>');
+					    	}
+					    }else{
+						    tr.append('<td>'+callHasRecord+'</td>');
+					    }
+					    
+					    tr.append('<td style="vertical-align: bottom; margin-top:30px;">'+
+					    		'<img src="static/image/remark.png;" width="25px;" height="25px;" onclick="deviceCallLog.remark('+callLogId+');"/>'+
+					    		'<img src="static/image/delete.png;" width="25px;" height="25px;" onclick="deviceCallLog.deleteLogAndRecord('+callLogId+',this,'+i+')"/></td>');
+				
+					    return tr;
+					}
+					var tbody = $('<tbody></tbody>');
+					
+					for(var i = 0; data!=null&&i < data.length; i ++ ){ 
+					    tbody.append(getRow(data[i],i));
+					}
+					return tbody;
+				},
+		}
+		function update(parame,orgId){
+				console.log("获取参数-->"+parame);
+				$.ajax({
+					type:"GET",
+					url:getRootPath()+"/callRecord/list?id=6&page=1&row=100",
+					success:function(data){
+						for(var i=0;data.rows!=null&&i<data.rows.length;i++){
+							var record=data.rows[i].list;
+							var table= recordModult.fillTable(record);
+							$("#deviceCallLog").append(table);
+							IFrameResize(orgId);
+						  $("#sp_device_title").append(getTitleName(data.rows[i]));
+						}
+					},
+				});
+		}
+		function IFrameResize(orgId){ 
+			var obj = parent.document.getElementById("iframe"+orgId); //取得父页面IFrame对象 
+			obj.height = this.document.body.scrollHeight; //调整父页面中IFrame的高度为此页面的高度 
+		} 
+		function getTitleName(rows){
+			var orgName="";
+			var orgList=rows.mOrganization;
+			var total=rows.listDeviceTotal;
+			var callLogCount=total.callLogCount;
+			
+			var callRecordCount=total.callRecordCount;
+			var callAlreadyAcceptCount=total.callAlreadyAcceptCount;
+			var callNoAccept=total.callNoAccept;
+			var callOut=total.callCallOut;
+			return orgList.name+"</br>"+"<span class='titleChild'>通话数量 : "+callLogCount+"</span>&nbsp;&nbsp;"
+								+"<span class='titleChild'>录音数量 : "+callRecordCount+"</span></br>"
+								+"<span class='titleChild'>已接 : "+callAlreadyAcceptCount+"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='titleChild'>未接 : "+callNoAccept+"</span>&nbsp;&nbsp;<span class='titleChild'>拨出 : "+callOut+"</span>";
+		}
+	</script>
+	
+
+</body>
+</html>

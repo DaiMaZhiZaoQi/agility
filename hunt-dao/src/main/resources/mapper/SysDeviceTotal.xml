@@ -1,0 +1,846 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunt.dao.SysDeviceTotalMapper">
+
+	<resultMap id="baseResultMap" type="com.hunt.model.entity.SysDeviceTotal">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="device_id" property="deviceId" jdbcType="BIGINT"/>
+		<result column="call_log_count" property="callLogCount" jdbcType="BIGINT"/>
+		<result column="call_record_count" property="callRecordCount" jdbcType="BIGINT"/>
+		<result column="reco_audio_length" property="recoAudioLength" jdbcType="BIGINT"/>
+		<result column="call_duration" property="callDuration" jdbcType="BIGINT"/>   
+		<result column="reco_file_size" property="recoFileSize" jdbcType="BIGINT"/>
+		<result column="call_already_accept_count" property="callAlreadyAcceptCount" jdbcType="BIGINT"/> 
+		<result column="call_no_accept" property="callNoAccept" jdbcType="BIGINT"/>
+		<result column="call_refuse_accept" property="callRefuseAccept" jdbcType="BIGINT"/>
+		<result column="call_call_out" property="callCallOut" jdbcType="BIGINT"/>
+		<result column="call_no_accept_leave" property="callNoAcceptLeave" jdbcType="BIGINT"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+		<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+		<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<insert id="insert" parameterType="SysDeviceTotal" useGeneratedKeys="true" keyProperty="recordTotalId">
+		insert into sys_device_total
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="deviceId!=null">
+				device_id,
+			</if>
+			<if test="callLogCount!=null">
+				call_log_count,
+			</if>
+			<if test="callRecordCount!=null">
+				call_record_count,
+			</if>
+			<if test="recoAudioLength!=null">
+				reco_audio_length,
+			</if>
+			<if test="callDuration!=null">
+				call_duration,
+			</if>
+			<if test="recoFileSize!=null">
+				reco_file_size,
+			</if>
+			<if test="callAlreadyAcceptCount!=null">
+				call_already_accept_count,
+			</if>
+			<if test="callNoAccept!=null">
+				call_no_accept,
+			</if>
+			<if test="callRefuseAccept!=null">
+				call_refuse_accept,
+			</if>
+			<if test="callCallOut!=null">
+				call_call_out,
+			</if>
+			<if test="callNoAcceptLeave!=null">
+				call_no_accept_leave,
+			</if>
+			<if test="createBy!=null">
+				create_by,
+			</if>
+			<if test="updateBy!=null">
+				update_by,
+			</if>
+			<if test="status!=null">
+				status,
+			</if>
+			<if test="isFinal!=null">
+				if_final,
+			</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="deviceId!=null">
+				#{deviceId},
+			</if>
+			<if test="callLogCount!=null">
+				#{callLogCount},
+			</if>
+			<if test="callRecordCount!=null">
+				#{callRecordCount},
+			</if>
+			<if test="recoAudioLength!=null">
+				#{recoAudioLength},
+			</if>
+			<if test="callDuration!=null">
+				#{callDuration},
+			</if>
+			<if test="recoFileSize!=null">
+				#{recoFileSize},
+			</if>
+			<if test="callAlreadyAcceptCount!=null">
+				#{callAlreadyAcceptCount},
+			</if>
+			<if test="callNoAccept!=null">
+				#{callNoAccept},
+			</if>
+			<if test="callRefuseAccept!=null">
+				#{callRefuseAccept},
+			</if>
+			<if test="callCallOut!=null">
+				#{callCallOut},
+			</if>
+			<if test="callNoAcceptLeave!=null">
+				#{callNoAcceptLeave},
+			</if>
+			<if test="createBy!=null">
+				#{createBy},
+			</if>
+			<if test="updateBy!=null">
+				#{updateBy},
+			</if>
+			<if test="status!=null">
+				#{status},
+			</if>
+			<if test="isFinal!=null">
+				#{isFinal},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="update" useGeneratedKeys="true" keyProperty="id">
+		update sys_device_total
+		<set>
+			<if test="deviceId!=null">
+				device_id=#{deviceId},
+			</if>
+			<if test="callLogCount!=null">
+				call_log_count=#{callLogCount},
+			</if>
+			<if test="callRecordCount!=null">
+				call_record_count=#{callRecordCount},
+			</if>
+			<if test="callDuration!=null">
+				call_duration=#{callDuration},
+			</if>
+			<if test="recoFileSize!=null">
+				reco_file_size=#{recoFileSize},
+			</if>
+			<if test="callAlreadyAcceptCount!=null">
+				call_already_accept_count=#{callAlreadyAcceptCount},
+			</if>
+			<if test="callNoAccept!=null">
+				call_no_accept=#{callNoAccept},
+			</if>
+			<if test="callRefuseAccept!=null">
+				call_refuse_accept=#{callRefuseAccept},
+			</if>
+			<if test="callCallOut!=null">
+				call_call_out=#{callCallOut},
+			</if>
+			<if test="callNoAcceptLeave!=null">
+				call_no_accept_leave=#{callNoAcceptLeave},
+			</if>
+			<if test="updateBy!=null">
+				update_by=#{updateBy},
+			</if>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="isFinal!=null">
+				is_final=#{isFinal},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="selectById" resultType="SysDeviceTotal">
+		SELECT * FROM sys_device_total WHERE id=#{id};
+	</select>
+	
+	<select id="selectByDeviceId" resultType="SysDeviceTotal">
+		SELECT * FROM sys_device_total WHERE device_id=#{deviceId} and status=1
+	</select>
+	
+	<!-- 查询今天的sysDeviceTotal记录  -->
+	<select id="selectByDevIdCreateTime" resultType="SysDeviceTotal">
+		SELECT * FROM sys_device_total WHERE device_id=#{deviceId}
+		AND DATE_FORMAT(sys_device_total.`create_time`,"%Y%m%d")=DATE_FORMAT(NOW(),"%Y%m%d")
+	</select>
+	
+	<!-- 查询指定日期的sysDeviceTotal记录  -->
+	<select id="selectByDevIdByCreateTime" resultType="SysDeviceTotal">
+		SELECT * FROM sys_device_total WHERE device_id=#{deviceId}
+		AND DATE_FORMAT(sys_device_total.`create_time`,"%Y%m%d")=DATE_FORMAT(#{createTime},"%Y%m%d")
+	</select>
+	
+	<resultMap type="com.hunt.model.dto.SysCallLogDeviceRecoDto" id="SysCallLogDeviceRecoDto">
+		<id column="call_id" property="callId"/>
+		<result column="org_name" property="orgName"/> 
+		<result column="org_id" property="orgId"/>
+		<result column="dev_serial" property="devSerial"/>
+		<result column="device_id" property="deviceId"/>
+		<!-- <result column="dev_rolg_id" property="devRolgId"/>
+		<result column="dev_rolg_id" property="devRolgId"/> -->
+		<result column="user_id" property="userId"/>
+		
+		<association property="sysDeviceRecord" javaType="com.hunt.model.dto.SysDeviceCallLogAndRecordDto">
+			<id column="id" property="id" jdbcType="BIGINT"/>
+			<result column="device_id" property="deviceId" jdbcType="BIGINT"/>
+			<result column="call_name" property="callName" jdbcType="VARCHAR"/>
+			<result column="call_type" property="callType" jdbcType="INTEGER"/>
+			<result column="call_duration" property="callDuration" jdbcType="VARCHAR"/>
+			<result column="call_number" property="callNumber" jdbcType="VARCHAR"/>
+			<result column="call_date" property="callDate" jdbcType="BIGINT"/>
+			<result column="call_subscription_id" property="callSubscriptionId" jdbcType="INTEGER"/>
+			<result column="call_has_record" property="callHasRecord" jdbcType="INTEGER"/>
+			<result column="call_record_ms" property="callRecordMs" jdbcType="INTEGER"/>
+			<result column="call_description" property="callDescription" jdbcType="VARCHAR"/>
+			<result column="call_address" property="callAddress" jdbcType="VARCHAR"/>
+			
+			<result column="call_out_phone" property="callOutPhone" jdbcType="VARCHAR"/>
+			<result column="call_in_phone" property="callInPhone" jdbcType="VARCHAR"/>
+			<result column="call_end_time" property="callEndTime" jdbcType="VARCHAR"/>
+			<result column="call_date" property="callDate" jdbcType="BIGINT"/>
+			<result column="call_duration" property="callDuration" jdbcType="BIGINT"/>
+			<result column="call_iscollect" property="callIsCollect" jdbcType="INTEGER"/>
+			<result column="call_other" property="callOther" jdbcType="VARCHAR"/>
+			<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+			<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+			<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+			<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+			<result column="status" property="status" jdbcType="INTEGER"/>
+			<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+			<result column="reco_audio_length" property="recoAudioLength"/>
+		</association>
+		
+	</resultMap>
+	
+	<!-- 查询通话记录  -->
+	<select id="selectCallLogByOrg" parameterType="java.util.Set" resultMap="SysCallLogDeviceRecoDto">
+		SELECT sys_device_calllog.`id` call_id, 
+		sys_organization.`name` org_name,
+		sys_organization.`id` org_id,
+		sys_device.`device_serial` dev_serial,
+		sys_device.`id` device_id,
+		sys_device_role_org.`sys_org_id` org_id,
+		sys_device_role_org.`sys_user_id` user_id,
+		sys_device_calllog.*,
+		sys_device_record.`reco_audio_length`
+		FROM sys_organization,sys_role_organization, sys_device,sys_device_role_org,sys_device_calllog
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id`
+		WHERE 
+		sys_role_organization.`sys_organization_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+	  		#{orgId}
+		</foreach>
+		
+		AND sys_organization.`id`=sys_role_organization.`sys_organization_id`
+		AND sys_role_organization.`id`=sys_device_role_org.`sys_role_org_id` AND sys_device_role_org.`status`=1 AND sys_device_role_org.`sys_device_id`=sys_device.`id`
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1 
+		ORDER BY
+		<choose>
+			 <when test="sort=='reco_audio_length'">
+			 	sys_device_record.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+			 </when>
+			 
+			<otherwise>
+				 sys_device_calllog.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+			</otherwise>		 
+		</choose>
+	</select>
+	<!-- 
+	(sys_device.`device_serial` LIKE concat('%',#{deviceSerial},'%')
+		OR sys_device_calllog.`call_name` LIKE concat('%',#{deviceSerial},'%'))
+	 -->
+	 
+	 <sql id="callIsHaveRecord">
+	 	<if test="callIsHaveRecord==1">
+		 	AND sys_device_calllog.`call_has_record`=1
+	 	</if>
+	 </sql>
+	 
+	 <sql id="searchTime">
+	 	AND sys_device_calllog.`call_date`&gt;=#{beginTime} AND sys_device_calllog.`call_date`&lt;=#{endTime}
+	 </sql>
+	 <sql id="searTotalTime">
+	 <!-- %h:%i:%s -->
+	 	AND DATE_FORMAT(sys_device_total.`create_time`,"%Y-%m-%d")&gt;=FROM_UNIXTIME(${beginTime/1000},"%Y-%m-%d") AND DATE_FORMAT(sys_device_total.`create_time`,"%Y-%m-%d")&lt;=FROM_UNIXTIME(${endTime/1000},"%Y-%m-%d")
+	 	<!-- AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000 -->
+	 </sql>
+	    
+	 
+	<!--按设备序列号查找  -->
+	<select id="selectSearDevserCallLogByOrg" parameterType="java.util.Set" resultMap="SysCallLogDeviceRecoDto"> 
+		SELECT sys_device_calllog.`id` call_id, 
+		sys_organization.`name` org_name,
+		sys_organization.`id` org_id,
+		sys_device.`device_serial` dev_serial,
+		sys_device.`id` device_id,
+		sys_device_role_org.`sys_org_id` org_id,
+		sys_device_role_org.`sys_user_id` user_id,
+		sys_device_calllog.*,
+		sys_device_record.`reco_audio_length`
+		FROM sys_organization,sys_device,sys_device_role_org,sys_device_calllog
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id`
+		WHERE 
+		sys_device_role_org.`sys_org_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+	  		#{orgId}
+		</foreach>
+		AND sys_organization.`id`=sys_device_role_org.`sys_org_id`
+		AND sys_device_role_org.`status`=1 AND sys_device_role_org.`sys_device_id`=sys_device.`id`
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1 AND sys_device_role_org.`status`=1
+		AND sys_device.`device_serial` LIKE concat('%',#{deviceSerial},'%')
+		<include refid="callIsHaveRecord"></include>
+		<include refid="searchTime"></include>
+		<!-- <choose>
+			<when test="sTimeType==1 or sTimeType==2 or sTimeType==3">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000
+			</when>
+			<when test="sTimeType==4 or sTimeType==5 or sTimeType==6">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} MONTH))*1000
+			</when>
+			<when test="sTimeType==7">今年内 
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000
+			</when>
+			<when test="sTimeType==8">一年前之内 
+				AND (sys_device_calllog.`call_date`>=UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")-1),'-01-01'))*1000 AND sys_device_calllog.`call_date`&lt;UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000)
+			</when>
+		</choose> -->
+		ORDER BY
+		<choose>
+		 <when test="sort=='reco_audio_length'">
+		 	sys_device_record.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+		 </when>
+		 
+		<otherwise>
+			 sys_device_calllog.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+		</otherwise>		 
+		</choose>
+	
+	</select>
+	
+	<!-- 按联系人名称搜索 -->
+	<select id="selectSearCallNameCallLogByOrg" parameterType="java.util.Set" resultMap="SysCallLogDeviceRecoDto"> 
+		SELECT sys_device_calllog.`id` call_id, 
+		sys_organization.`name` org_name,
+		sys_organization.`id` org_id,
+		sys_device.`device_serial` dev_serial,
+		sys_device.`id` device_id,
+		sys_device_role_org.`sys_org_id` org_id,
+		sys_device_role_org.`sys_user_id` user_id,
+		sys_device_calllog.*,
+		sys_device_record.`reco_audio_length`
+		FROM sys_organization,sys_device,sys_device_role_org,sys_device_calllog
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id`
+		WHERE 
+		sys_device_role_org.`sys_org_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+	  		#{orgId}
+		</foreach>
+		AND sys_organization.`id`=sys_device_role_org.`sys_org_id`
+		AND sys_device_role_org.`status`=1 AND sys_device_role_org.`sys_device_id`=sys_device.`id`
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1 AND sys_device_role_org.`status`=1
+		AND sys_device_calllog.`call_name` LIKE concat('%',#{callName},'%')
+		<include refid="callIsHaveRecord"></include>
+		<include refid="searchTime"></include>
+		<!-- <choose>
+			<when test="sTimeType==1 or sTimeType==2 or sTimeType==3">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000
+			</when>
+			<when test="sTimeType==4 or sTimeType==5 or sTimeType==6">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} MONTH))*1000
+			</when>
+			<when test="sTimeType==7">今年内 
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000
+			</when>
+			<when test="sTimeType==8">一年前之内 
+				AND (sys_device_calllog.`call_date`>=UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")-1),'-01-01'))*1000 AND sys_device_calllog.`call_date`&lt;UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000)
+			</when>
+		
+		</choose> -->
+		ORDER BY
+		<choose>
+		 <when test="sort=='reco_audio_length'">
+		 	sys_device_record.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+		 </when>
+		 
+		<otherwise>
+			 sys_device_calllog.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+		</otherwise>		 
+		</choose>
+	
+	</select>
+	
+	
+	<!--按通话号码查找  -->
+	<select id="selectSearCallNumCallLogByOrg" parameterType="java.util.Set" resultMap="SysCallLogDeviceRecoDto"> 
+		SELECT sys_device_calllog.`id` call_id, 
+		sys_organization.`name` org_name,
+		sys_organization.`id` org_id,
+		sys_device.`device_serial` dev_serial,
+		sys_device.`id` device_id,
+		sys_device_role_org.`sys_org_id` org_id,
+		sys_device_role_org.`sys_user_id` user_id,
+		sys_device_calllog.*,
+		sys_device_record.`reco_audio_length`
+		FROM sys_organization,sys_device,sys_device_role_org,sys_device_calllog
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id`
+		WHERE 
+		sys_device_role_org.`sys_org_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+	  		#{orgId}
+		</foreach>
+		AND sys_organization.`id`=sys_device_role_org.`sys_org_id`
+		AND sys_device_role_org.`status`=1 AND sys_device_role_org.`sys_device_id`=sys_device.`id` 
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1 AND sys_device_role_org.`status`=1
+		AND sys_device_calllog.`call_number` LIKE concat('%',#{callNumber},'%')
+		<include refid="callIsHaveRecord"></include>
+		<include refid="searchTime"></include>
+		ORDER BY
+		<choose>
+		 <when test="sort=='reco_audio_length'">
+		 	sys_device_record.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+		 </when>
+		 
+		<otherwise>
+			 sys_device_calllog.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+		</otherwise>		 
+		</choose>
+	
+	</select>
+	
+	
+	<select id="selectSearCallDateCallLogByOrg" parameterType="java.util.Set" resultMap="SysCallLogDeviceRecoDto">
+	SELECT sys_device_calllog.`id` call_id, 
+		sys_organization.`name` org_name,
+		sys_organization.`id` org_id,
+		sys_device.`device_serial` dev_serial,
+		sys_device.`id` device_id,
+		sys_device_role_org.`sys_org_id` org_id,
+		sys_device_role_org.`sys_user_id` user_id,
+		sys_device_calllog.*,
+		sys_device_record.`reco_audio_length`
+		FROM sys_organization,sys_device,sys_device_role_org,sys_device_calllog
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id`
+		WHERE 
+		sys_device_role_org.`sys_org_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+	  		#{orgId}
+		</foreach>
+		AND sys_organization.`id`=sys_device_role_org.`sys_org_id`
+		<!-- AND sys_organization.`id`=sys_role_organization.`sys_organization_id`
+		AND sys_role_organization.`id`=sys_device_role_org.`sys_role_org_id` -->
+		AND sys_device_role_org.`status`=1 AND sys_device_role_org.`sys_device_id`=sys_device.`id` 
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1 AND sys_device_role_org.`status`=1
+		<include refid="callIsHaveRecord"></include>
+		<include refid="searchTime"></include>
+		<!-- <choose>
+			<when test="sTimeType==1 or sTimeType==2 or sTimeType==3">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000
+			</when>
+			<when test="sTimeType==4 or sTimeType==5 or sTimeType==6">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} MONTH))*1000
+			</when>
+			<when test="sTimeType==7">今年内 
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000
+			</when>
+			<when test="sTimeType==8">一年前之内 
+				AND (sys_device_calllog.`call_date`>=UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")-1),'-01-01'))*1000 AND sys_device_calllog.`call_date`&lt;UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000)
+			</when>
+		</choose> -->
+		ORDER BY
+		<choose>
+		 <when test="sort=='reco_audio_length'">
+		 	sys_device_record.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+		 </when>
+		 
+		<otherwise>
+			 sys_device_calllog.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+		</otherwise>		 
+		</choose>
+	</select>
+	
+	
+	
+	
+	<!-- 查询该机构下的所有通话记录数量  -->
+	<select id="selectCallCount" parameterType="java.util.Set" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM sys_organization,sys_role_organization, sys_device,sys_device_role_org,sys_device_calllog
+		WHERE 
+		sys_role_organization.`sys_organization_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+		  		#{orgId}
+		</foreach>
+		AND sys_organization.`id`=sys_role_organization.`sys_organization_id`
+		AND sys_role_organization.`id`=sys_device_role_org.`sys_role_org_id` AND sys_device_role_org.`status`=1 AND sys_device_role_org.`sys_device_id`=sys_device.`id`
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1 
+		
+	</select>
+	<!-- 查询该用户所有通话记录 -->
+	<select id="selectSearCallCount" parameterType="java.util.Set" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM 
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			sys_device,
+		</if>
+		sys_device_role_org,sys_device_calllog
+		WHERE 
+		sys_device_role_org.`sys_org_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+		  		#{orgId}
+		</foreach>
+		<!--AND sys_organization.`id`=sys_role_organization.`sys_organization_id`
+		 AND sys_role_organization.`id`=sys_device_role_org.`sys_role_org_id` AND sys_device_role_org.`status`=1 AND sys_device_role_org.`sys_device_id`=sys_device.`id` -->
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1 AND sys_device_role_org.`status`=1
+		<if test="callNumber!=null and callNumber.length()!=0">
+			AND sys_device_calllog.`call_number` LIKE concat('%',#{callNumber},'%')
+		</if>
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			AND sys_device.`device_serial` LIKE concat('%',#{deviceSerial},'%')
+		</if>
+		<if test="callName!=null and callName.length()!=0">
+			<!-- AND sys_device_calllog.`device_id`=sys_device_total.`device_id` -->
+			AND sys_device_calllog.`call_name` LIKE concat('%',#{callName},'%')
+		</if>
+		<include refid="callIsHaveRecord"></include> 
+		<include refid="searchTime"></include>
+	<!-- 	<choose>
+			<when test="sTimeType==1 or sTimeType==2 or sTimeType==3">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000
+			</when>
+			<when test="sTimeType==4 or sTimeType==5 or sTimeType==6">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} MONTH))*1000
+			</when>
+			<when test="sTimeType==7">今年内 
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000
+			</when>
+			<when test="sTimeType==8">一年前之内 
+				AND (sys_device_calllog.`call_date`>=UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")-1),'-01-01'))*1000 AND sys_device_calllog.`call_date`&lt;UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000)
+			</when>
+		</choose> -->
+	</select>
+	
+	<!-- 查看该用户的所有通话记录 -->	
+	<select id="selectCountByUserId" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM sys_device_calllog 
+		WHERE sys_device_calllog.`device_id` IN(
+		SELECT sys_device_role_org.`sys_device_id` 
+		FROM sys_device_role_org 
+		WHERE sys_device_role_org.`sys_user_id`=#{userId}
+		AND sys_device_role_org.`status`=1) 
+		AND sys_device_calllog.`status`=1;
+	</select>
+	
+	<!-- 查看该用户的所有通话记录 -->	
+	<select id="selectSearCountByUserId" resultType="java.lang.Long">
+		SELECT COUNT(*)
+		FROM sys_device_calllog 
+		WHERE sys_device_calllog.`device_id` IN(
+		SELECT sys_device_role_org.`sys_device_id` 
+		FROM sys_device_role_org 
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			,sys_device
+		</if>
+		WHERE sys_device_role_org.`sys_user_id`=#{userId}
+		AND sys_device_role_org.`status`=1
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			AND sys_device.`id`=sys_device_calllog.`device_id`
+			AND sys_device.`device_serial` LIKE concat('%',#{deviceSerial},'%')
+		</if>
+		) 
+		AND sys_device_calllog.`status`=1
+		<if test="callNumber!=null and callNumber.length()!=0">
+			<!-- AND sys_device_calllog.`device_id`=sys_device_calllog.`device_id` -->
+			AND sys_device_calllog.`call_number` LIKE concat('%',#{callNumber},'%')
+		</if>
+		<if test="callName!=null and callName.length()!=0">
+			<!-- AND sys_device_calllog.`device_id`=sys_device_total.`device_id` -->
+			AND sys_device_calllog.`call_name` LIKE concat('%',#{callName},'%')
+		</if>
+		<include refid="callIsHaveRecord"></include> 
+		<include refid="searchTime"></include>
+		<!-- <choose>
+			<when test="sTimeType==1 or sTimeType==2 or sTimeType==3">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000
+			</when>
+			<when test="sTimeType==4 or sTimeType==5 or sTimeType==6">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} MONTH))*1000
+			</when>
+			<when test="sTimeType==7">今年内 
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000
+			</when>
+			<when test="sTimeType==8">一年前之内 
+				AND (sys_device_calllog.`call_date`>=UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")-1),'-01-01'))*1000 AND sys_device_calllog.`call_date`&lt;UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000)
+			</when>
+		</choose> -->
+	</select>
+	
+	
+	<!--查询设备统计  -->
+	<select id="selectTotalByOrg" resultType="SysDeviceTotal">
+		SELECT sys_device_total.* FROM sys_role_organization,sys_device_role_org,sys_device_total
+		WHERE sys_role_organization.`sys_organization_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+	  		#{orgId}
+		</foreach>
+		AND sys_role_organization.`id`=sys_device_role_org.`sys_role_org_id` 
+		AND sys_role_organization.`status`=1 
+		AND sys_device_role_org.`status`=1
+		AND sys_device_role_org.`sys_device_id`=sys_device_total.`device_id`
+	</select>
+	
+	<!--查询设备统计  -->
+	<select id="selectSearTotalByOrg" resultType="SysDeviceTotal">
+		SELECT distinct sys_device_total.* FROM sys_device_role_org,sys_device_total
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			,sys_device
+		</if>
+		<if test="callNumber!=null and callNumber.length()!=0">
+			,sys_device_calllog
+		</if>
+		<if test="callName!=null and callName.length()!=0">
+			,sys_device_calllog
+		</if>
+		WHERE sys_device_role_org.`sys_org_id` IN
+		<foreach collection="set" item="orgId" index="index" open="(" close=")" separator=",">
+	  		#{orgId}
+		</foreach>
+		<!-- AND sys_role_organization.`id`=sys_device_role_org.`sys_role_org_id`  
+		AND sys_role_organization.`status`=1 -->
+		AND sys_device_role_org.`status`=1
+		AND sys_device_role_org.`sys_device_id`=sys_device_total.`device_id`
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			AND sys_device.`id`=sys_device_total.`device_id`
+			AND sys_device.`device_serial` LIKE concat('%',#{deviceSerial},'%')
+		</if>
+		<if test="callNumber!=null and callNumber.length()!=0">
+			AND sys_device_calllog.`device_id`=sys_device_total.`device_id`
+			AND sys_device_calllog.`call_number` LIKE concat('%',#{callNumber},'%')
+		</if>
+		<if test="callName!=null and callName.length()!=0">
+			AND sys_device_calllog.`device_id`=sys_device_total.`device_id`
+			AND sys_device_calllog.`call_name` LIKE concat('%',#{callName},'%')
+		</if>
+		<include refid="searTotalTime"></include>
+		<!-- <choose>
+			<when test="sTimeType==1 or sTimeType==2 or sTimeType==3">
+				AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000
+			</when>
+			<when test="sTimeType==4 or sTimeType==5 or sTimeType==6">
+				AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} MONTH))*1000
+			</when>
+			<when test="sTimeType==7">今年内 
+				AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000
+			</when>
+			<when test="sTimeType==8">一年前之内 
+				AND (UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>=UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")-1),'-01-01'))*1000 AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000&lt;UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000)
+			</when>
+		
+		</choose> -->
+	</select>
+	
+	
+	
+	<!-- 根据用户id查询通话记录  -->
+	<select id="selectCallLogByUser" resultMap="SysCallLogDeviceRecoDto"> 
+		SELECT sys_device_calllog.`id` call_id,
+		sys_device.`id` device_id,
+		sys_device.`device_serial` dev_serial,
+		sys_device_role_org.`sys_org_id` org_id,
+		sys_device_role_org.`sys_user_id` user_id,
+		sys_device_calllog.*,
+		sys_device_record.`reco_audio_length` FROM sys_device_role_org,sys_device,sys_device_calllog 
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` AND sys_device_record.`status`=1
+		WHERE sys_device_role_org.`sys_user_id`=#{userId}
+		AND sys_device_role_org.`sys_device_id`=sys_device.`id` AND sys_device_role_org.`status`=1
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1
+		<choose>
+			 <when test="sort=='reco_audio_length'">
+			 	sys_device_record.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+			 </when>
+			 
+			<otherwise>
+				 sys_device_calllog.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 搜索用户通话记录，通话号码，设备序列号，时间范围  -->
+	<select id="selectSearCallLogByUser" resultMap="SysCallLogDeviceRecoDto"> 
+		SELECT sys_device_calllog.`id` call_id,
+		sys_device.`id` device_id,
+		sys_device.`device_serial` dev_serial,
+		sys_device_role_org.`sys_org_id` org_id,
+		sys_device_role_org.`sys_user_id` user_id,
+		sys_device_calllog.*,
+		sys_device_record.`reco_audio_length` FROM sys_device_role_org,sys_device,sys_device_calllog 
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` AND sys_device_record.`status`=1
+		WHERE sys_device_role_org.`sys_user_id`=#{userId}
+		AND sys_device_role_org.`sys_device_id`=sys_device.`id` AND sys_device_role_org.`status`=1
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1
+		<if test="callNumber!=null and callNumber.length()!=0">
+			AND sys_device_calllog.`call_number` LIKE concat('%',#{callNumber},'%')
+		</if>
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			AND sys_device.`device_serial` LIKE concat('%',#{deviceSerial},'%')
+		</if>
+		<if test="callName!=null and callName.length()!=0">
+			AND sys_device_calllog.`call_name` LIKE concat('%',#{callName},'%')
+		</if>
+		<include refid="callIsHaveRecord"></include>
+		<include refid="searchTime"></include>
+		<!-- <choose>
+			<when test="sTimeType==1 or sTimeType==2 or sTimeType==3">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000
+			</when>
+			<when test="sTimeType==4 or sTimeType==5 or sTimeType==6">
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} MONTH))*1000
+			</when>
+			<when test="sTimeType==7">今年内 
+				AND sys_device_calllog.`call_date`>UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000
+			</when>
+			<when test="sTimeType==8">一年前之内 
+				AND (sys_device_calllog.`call_date`>=UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")-1),'-01-01'))*1000 AND sys_device_calllog.`call_date`&lt;UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000)
+			</when>
+		</choose>  -->
+		ORDER BY
+		<choose>
+			 <when test="sort=='reco_audio_length'">
+			 	sys_device_record.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+			 </when>
+			 
+			<otherwise>
+				 sys_device_calllog.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+			</otherwise>
+		</choose>
+	</select>
+	
+	
+	<!-- 搜索用户通话记录，通话号码，设备序列号，时间范围  -->
+	<select id="selectSearCallLogByUserSet" resultMap="SysCallLogDeviceRecoDto"> 
+		SELECT sys_device_calllog.`id` call_id,
+		sys_device.`id` device_id,
+		sys_device.`device_serial` dev_serial,
+		sys_device_role_org.`sys_org_id` org_id,
+		sys_device_role_org.`sys_user_id` user_id,
+		sys_device_calllog.*,
+		sys_device_record.`reco_audio_length` FROM sys_device_role_org,sys_device,sys_device_calllog 
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` AND sys_device_record.`status`=1
+		WHERE sys_device_role_org.`sys_user_id` IN
+		<foreach collection="userSetId" item="userId" index="index" open="(" close=")" separator=",">
+	  		#{userId}
+		</foreach>
+		AND sys_device_role_org.`sys_device_id`=sys_device.`id` AND sys_device_role_org.`status`=1
+		AND sys_device_calllog.`device_id`=sys_device_role_org.`sys_device_id` AND sys_device_calllog.`status`=1
+		<if test="callNumber!=null and callNumber.length()!=0">
+			AND sys_device_calllog.`call_number` LIKE concat('%',#{callNumber},'%')
+		</if>
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			AND sys_device.`device_serial` LIKE concat('%',#{deviceSerial},'%')
+		</if>
+		<if test="callName!=null and callName.length()!=0">
+			AND sys_device_calllog.`call_name` LIKE concat('%',#{callName},'%')
+		</if>
+		<include refid="callIsHaveRecord"></include>
+		<include refid="searchTime"></include>
+		ORDER BY
+		<choose>
+			 <when test="sort=='reco_audio_length'">
+			 	sys_device_record.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+			 </when>
+			 
+			<otherwise>
+				 sys_device_calllog.`${sort}` ${order} limit ${(page-1)*rows},${rows}
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 查询该用户所在的机构  -->
+	<select id="selectRogIdByRoleOrgId" resultMap="SysCallLogDeviceRecoDto">
+		SELECT
+		sys_organization.`id` org_id,
+		sys_organization.`name` org_name
+		FROM sys_organization 
+		WHERE sys_organization.`id` =(
+		SELECT sys_role_organization.`sys_organization_id` 
+		FROM sys_role_organization 
+		WHERE sys_role_organization.`id`=#{roleOrgId}
+		AND sys_role_organization.`status`=1) AND sys_organization.`status`=1
+	</select>
+	
+	<select id="selectTotalByUserId" resultType="SysDeviceTotal">
+		SELECT sys_device_total.* FROM sys_device_total 
+		WHERE sys_device_total.`device_id` IN(
+		SELECT sys_device_role_org.`sys_device_id` 
+		FROM sys_device_role_org 
+		WHERE sys_device_role_org.`sys_user_id`=#{userId})
+	</select>
+	
+	<select id="selectSerTotalByUserId" resultType="SysDeviceTotal">
+		SELECT sys_device_total.* FROM sys_device_total 
+		WHERE sys_device_total.`device_id` IN(
+		SELECT sys_device_role_org.`sys_device_id` 
+		FROM sys_device_role_org 
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			,sys_device
+		</if>
+		<if test="callNumber!=null and callNumber.length()!=0">
+			,sys_device_calllog
+		</if>
+		<if test="callName!=null and callName.length()!=0">
+			,sys_device_calllog
+		</if>
+		WHERE sys_device_role_org.`sys_user_id`=#{userId}
+		<if test="deviceSerial!=null and deviceSerial.length()!=0">
+			AND sys_device.`id`=sys_device_total.`device_id`
+			AND sys_device.`device_serial` LIKE concat('%',#{deviceSerial},'%')
+		</if>
+		<if test="callNumber!=null and callNumber.length()!=0">
+			AND sys_device_calllog.`device_id`=sys_device_total.`device_id`
+			AND sys_device_calllog.`call_number` LIKE concat('%',#{callNumber},'%')
+		</if>
+		<if test="callName!=null and callName.length()!=0">
+			AND sys_device_calllog.`device_id`=sys_device_total.`device_id`
+			AND sys_device_calllog.`call_name` LIKE concat('%',#{callName},'%')
+		</if>
+		)
+		<include refid="searTotalTime"></include>
+		<!-- <choose>
+			<when test="sTimeType==1 or sTimeType==2 or sTimeType==3">
+				AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} DAY))*1000
+			</when>
+			<when test="sTimeType==4 or sTimeType==5 or sTimeType==6">
+				AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>UNIX_TIMESTAMP(DATE_SUB(NOW(),INTERVAL #{callDate} MONTH))*1000
+			</when>
+			<when test="sTimeType==7">今年内 
+				AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000
+			</when>
+			<when test="sTimeType==8">一年前之内 
+				AND (UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000>=UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")-1),'-01-01'))*1000 AND UNIX_TIMESTAMP(sys_device_total.`create_time`)*1000&lt;UNIX_TIMESTAMP(CONCAT((SELECT DATE_FORMAT(NOW(),"%Y")),'-01-01'))*1000)
+			</when>
+		
+		</choose> -->
+	</select>
+	
+
+
+
+
+</mapper>

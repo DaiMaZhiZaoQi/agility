@@ -1,0 +1,164 @@
+@charset "UTF-8";
+
+
+
+.container {
+    height: 45px;
+    width: 300px;
+    margin-top: 10px ;
+}
+
+
+/* 自适应 */
+.tdAuto{
+	white-space: nowrap;
+}
+/* 搜索框  */
+.search {
+    width: 250px;
+    height: 45px;
+    border-radius: 18px;
+    outline: none;
+    font-size:18px;
+    border: 1px solid #888787;
+    padding-left: 20px;
+    background: url("../image/nsearch.png") no-repeat;
+    background-size:25px;
+     background-position: 230px;
+	
+    /* position: absolute; */
+}
+
+/* 全部设备 */
+.alldevice{
+	margin-left:20px;
+	height:45px;
+	width:90px;
+	color:white;
+	font-size:19px;
+	border-radius:5px;
+	box-shadow:none;
+	background: #6dcdf3;
+	border-color: transparent;
+	
+}
+
+.titleChild{
+	color: #8A8A8A;
+    font-size: 19px;
+}
+#btn_green_alldevice{
+	margin-left:20px;
+	height:45px;
+	width:90px;
+	color:white;
+	font-size:18px;
+	border-radius:5px;
+	box-shadow:none;
+	background: #5abb71;
+	border-color: transparent;
+	
+}
+.tree-checkbox{
+	
+}
+.panel-title {
+    height: 30px;
+    line-height: 30px;
+    font-size: 18px;
+}
+.btn-green-allDevice{
+	    margin-left: 20px;
+    height: 45px;
+    width: 90px;
+    color: white;
+    font-size: 18px;
+    border-radius: 5px;
+    box-shadow: none;
+    background: #5abb71;
+    border-color: transparent;
+}
+
+#btn_red_alldevice{
+	margin-left:20px;
+	height:45px;
+	width:90px;
+	color:white;
+	font-size:18px;
+	border-radius:5px;
+	box-shadow:none;
+	background: #d75b5b;
+	border-color: transparent;
+	
+}
+
+.btn-red-allDevice{
+	margin-left:20px;
+	height:45px;
+	width:90px;
+	color:white;
+	font-size:18px;
+	border-radius:5px;
+	box-shadow:none;
+	background: #d75b5b;
+	border-color: transparent;
+}
+
+
+
+
+.btn_blue_alldevice{
+	margin-left:20px;
+	height:45px;
+	width:90px;
+	color:white;
+	font-size:18px;
+	border-radius:5px;
+	box-shadow:none;
+	background: #6dcdf3;
+	border-color: transparent;
+}
+.pageDisplay{
+	font-size: 20px;
+}
+.pageOption{
+	color: #007ad5;
+	font-size: 24px;
+}
+
+.horLine{
+	height:0.05px;
+	background-color:#CCCCCC; 
+	margin-right: 30px;
+}
+	
+	.panel-body{
+		font-size:18px;
+	}
+/* .btn {
+    height: 30px;
+    width: 30px;
+    
+    border: none;
+    outline: none;
+    cursor: pointer;
+    
+} */
+
+
+/* @media (min-width: 1300px){.mediaContainer {width:1274px;margin: 0px auto;}}
+
+@media (min-width: 1200px){.mediaContainer {width: 1170px;margin: 0px auto;}}
+@media (min-width:992px){
+	.mediaContainer {
+		width:970px;
+		margin: 0px auto;
+	}
+}
+@media (min-width:768px){
+	.mediaContainer {
+		width:750px;
+		margin: 0px auto;
+	}
+} */
+

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+	.optionHead{
+	    background-color: #007ad5;
+	    padding-top: 10px;
+	    padding-bottom: 10px;
+	    text-align: center;
+	}
+	.spanText{
+	    padding: 10px;
+	    font-size: 18px;
+	    color: white;
+	}
+/* 	.tdpd{
+		white-space: nowrap;
+		padding: 0px 10px 0px 10px;
+	} */
+	
+	#tabFile input[type=checkbox]{
+		width:30px;
+		height:30px;
+		/* background: url("static/css/home/image/gou.png") no-repeat; */
+		
+	}
+	#userOrg input[type=checkbox]{
+		width:30px;
+		height:30px;
+		/* background: url("static/css/home/image/gou.png") no-repeat; */
+		
+	}
+	.thWidth th{width:100%;}
+	
+</style>
+<script type="text/javascript" src="static/css/home/js/contactUpFile.js"></script>
+<!-- <link rel="import" href="contactHead.html" id="head"> -->
+
+</head>
+<body >
+
+	<div id="contactHead">
+		
+	</div>
+	<div id="contactContent" style="width: 55%;margin-top: 5px;margin: 0px auto;text-align: center;" class="clearfix">
+ 		<!-- <input id="contactFile" type="file"  style="width:400px;height: 50px;display:block;text-align: center;"> -->
+ 		<table >
+	 		<tr >
+		 		<td style="padding-right: 20px;font-size: 19px;">
+		 			通讯录发布
+		 		</td> 
+		 		<td align="center" style="position: relative;display: block;">
+			 		<!-- <input class="easyui-filebox" style="width:320px;height: 50px;" id="fb"> -->
+			 		<input type="file" onchange="contact.getFilePath()" name="file"  style="width:320px; display:none; height: 50px;border: 0.5px solid #cccccc;background-color: rgba(0,0,0,0)">
+			 		<input type="text" id="clickFile" style="width: 500px;height: 45px;border: 0.5px solid #6f6f6f;text-align:right;font-size: 22px;color: black;padding-right: 15px;">
+			 		<button id="btnClick" style="font-size: 18px;position: absolute;top: 10px;left: 15px;">选择文件</button>
+		 			  <!-- <input id="fb" type="text" style="width:320px;height: 50px;"> -->
+		 		</td>
+		 		<td>
+	 				<!-- <img src="static/css/home/image/loadinfo.gif" id="loading_img" style="margin-left: 20px;"> -->
+	 			</td>
+		 		<!-- <td style="padding-left: 10px;"><button id="btn_confirm_up" class="btn-green-allDevice" style="font-size: 22px;">激活</button></td> -->
+		 		
+	 		</tr>
+	 		
+	 		<tr>
+	 			<td style="padding-right: 20px;font-size: 22px;">
+							 				
+	 			</td>
+	 			<td>
+	 				<input type="text" placeholder="请输入同步密码(字母/数字)" id="inputSychPwd" style="width: 495px;padding-left:10px; height: 40px;border: 0.5px solid #6f6f6f;font-size: 18px;color: black;padding-right: 15px;">
+	 			</td>
+	 		</tr>
+	 		<tr>
+	 			<td style="padding-right: 20px;font-size: 22px;">
+							 				
+	 			</td>
+	 			<td>
+	 				<input type="text" placeholder="请再次输入同步密码(字母/数字)" id="conSychPwd" style="width: 495px;padding-left:10px; height: 40px;border: 0.5px solid #6f6f6f;font-size: 18px;color: black;padding-right: 15px;">
+	 			</td>
+	 			<td style="padding-left: 10px;">
+	 				<button id="btn_confirm_up" class="btn-green-allDevice" style="font-size: 18px;">发布</button>
+	 			</td>
+	 		</tr>
+ 		 <!-- html 使用方式见device.jsp -->
+         
+        
+        
+ 		<!-- <tr style="height: 70px;">
+ 			<td></td>
+ 			<td align="left">
+ 				<button style="font-size: 22px;">导入</button>
+ 			</td>
+ 		</tr> -->
+ 		</table>
+ 		
+	</div>
+	<div style="display: block; margin-top: 10px; " class="clearfix" id="contactAllTable">
+	        <div style="width: 50%;height: auto;    margin: 0px auto;">
+		       	 <div class="optionHead" style="text-align: left;">
+	        		<span class="spanText">通讯录文件</span>
+	        	</div>
+	        	<table id="tabFile" class="deviceCallLog" 
+	        	style="
+	        	 border:0;
+	        	 height:380px;
+	        	 width: 100%;
+                overflow-y: scroll;
+                display: inherit;
+                overflow-x: scroll;
+	        	 width:100%;background-color: #ffffff;">
+	        		<thead>
+	        			<tr style="background-color: #f3f3f3;" class="thWidth"">
+	        				<th style="width:40px;">序号</th>
+	        				<th>组织名</th>
+	        				<th>文件名</th>
+	        				<th>版本号</th>
+	        				<th>作者</th>
+	        				<th>选择</th>
+	        			</tr>
+	        		</thead>
+	        	</table>
+	        	<div style="text-align: center;margin-top: 10px">
+		        	<button class="btn-red-allDevice" id="btn_down_delete"  style="font-size: 18px;">删除</button>
+		        	<button class="btn_blue_alldevice" id="btn_down_file"  style="font-size: 18px;">下载</button>
+	        	</div>
+	        </div>
+	        <div style="text-align: center;"> 
+	        	<img alt="通讯录关联" src="static/css/home/image/downpo.png" style="height: 80px;width: 80px;">
+	        </div>
+	        <div style="width: 50%;height: auto;margin-left: 10px;margin: 0px auto; margin-top: 10px" id="authManage">
+	        	<div class="optionHead" style="position: relative;">
+	        		<span class="spanText" id="auth">通讯录已授权</span>
+	        		<span class="spanText" id="noAuth">通讯录未授权</span>
+		        	<span id="upOrg" style="
+		        	position: absolute;
+		        	float:right;
+		        	padding:10px; 
+		        	right:1px;
+		        	top:0px;
+		        	color:#ffffff; 
+		        	display: block;
+		        	">显示上级</span>
+	        	</div>
+	        	<div>
+	        	  	<div  style="float:left;width:100%;height: 380px;">
+						<table id="userOrg" class="deviceCallLog" style="
+		        	 		border:0;
+		        	 		height: 100%;
+		        	 		display:inherit;
+		        	 		overflow-y: scroll;
+		        	 		overflow-x: scroll;
+		        	 		width: 100%;
+		        	 		background-color: #ffffff;
+		        	 		">
+					 	<thead>
+					 		<tr style="background-color: #f3f3f3;" class="thWidth">
+					 			<th style="width:40px;">序号</th>
+					 			<th>所属机构</th>
+					 			<th>用户</th>
+					 			<th>昵称</th>
+					 			<th>选择</th>
+					 		</tr>
+					 	</thead>
+					 	
+					 </table>
+						<div style="text-align: center;margin-top: 10px;margin-bottom: 20px;">
+				        	<button class="btn-red-allDevice" id="person" style="width: 150px;font-size: 18px;">解除授权</button>
+				        	<button class="btn_blue_alldevice" id="partment"  style="width: 150px;font-size: 18px;">部门解除授权</button>
+			        	</div>
+					</div>
+	        	</div>
+	        </div>
+	        
+	        
+	        
+ 	</div>
+
+</body>
+</html>

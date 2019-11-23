@@ -1,0 +1,49 @@
+ .h1, .h2, .h3, .h4, .h5, .h6, a, abbr, body, cite, dd, dl, dt, h1, h2, h3, h4, h5, h6, iframe, input, li, object, ol, p, pre, span, ul {
+    font-family: "Microsoft YaHei","SF Pro Display",Roboto,Noto,Arial,"PingFang SC",sans-serif;
+}
+body .easyui-layout .layout .panel-noscroll{
+	margin-left: 20px;
+    margin-right: 20px;
+ 	}
+#logout-btn {
+    height: 40px;
+    width: 60px;
+    background: #1489c2;
+    border: 0px;
+    color: #ffffff;
+    font-weight: bolder;
+    margin-right: 10px;
+}
+
+#logout-btn:hover {
+    background: #c27c4e;
+}
+
+.easyui-linkbutton :hover {
+    color: #5a60c2;
+}
+
+.easyui-accordion .easyui-linkbutton {
+   background: transparent;
+       
+}
+.easyui-accordion .nav-list{
+	margin: 5px 0px 5px 0px;
+}
+.easyui-accordion .l-btn-left{
+	width: 135px;
+	height: 35px;
+}
+.easyui-accordion .panel-body{
+	background-color: #288bde;
+}
+.easyui-accordion .l-btn-text{
+	color: white;
+	font-size: 18px;
+	margin-top: 5px;
+}
+.nav-list {
+    width: 100px;
+}
+
+

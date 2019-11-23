@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunt.dao.SysDeviceRoleOrgMapper">
+ 		<resultMap id="baseResultMap" type="com.hunt.model.entity.SysDeviceRoleOrg">
+ 			<result column="id" property="id" jdbcType="BIGINT"/>
+ 			<!-- <result column="sys_role_org_id" property="sysRoleOrgId" jdbcType="BIGINT"/> -->
+ 			<result column="sys_org_id" property="sysOrgId" jdbcType="BIGINT"/> 
+ 			<result column="sys_device_id" property="sysDeviceId" jdbcType="BIGINT"/>
+ 			<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+ 			<result column="rank" property="rank" jdbcType="BIGINT"/>
+ 			<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+ 			<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+ 			<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+ 			<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+ 			<result column="status" property="status" jdbcType="INTEGER"/>
+ 		</resultMap>
+ 		
+ 		<insert id="insert" parameterType="SysDeviceRoleOrg" useGeneratedKeys="true" keyProperty="id" >
+ 			insert into sys_device_role_org
+ 			<trim prefix="(" suffix=")" suffixOverrides=",">
+ 				<!-- <if test="sysRoleOrgId!=null">
+ 					sys_role_org_id,
+ 				</if> -->
+ 				<if test="sysOrgId!=null">
+ 					sys_org_id,
+ 				</if>
+ 				<if test="sysDeviceId!=null">
+ 					sys_device_id,
+ 				</if>
+ 				<if test="sysUserId!=null">
+ 					sys_user_id,
+ 				</if>
+ 				<if test="isFinal!=null">
+ 					is_final,
+ 				</if>
+ 				<if test="rank!=null">
+ 					rank,
+ 				</if>
+ 				<if test="createBy!=null">
+ 					create_by,
+ 				</if>
+ 				<if test="updateBy!=null">
+ 					update_by,
+ 				</if>
+ 				<if test="status!=null">
+ 					status
+ 				</if>
+ 			</trim>
+ 			<trim prefix="values(" suffix=")" suffixOverrides=",">
+ 			<!-- 	<if test="sysRoleOrgId!=null">
+ 					#{sysRoleOrgId},
+ 				</if> -->
+ 				<if test="sysOrgId!=null">
+ 					#{sysOrgId},
+ 				</if>
+ 				<if test="sysDeviceId!=null">
+ 					#{sysDeviceId},
+ 				</if>
+ 				<if test="sysUserId!=null">
+ 					#{sysUserId},
+ 				</if>
+ 				<if test="isFinal!=null">
+ 					#{isFinal},
+ 				</if>
+ 				<if test="rank!=null">
+ 					#{rank},
+ 				</if>
+ 				<if test="createBy!=null">
+ 					#{createBy},
+ 				</if>
+ 				<if test="updateBy!=null">
+ 					#{updateBy},
+ 				</if>
+ 				<if test="status!=null">
+ 					#{status}
+ 				</if>
+ 			</trim>
+ 		</insert>
+ 		
+ 		<update id="update" parameterType="SysDeviceRoleOrg" useGeneratedKeys="true" keyProperty="id">
+ 			update sys_device_role_org 
+ 			<set>
+ 		<!-- 		<if test="sysRoleOrgId!=null">
+ 					sys_role_org_id=#{sysRoleOrgId},
+ 				</if> -->
+ 				<if test="sysOrgId!=null">
+ 					sys_org_id=#{sysOrgId},
+ 				</if>
+ 				<!-- <if test="sysDeviceId!=null">
+ 					sys_device_id=#{sysDeviceId},
+ 				</if> -->
+ 				<if test="sysUserId!=null">
+ 					sys_user_id=#{sysUserId},
+ 				</if>
+ 				<if test="isFinal!=null">
+ 					is_final=#{isFinal},
+ 				</if>
+ 				<if test="rank!=null">
+ 					rank=#{rank},
+ 				</if>
+ 				<if test="updateBy!=null">
+ 					update_by=#{updateBy},
+ 				</if>
+ 				<if test="status!=null">
+ 					status=#{status}
+ 				</if>
+ 			</set>
+ 			where sys_device_id=#{sysDeviceId}
+ 		</update>
+ 		
+ 		
+ 		<select id="selectByDeviceId" resultType="SysDeviceRoleOrg">
+ 				SELECT * FROM sys_device_role_org WHERE sys_device_id=#{sysDeviceId}
+ 		</select>
+ 		
+ 		<select id="selectOnByDeviceId" resultType="sysDeviceRoleOrg">
+ 				SELECT * FROM sys_device_role_org WHERE sys_device_id=#{sysDeviceId} and status=1
+ 		</select>
+ 		
+ 		<!-- 查询使用该设备的用户 -->
+ 		<select id="selectUserIdByDeviceId" resultType="java.lang.Long">
+			SELECT DISTINCT sys_user_id FROM sys_device_role_org WHERE sys_device_id=#{deviceId} AND status=1
+		</select>
+	
+ 		<select id="selectByDeviceIdAndUserId" resultType="SysDeviceRoleOrg">
+ 				SELECT * FROM sys_device_role_org WHERE sys_device_id=#{sysDeviceId} and sys_user_id=#{sysUserId}
+ 		</select>
+ 		
+ 		<select id="selectDeviceIdByRoleOrgId" resultType="java.lang.Long">
+ 			SELECT sys_device_id FROM sys_device_role_org WHERE sys_role_org_id=#{roleOrgId}
+ 		</select>
+ 		
+ 		<select id="selectByUserId" resultType="SysDeviceRoleOrg">
+ 			SELECT * FROM sys_device_role_org WHERE sys_user_id=#{userId} and status=1;
+ 		</select>
+ 		
+ 		
+ 		
+</mapper>

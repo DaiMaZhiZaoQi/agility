@@ -1,0 +1,10 @@
+.themepark_commont{ width:97%; height:auto; padding:20px 1%; background:#F3F3F3; border:solid 1px #CCCCCC;}
+.themepark_commont .liuy3{ width:100%; height:auto; overflow:hidden; padding:5px;}
+.themepark_commont .liuy2{ width:20%; max-width:100px; min-width:50px; height: auto; min-height:20px; float:left; text-align:right; line-height:29px;}
+.themepark_commont input,.themepark_commont textarea,.themepark_commont select {background: #fff none repeat scroll 0 0; border: 1px solid #ccc; padding: 5px;} 
+.themepark_radio{ margin:8px 5px 0 15px;}
+.themepark_commont #comment{ width:70%}
+.themepark_commont #commentform #submit {background: #aabe00 none repeat scroll 0 0; border-radius: 5px; color: #fff;  cursor: pointer; font-weight: bold; margin: 0 0 0 60px;  padding: 5px 20px;; float:left;}
+.themepark_commont .themepark_comment_title{ display:block; width:96%; padding:5px 2%; margin-bottom:15px; border-bottom:dashed 1px #999999; color:#333;}
+a.themepark{ font-size:12px; color:#999; text-decoration:none;}
+a.themepark:hover{ text-decoration:underline;}

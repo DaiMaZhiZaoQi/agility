@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunt.dao.SysDeviceCallLogMapper">
+	<resultMap id="baseResultMap" type="com.hunt.model.entity.SysDeviceCallLog">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="device_role_org_id" property="deviceRoleOrgId" jdbcType="BIGINT"/>
+		<result column="device_id" property="deviceId" jdbcType="BIGINT"/>
+		<result column="call_name" property="callName" jdbcType="VARCHAR"/>
+		<result column="call_type" property="callType" jdbcType="INTEGER"/>
+		<result column="call_duration" property="callDuration" jdbcType="VARCHAR"/>
+		<result column="call_number" property="callNumber" jdbcType="VARCHAR"/>
+		<result column="call_date" property="callDate" jdbcType="BIGINT"/>
+		<result column="call_subscription_id" property="callSubscriptionId" jdbcType="INTEGER"/>
+		<result column="call_has_record" property="callHasRecord" jdbcType="INTEGER"/>
+		<result column="call_record_ms" property="callRecordMs" jdbcType="INTEGER"/>
+		<result column="call_description" property="callDescription" jdbcType="VARCHAR"/>
+		<result column="call_address" property="callAddress" jdbcType="VARCHAR"/>
+		<result column="call_out_phone" property="callOutPhone" jdbcType="VARCHAR"/>
+		<result column="call_in_phone" property="callInPhone" jdbcType="VARCHAR"/>
+		<result column="call_end_time" property="callEndTime" jdbcType="VARCHAR"/>
+		<result column="call_date" property="callDate" jdbcType="BIGINT"/>
+		<result column="call_duration" property="callDuration" jdbcType="BIGINT"/>
+		<result column="call_iscollect" property="callIsCollect" jdbcType="INTEGER"/>
+		<result column="call_ishave_record" property="callIsHaveRecord" jdbcType="INTEGER"/>
+		<result column="call_other" property="callOther" jdbcType="VARCHAR"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+		<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+		<result column="description" property="description" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<sql id="sql_column_where">
+		<if test="deviceId!=null">
+			device_id=#{deviceId}
+		</if>
+		<if test="callDate!=null">
+			and call_date=#{callDate}
+		</if>
+		
+	</sql>
+	
+	<insert id="insert" parameterType="SysDeviceCallLog" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_device_calllog
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="deviceId!=null">
+				device_id,
+			</if>
+			<if test="callType!=null">
+				call_type,
+			</if>
+			<if test="callName!=null and callName.length()!=0">
+				call_name,
+			</if>
+			<if test="callNumber!=null and callNumber.length()!=0">
+				call_number,
+			</if>
+			<if test="callDate!=null">
+				call_date,
+			</if>
+			<if test="callSubscriptionId!=null">
+				call_subscription_id,
+			</if>
+			<if test="callHasRecord!=null">
+				call_has_record,
+			</if>
+			<if test="callRecordMs!=null">
+				call_record_ms,
+			</if>
+			<if test="callDescription!=null and callDescription.length()!=0">
+				call_description,
+			</if>
+			
+			<if test="callDuration!=null">
+				call_duration,
+			</if>
+			
+			<if test="callAddress!=null and callAddress.length()!=0">
+				call_address,
+			</if>
+			<if test="callIsCollect!=null">
+				call_iscollect,
+			</if>
+			
+			<if test="callOther!=null and callOther.length()!=0">
+				call_other,
+			</if>
+			<if test="createBy!=null">
+				create_by,
+			</if>
+			<if test="updateBy!=null">
+				update_by,
+			</if>
+			<if test="status!=null">
+				status,
+			</if>
+			<if test="isFinal!=null">
+				is_final,
+			</if>
+			
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="deviceId!=null">
+				#{deviceId},
+			</if>
+			<if test="callType!=null">
+				#{callType},
+			</if>
+		
+			<if test="callName!=null and callName.length()!=0">
+				#{callName},
+			</if>
+			<if test="callNumber!=null and callNumber.length()!=0">
+				#{callNumber},
+			</if>
+			<if test="callDate!=null">
+				#{callDate},
+			</if>
+			<if test="callSubscriptionId!=null">
+				#{callSubscriptionId},
+			</if>
+			<if test="callHasRecord!=null">
+				#{callHasRecord},
+			</if>
+			<if test="callRecordMs!=null">
+				#{callRecordMs},
+			</if>
+			<if test="callDescription!=null and callDescription.length()!=0">
+				#{callDescription},
+			</if>
+			<if test="callDuration!=null">
+				#{callDuration},
+			</if>
+			<if test="callAddress!=null and callAddress.length()!=0">
+				#{callAddress},
+			</if>
+			<if test="callIsCollect!=null">
+				#{callIsCollect},
+			</if>
+			
+			<if test="callOther!=null and callOther.length()!=0">
+				#{callOther},
+			</if>
+			<if test="createBy!=null">
+				#{createBy},
+			</if>
+			<if test="updateBy!=null">
+				#{updateBy},
+			</if>
+			<if test="status!=null">
+				#{status},
+			</if>
+			<if test="isFinal!=null">
+				#{isFinal},
+			</if>
+			
+		</trim>
+	</insert>
+	
+	<update id="updateAll" parameterType="SysDeviceCallLog" useGeneratedKeys="true" keyProperty="id">
+		update sys_device_calllog
+		<set>
+			<if test="callType!=null">
+				call_type=#{callType},
+			</if>
+			<if test="callOutPhone!=null and callOutPhone.length()!=0">
+				call_out_phone=#{callOutPhone},
+			</if>
+			<if test="callInPhone!=null and callInPhone.length()!=0">
+				call_in_phone=#{callInPhone},
+			</if>
+			<if test="callDuration!=null">
+				call_duration=#{callDuration},
+			</if>
+			<if test="callAddress!=null and callAddress.length()!=0">
+				call_address=#{callAddress},
+			</if>
+			<if test="callIsCollect!=null">
+				call_iscollect=#{callIsCollect},
+			</if>
+			<if test="callIsHaveRecord!=null">
+				call_ishave_record=#{callIsHaveRecord},
+			</if>
+			<if test="callOther!=null and callOther.length()!=0">
+				call_other=#{callOther},
+			</if>
+			<if test="createBy!=null">
+				create_by=#{createBy},
+			</if>
+			<if test="updateBy!=null">
+				update_by=#{updateBy},
+			</if>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="isFinal!=null">
+				is_final=#{isFinal},
+			</if>
+			<if test="description!=null">
+				description=#{description},
+			</if>
+		</set>
+		where id=#{id} and status=1
+	</update>
+	
+	<update id="update" parameterType="SysDeviceCallLog" useGeneratedKeys="true" keyProperty="id">
+		update sys_device_calllog
+		<set>
+			<if test="callAddress!=null and callAddress.length()!=0">
+				call_address=#{callAddress},
+			</if>
+			<if test="callIsCollect!=null">
+				call_iscollect=#{callIsCollect},
+			</if>
+			<if test="callHasRecord!=null">
+				call_has_record=#{callHasRecord},
+			</if>
+			<if test="callDescription!=null and callDescription.length()!=0">
+				call_description=#{callDescription},
+			</if>
+		</set>
+		where id=#{id} and status=1
+	
+	</update>
+	
+	<update id="deleteOrNoDeleteDeviceCallLog" parameterType="SysDeviceCallLog" useGeneratedKeys="true" keyProperty="id">
+		update sys_device_calllog
+		<set>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="selectById" resultType="SysDeviceCallLog">
+		SELECT * FROM sys_device_calllog WHERE id=#{id};
+	</select>
+	
+	<select id="selectByDeviceId" resultType="SysDeviceCallLog">
+		SELECT * FROM sys_device_calllog WHERE device_id=#{deviceId} and status=1 ORDER BY ${sort} ${order} limit ${(page-1)*rows},${rows}
+	
+	</select>
+	
+	<select id="selectByUserId" resultType="SysDeviceCallLog">
+		SELECT  sys_device_role_org.`sys_role_org_id` 
+		AS device_role_org_id,sys_device_calllog.* 
+		FROM sys_device_role_org 
+		LEFT JOIN sys_device_calllog 
+		ON sys_device_role_org.`sys_device_id`=sys_device_calllog.`device_id` 
+		WHERE sys_user_id=#{sysUserId} 
+		AND sys_device_role_org.`sys_device_id`=sys_device_calllog.`device_id` 
+		AND sys_device_calllog.`status`=1 ORDER BY ${sort} ${order} limit ${(page-1)*rows},${rows}
+	</select>
+	
+	<!-- 根据角色id查询通话记录 -->
+	<select id="selectByRoleOrgId" resultType="SysDeviceCallLog">
+		SELECT sys_device_calllog.* FROM sys_device_calllog 
+		LEFT JOIN sys_device_role_org 
+		ON sys_device_role_org.`sys_device_id`=sys_device_calllog.`device_id`
+		WHERE sys_device_role_org.`sys_role_org_id`=#{sysRoleOrgId}
+		AND sys_device_role_org.`sys_device_id`=sys_device_calllog.`device_id`
+		AND sys_device_calllog.`status`=1 ORDER BY ${sort} ${order} limit ${(page-1)*rows},${rows}
+	</select>
+	
+	<select id="selectTotalByDeviceId" resultType="SysDeviceCallLog">
+		SELECT * FROM sys_device_calllog WHERE device_id=#{deviceId} and status=1;
+	
+	</select>
+	
+	<select id="selectCountsByDeviceId" resultType="java.lang.Long">
+		select count(*) from sys_device_calllog where device_id=#{deviceId} and status=1;
+	</select>
+	
+	<select id="selectByCallDate" resultType="SysDeviceCallLog">
+		SELECT * FROM sys_device_calllog 
+		<where>
+			<include refid="sql_column_where"/>
+		</where>
+	</select>
+	
+	
+	
+	
+	
+	
+</mapper>

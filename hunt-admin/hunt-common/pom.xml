@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>hunt-parent</artifactId>
+        <groupId>com.anouyang.hunt</groupId>
+        <version>1.0-SNAPSHOT</version>
+        <relativePath>../hunt-parent/pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>hunt-common</artifactId>
+<!-- 	
+	<modules>
+	   <module>hunt-model</module>
+	</modules> -->
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>com.anouyang.hunt</groupId>
+            <artifactId>hunt-model</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+         <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+        </dependency>
+        <!-- amr转mp3  -->
+         <dependency>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-core</artifactId>
+            <version>2.4.4</version>
+        </dependency>
+	        <dependency>
+			    <groupId>ws.schild</groupId>
+			    <artifactId>jave-native-linux64</artifactId>
+			    <version>2.4.4</version>
+		</dependency>
+    </dependencies>
+
+</project>

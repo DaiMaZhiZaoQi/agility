@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunt.dao.SysContactUserMapper"> 
+	<resultMap type="com.hunt.model.entity.SysContactUser" id="sysContactUser">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="sys_contact_id" property="sysContactId" jdbcType="BIGINT"/>
+		<result column="sys_user_id" property="sysUserId" jdbcType="BIGINT"/>
+		<result column="sys_org_id" property="sysOrgId" jdbcType="BIGINT"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="is_auth" property="isAuth" jdbcType="INTEGER"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+	
+	<resultMap type="com.hunt.model.dto.SysUserOrgDto" id="sysUserOrgDto">
+			 <id column="sys_user_id" property="sysUserId" jdbcType="BIGINT"/>
+			<result column="org_id" property="orgId" jdbcType="BIGINT"/>
+			<result column="org_name" property="orgName" jdbcType="VARCHAR"/>
+			 <result column="login_name" property="loginName" jdbcType="VARCHAR"/>
+			 <result column="is_auth" property="isAuth" jdbcType="INTEGER"/>
+			 <result column="zh_name" property="zhName" jdbcType="VARCHAR"/>
+			 <result column="en_name" property="enName" jdbcType="VARCHAR"/>
+		<!-- <association property="sysUser" javaType="com.hunt.model.entity.SysUser">
+		
+		</association>  -->
+	</resultMap>
+	
+	<sql id="sql_column_where">
+		<if test="sysContactUser.sysContactId!=null">
+			AND	sys_contact_id=#{sysContactUser.sysContactId}
+		</if>
+		<if test="sysContactUser.sysUserId!=null">
+			AND sys_user_id=#{sysContactUser.sysUserId}
+		</if>
+		<if test="sysContactUser.sysOrgId!=null">
+			AND sys_org_id=#{sysContactUser.sysOrgId}
+		</if>
+		<if test="sysContactUser.status!=null">
+			AND status=#{sysContactUser.status}
+		</if>
+		<if test="sysContactUser.isAuth!=null">
+			AND is_auth=#{sysContactUser.isAuth}
+		</if>
+	</sql>
+	
+	<insert id="insert" parameterType="sysContactUser" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_contact_user
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="sysContactId!=null">
+				sys_contact_id,
+			</if>
+			<if test="sysUserId!=null">
+				sys_user_id,
+			</if>
+			<if test="sysOrgId!=null">
+				sys_org_id,
+			</if>
+			<if test="status!=null">
+				status,
+			</if>
+			<if test="isAuth!=null">
+				is_auth,
+			</if>
+		</trim>
+		<trim prefix="values(" suffix=")" suffixOverrides=",">
+			<if test="sysContactId!=null">
+				#{sysContactId},
+			</if>
+			<if test="sysUserId!=null">
+				#{sysUserId},
+			</if>
+			<if test="sysOrgId!=null">
+				#{sysOrgId},
+			</if>
+			<if test="status!=null">
+				#{status},
+			</if>
+			<if test="isAuth!=null">
+				#{isAuth},
+			</if>
+		</trim>
+	</insert>
+	
+	<!-- 修改状态  -->
+	<update id="update" parameterType="sysContactUser" useGeneratedKeys="true" keyProperty="id">
+		update sys_contact_user
+		<set>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="sysOrgId!=null">
+				sys_org_id=#{sysOrgId},
+			</if>
+		</set>
+		where sys_contact_id=#{sysContactId} and sys_user_id=#{sysUserId}
+	</update>
+	
+	<!-- 解除授权  -->
+	<update id="updateStatusByUserIdContactId" useGeneratedKeys="true" keyProperty="id">
+		update sys_contact_user
+		<set>
+			<if test="updateStatus!=null">
+				status=#{updateStatus}
+			</if>
+		</set>
+		<where>
+			<include refid="sql_column_where"/>
+		</where>
+	</update>
+	
+	<select id="selectByUserId" resultType="sysContactUser">
+		SELECT * FROM sys_contact_user WHERE sys_user_id=#{sysUserId}
+	</select>
+	
+	<select id="selectContactIdByUser" resultType="java.lang.Long">
+		SELECT sys_contact_id FROM sys_contact_user WHERE sys_user_id=#{sysUserId} and status=1
+	</select>
+	
+	<select id="selectUserOrgAuthByContactId" resultMap="sysUserOrgDto">
+		SELECT sys_user.`id` sys_user_id,sys_user.`login_name` login_name,
+		sys_contact_user.`is_auth` is_auth,
+		sys_user.`zh_name` zh_name,sys_user.`en_name` en_name,
+		sys_organization.`id` org_id,sys_organization.`name` org_name 
+		FROM sys_user 
+		LEFT JOIN sys_contact_user ON sys_contact_user.`sys_contact_id`=#{contactId} AND sys_contact_user.`status`=1
+		LEFT JOIN sys_organization ON sys_organization.`id`=sys_contact_user.`sys_org_id` AND sys_organization.`status`=1
+		WHERE sys_user.`id`=sys_contact_user.`sys_user_id` AND sys_user.`status`=1
+	</select>
+	
+	<select id="select" resultType="sysContactUser">
+		select * from sys_contact_user
+		<where>
+			<include refid="sql_column_where"></include>
+		</where>
+	</select>
+	
+	<select id="selectUnAuth" resultType="sysContactUser">
+		SELECT * FROM sys_contact_user 
+		WHERE sys_contact_user.`sys_contact_id`=#{sysContactId} 
+		AND sys_contact_user.`sys_user_id`=#{sysUserId}
+		AND sys_contact_user.`status`!=1
+	</select>
+	
+	
+</mapper>
