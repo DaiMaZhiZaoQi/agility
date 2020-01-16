@@ -39,8 +39,9 @@
                                                              class="easyui-textbox easyui-validatebox"></p>
             <p style="padding: 10px;"> &nbsp;&nbsp;描述:<input name="permission_description" id="permission_description"
                                                              style="width: 300px;height: 130px"
-                                                             data-options="required:true,multiline:true"
+                                                             data-options="multiline:true"
                                                              class="easyui-textbox easyui-validatebox">
+                                                             
             </p>
         </div>
         <div style="float: right; width: 50%; height:326px;">
@@ -79,7 +80,7 @@
                 <p style="padding: 10px;"> &nbsp;&nbsp;描述:<input name="permission_group_description"
                                                                  id="permission_group_description"
                                                                  style="width: 300px;height: 130px"
-                                                                 data-options="required:true,multiline:true"
+                                                                 data-options="multiline:true"
                                                                  class="easyui-textbox easyui-validatebox">
                 </p>
             </div>

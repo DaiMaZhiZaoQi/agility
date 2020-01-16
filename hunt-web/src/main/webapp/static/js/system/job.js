@@ -56,7 +56,8 @@ job_tool = {
                 if (result.code == 10000) {
                     $("#job_dialog").dialog('close');
                     job_tool.form_clear();
-                    job_tool.init_main_view();
+//                    job_tool.init_main_view();
+                    $("#job_grid").treegrid("reload");
                 }
                 else {
                     common_tool.messager_show(result.msg);
@@ -95,7 +96,8 @@ job_tool = {
                 if (result.code == 10000) {
                     $("#job_dialog").dialog('close');
                     job_tool.form_clear();
-                    job_tool.init_main_view();
+//                    job_tool.init_main_view();
+                    $("#job_grid").treegrid("reload");
                 }
                 else {
                     common_tool.messager_show(result.msg);
@@ -115,7 +117,8 @@ job_tool = {
             success: function (result) {
                 if (result.code == 10000) {
                     job_tool.form_clear();
-                    job_tool.init_main_view();
+//                    job_tool.init_main_view();
+                    $("#job_grid").treegrid("reload");
                 }
                 else {
                     common_tool.messager_show(result.msg);
@@ -234,6 +237,9 @@ job_tool = {
             modal: true,
             resizable: false,
             'onOpen': function () {
+            	$("#job_dialog_organization").treegrid("reload");
+            	$("#job_dialog_role").datagrid("reload");
+            	$("#job_dialog_parent_tree").treegrid("reload");
                 if (type == 2) {		
                     var job = $("#job_grid").treegrid('getChecked')[0];
                     $("#job_dialog_parent_tree").treegrid('select', job.parentId);

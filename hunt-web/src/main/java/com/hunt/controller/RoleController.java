@@ -35,7 +35,7 @@ public class RoleController extends BaseController {
     private SystemService systemService;
 
     @ApiOperation(value = "跳转至角色模块", httpMethod = "GET", produces = "text/html")
-    @RequiresPermissions("role:list")
+    @RequiresPermissions("role:manage")
     @RequestMapping(value = "role", method = RequestMethod.GET)
     public String role() {
         return "system/role";
@@ -51,7 +51,7 @@ public class RoleController extends BaseController {
      * @return
      */
     @ApiOperation(value = "新增角色", httpMethod = "POST", produces = "application/json", response = Result.class)
-    @RequiresPermissions("role:insert")
+    @RequiresPermissions("role:manage")
     @ResponseBody
     @RequestMapping(value = "insert", method = RequestMethod.POST)
     public Result insert(@RequestParam String name,
@@ -80,7 +80,7 @@ public class RoleController extends BaseController {
      * @return
      */
     @ApiOperation(value = "更新角色", httpMethod = "POST", produces = "application/json", response = Result.class)
-    @RequiresPermissions("role:update")
+    @RequiresPermissions("role:manage")
     @ResponseBody
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public Result update(@RequestParam long id,
@@ -114,7 +114,7 @@ public class RoleController extends BaseController {
      * @return
      */
     @ApiOperation(value = "删除角色", httpMethod = "POST", produces = "application/json", response = Result.class)
-    @RequiresPermissions("role:delete")
+    @RequiresPermissions("role:manage")
     @ResponseBody
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public Result delete(@RequestParam long id) {
@@ -139,12 +139,17 @@ public class RoleController extends BaseController {
      * @return
      */
     @ApiOperation(value = "角色列表", httpMethod = "GET", produces = "application/json", response = PageInfo.class)
-    @RequiresPermissions("role:list")
+    @RequiresPermissions("user:manage")
     @ResponseBody
     @RequestMapping(value = "list", method = RequestMethod.GET)
     public PageInfo list(@RequestParam(defaultValue = "1") int page,
-                         @RequestParam(defaultValue = "15") int rows) {
-        PageInfo pageInfo = sysRoleService.selectPage(page, rows);
+                         @RequestParam(defaultValue = "15") int rows,
+                         @RequestParam(value="userId",defaultValue="0",required=false) long userId
+                         ) {
+    	if(userId==0l) {
+    		return sysRoleService.selectPage(page, rows);
+    	}
+        PageInfo pageInfo = sysRoleService.selectPageUserId(page, rows, userId);
         return pageInfo;
     }
 }

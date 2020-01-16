@@ -57,7 +57,6 @@ $(document).ready(function () {
                 },
                 success: function (data) {
                     if (data.code == 10000) {
-                    	
                     	localStorage.setItem("userName", $("#username").val());
                     	var checked=$("#login input[id=rempwd]").is(":checked");
                     	if(checked){
@@ -68,14 +67,14 @@ $(document).ready(function () {
 //                        location.href = getRootPath() + "/system/welcome";   //  TODO  跳转到login.jsp页面
                         location.href = getRootPath() + "/home.jsp";   //  TODO  跳转到login.jsp页面
                     } else if (data.code == 20001) {
-                        common_tool.messager_show(data.msg)
+                        common_tool.messager_show(data.msg);
                         $("#username").focus();
                     } else if (data.code == 20003) {
-                        common_tool.messager_show(data.msg)
+                        common_tool.messager_show(data.msg);
                         $("#password").focus();
                     }
                     else {
-                        common_tool.messager_show(data.msg)
+                        common_tool.messager_show(data.msg);
                     }
                 }
             })

@@ -122,11 +122,11 @@
 			    var callDate=deviceCallLog.getMoth(row.callDate);
 			    var callDuration=row.callDuration==0?"无通话时间":row.callDuration;
 			    var secondIsValid=deviceCallLog.secondIsValid(callDuration);
-			    var callDuration=deviceCallLog.secondToMinute(secondIsValid==true?(callDuration/1000):callDuration);
+			    var callDuration=common_tool.secondToMinute(secondIsValid==true?(callDuration/1000):callDuration);
 			    
 			    var recoAudioLength=row.sysDeviceRecord==null?0:row.sysDeviceRecord.recoAudioLength;
 				//var recoIsValid=deviceCallLog.secondIsValid(recoAudioLength);		    
-				var recoAudioLength=deviceCallLog.secondToMinute(Math.floor(recoAudioLength/1000));
+				var recoAudioLength=common_tool.secondToMinute(Math.floor(recoAudioLength/1000));
 				
 			    tr.append('<td>'+type+'</td>');
 			    tr.append('<td>'+callNumber+'</td>');
@@ -208,25 +208,7 @@
 			return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;
 	    },  
 	    
-		/**秒数转分钟*/    
-	    secondToMinute:function(callDuration){
-	    	if(callDuration<60){
-	    		return "00:"+(callDuration<10?("0"+callDuration):(callDuration));
-	    	}else{
-	    		if(callDuration>60&&callDuration<3600){
-	    			var minute=callDuration/60;
-	    			var second=callDuration%60;
-	    			var mi=Math.floor(minute);
-	    			var sec=Math.floor(second);
-	    			return (mi<10?("0"+mi):mi)+":"+(sec<10?("0"+sec):sec);
-	    		}else{
-	    			var hour=callDuration/3600;
-	    			var m=callDuration%3600;
-	    			var minute=deviceCallLog.secondToMinute(m);
-	    			return Math.floor(hour)+":"+minute;
-	    		}
-	    	}
-	    },
+	
 	    
 	    /**验证是否为毫秒数，毫秒数转换为秒数*/
 	    secondIsValid:function(second){

@@ -9,9 +9,17 @@ import org.apache.shiro.authz.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import com.hunt.dao.SysDeviceMapper;
+import com.hunt.dao.SysPermissionMapper;
+import com.hunt.dao.SysUserRoleMapper;
+import com.hunt.model.entity.SysPermission;
 import com.hunt.service.SystemService;
 import com.hunt.util.ResponseCode;
 import com.hunt.util.Result;
@@ -21,6 +29,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * 基础controller,方便统一异常处理
@@ -28,11 +37,22 @@ import java.io.IOException;
  * @Author: ouyangan
  * @Date : 2016/10/8
  */
+
+
 public class BaseController {
     private static final Logger log = LoggerFactory.getLogger(BaseController.class);
     @Autowired
     private SystemService systemService;
-
+	@Autowired
+	SysUserRoleMapper mSysUserRoleMapper;
+	@Autowired
+	SysPermissionMapper mSysPermissionMapper;
+	
+	@Autowired
+	SysDeviceMapper mSysDeviceMapper;
+	
+	
+	
     /** 
      * 极限验证码二次验证
      *
@@ -111,4 +131,39 @@ public class BaseController {
             response.sendRedirect(basePath + url);
         }
     }
+	/**
+	 * 移动端判断用户是否有权限
+	 * @param userId
+	 * @param permission
+	 * @return
+	 */
+	public boolean mobileHasPermission(Long userId,String permission) {
+		//  查询用户角色 
+		List<Long> listPermissionId = mSysUserRoleMapper.selectPerIdByUserId(userId);
+		SysPermission sysPermission = mSysPermissionMapper.selectByCode(permission);
+		return listPermissionId.contains(sysPermission.getId());
+		
+	}  
+	
+	/**
+	 * 更新心跳 
+	 * @param request
+	 * @param deviceSerial
+	 * @return
+	 */
+	public Long updateHeart(HttpServletRequest request,String deviceSerial) {
+		String ip = request.getRemoteAddr();
+		return mSysDeviceMapper.updateDeviceTimeById(deviceSerial,ip);
+	}
+	
+	/**
+	 * 查询用户权限码
+	 * @param userId
+	 * @return
+	 */
+	public List<String> selectPerCodeByUserId(Long userId) {
+		 return mSysUserRoleMapper.selectPerCodeByUserId(userId);
+	}
+	
+    
 }

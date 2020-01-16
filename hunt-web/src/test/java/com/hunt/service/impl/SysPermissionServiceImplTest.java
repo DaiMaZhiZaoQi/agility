@@ -19,6 +19,7 @@ import com.hunt.model.dto.PageInfo;
 import com.hunt.model.dto.SysCallLogDeviceRecoDto;
 import com.hunt.model.dto.SysDeviceAndCallDto;
 import com.hunt.model.dto.SysDeviceOrgDto;
+import com.hunt.model.dto.SysPermissionOrgDto;
 import com.hunt.model.dto.SysUserOrgDto;
 import com.hunt.model.entity.SysContactUser;
 import com.hunt.model.entity.SysDevice;
@@ -30,6 +31,8 @@ import com.hunt.model.entity.SysPermissionGroup;
 import com.hunt.model.entity.SysPermissionGroupTest;
 import com.hunt.model.entity.SysUser;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -44,11 +47,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.hunt.service.DeviceCallLogService;
 import com.hunt.service.SysOrganizationService;
 import com.hunt.service.SysPermissionService;
 import com.hunt.service.SysUserService;
 import com.hunt.service.SystemDeviceService;
 import com.hunt.util.AmrToMP3Utils;
+import com.hunt.util.StringUtil;
 
 import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import junit.extensions.TestDecorator;
@@ -104,6 +109,8 @@ public class SysPermissionServiceImplTest {
 	SysContactUserMapper mSysContactUserMapper;
 	@Autowired
 	SysOrganizationMapper mSysOrganizationMapper;
+	@Autowired
+	DeviceCallLogService mDeviceCallService;
 	
 	@Autowired
 	SysUserMapper mSysUserMapper;
@@ -318,7 +325,7 @@ public class SysPermissionServiceImplTest {
    	@Rollback(false)
    	public void test2() {
    		SysContactUser sysContactUser = new SysContactUser();
-   		sysContactUser.setSysUserId(13l);
+//   		sysContactUser.setSysUserId(13l);
    		sysContactUser.setSysContactId(17l);
    	  SysContactUser selectUnAuth = mSysContactUserMapper.selectUnAuth(sysContactUser);
    	  System.out.println("selectUn-->"+selectUnAuth.toEntityString());
@@ -341,7 +348,30 @@ public class SysPermissionServiceImplTest {
    		String jSon = JsonUtils.toJSon(selectUpSysOrgList);
    		System.out.println("test3-->"+jSon);
    	}
+	@Test
+   	@Rollback(false)
+   	public void testCallLog() {
+   		PageDto pageDto = new PageDto();
+//   		pageDto.setBeginTime(StringUtil.getDayFirstWeek());
+//   		pageDto.setEndTime(System.currentTimeMillis());
+   		pageDto.setId(23l);
+   		pageDto.setPage(1);
+   		pageDto.setRows(15);
+   		pageDto.setSort("call_date");
+   		pageDto.setBeginTime(1575040598530l);
+   		pageDto.setEndTime(1576117376135l);
+   		PageInfo listCallRecord = mDeviceCallService.listCallRecord(pageDto);
+   		System.out.println("json数据"+JsonUtils.toJSon(listCallRecord));
+   	}
+	
+	@Test
+	@Rollback(false)
+	public void testOldCallLog() {
+		PageInfo pageInfo = mSysOrganizationService.selectAllCallLogByOrg(23l,"call_date","desc",1,10,"0",1575040598530l,1576117376135l,"",0);
+		System.out.println("json数据-->"+JsonUtils.toJSon(pageInfo));
+	}
    	
+	
    	
    	@Test
    	public void testTimeTotal() {
@@ -494,7 +524,7 @@ public class SysPermissionServiceImplTest {
    	@Rollback
    	public void test1() {
    		SysContactUser sysContactUser = new SysContactUser();
-   		sysContactUser.setSysUserId(15l);
+//   		sysContactUser.setSysUserId(15l);
    		sysContactUser.setSysContactId(21l);
    		sysContactUser.setStatus(1);
    		SysContactUser sysCon = mSysContactUserMapper.select(sysContactUser);
@@ -513,6 +543,16 @@ public class SysPermissionServiceImplTest {
    		System.out.println("在线用户"+selectOnLine.toString());
    	}
     
+   	@Test
+   	@Rollback(false)
+   	public void insertOrgPer() {
+//   		SysOrganization sysOrganization = new SysOrganization();    
+//		sysOrganization.setId(10l);
+//		sysOrganization.setOrgCode("100000001000");
+//		mSysOrganizationService.insertOrgPermission(sysOrganization);
+		   
+   	}
+   	
     
    	@Test
    	public void testOrg() {
@@ -545,6 +585,14 @@ public class SysPermissionServiceImplTest {
 			System.out.println("添加权限组成功-->"+insert+"-->id="+long1);
 		}
 		
+	}
+	
+	@Test
+	@Rollback(false)
+	public void selectSysOrg() {
+		PageInfo pageInfo = mSysOrganizationService.selectPageListSimple(1, 100, 9);
+		String jSon = JsonUtils.toJSon(pageInfo);
+		System.out.println("selectSysOrg"+jSon);
 	}
 	
  

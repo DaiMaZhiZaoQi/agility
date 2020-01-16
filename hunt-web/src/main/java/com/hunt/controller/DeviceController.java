@@ -30,7 +30,9 @@ import com.hunt.service.SysOrganizationService;
 import com.hunt.service.SysUserService;
 import com.hunt.service.impl.SysOrganizationServiceImpl;
 import com.hunt.service.impl.SysUserServiceImpl;
+import com.hunt.util.PermissionCode;
 import com.hunt.util.PermissionUtil;
+import com.hunt.util.ResponseCode;
 import com.hunt.util.Result;
 import com.hunt.util.StringUtil;
 import com.mysql.fabric.xmlrpc.base.Array;
@@ -52,7 +54,7 @@ import net.sf.jsqlparser.statement.select.Select;
 @Api(value="设备模块")
 @Controller
 @RequestMapping("device")
-public class DeviceController {
+public class DeviceController extends BaseController{
 
 	private static Logger log = LoggerFactory.getLogger(RoleController.class);
 	/**
@@ -91,6 +93,7 @@ public class DeviceController {
 							@RequestParam(value="page",defaultValue="1") Integer page,
 							@RequestParam(value="row",defaultValue="15") Integer row
 							) {
+	
 		System.out.println("device type-->"+id+"<--requestType-->"+requestType); 
 		PageInfo pageInfo=null;
 		if(requestType==0) {			//   查询机构，机构查询完毕后，汇总当前机构中的设备数据信息，汇总个人设备
@@ -125,19 +128,23 @@ public class DeviceController {
 								@RequestParam(value="isLoadAll",required=false,defaultValue="0") Integer isLoadAll,
 								@RequestParam(value="searchContent",required=false,defaultValue="") String searchContent,
 								@RequestParam(value="searchType",required=false,defaultValue="0") Integer searchType,
+								@RequestParam(value="userId",defaultValue="0",required=true)Long userId,
 								HttpServletRequest request) {
 		System.out.println("getAllDevice-->"+orgId);
+		if(!mobileHasPermission(userId, PermissionCode.DEVICE_SELECT.pName)) {
+			request.setAttribute("perMsg", PermissionCode.DEVICE_SELECT.pMsg);
+			return "system/noPermiss";
+		}
+		// 判断有无查询权限，setAttribute;
 		if(!"-1".equals(orgId)&&"-1".equals(personalId)) {					//查询机构
 			request.setAttribute("orgId", orgId); 
-			request.setAttribute("requestType", 0);
+			request.setAttribute("requestType", 0);   
 			if(isLoadAll!=null&&isLoadAll==1) {								//加载顶级机构	
 				request.setAttribute("isLoadAll",1);
 			} 
 			PageInfo pageInfo = mSysOrganizationServiceImpl.selectDeviceFromOrg(page, row, Long.parseLong(orgId));
 			List<SysDeviceAndCallDto> listUserAndDevice=(List<SysDeviceAndCallDto>)pageInfo.getRows();
 			List<SysDeviceAndCallDto> listSearchSysDevice = searchSysDevice(listUserAndDevice, searchContent,searchType,request); 
-			String json=JsonUtils.toJSon(listSearchSysDevice);
-			System.out.println("JsonUtils-->"+json);
 			request.setAttribute("listDevice", listSearchSysDevice);
 		}else if("-1".equals(orgId)&&!"-1".equals(personalId)) {			//查询个人		
 			request.setAttribute("orgId", personalId);
@@ -147,11 +154,14 @@ public class DeviceController {
 			List<SysDeviceAndCallDto> listUserAndDevice = mSysUserServiceImpl.listUserAndDevice(sysUser.getId());
 			request.setAttribute("listDevice", listUserAndDevice);
 		}
-		boolean hasP = PermissionUtil.hasDataPermission(null, "user:list");
-		if(hasP) {
-			request.setAttribute("hasP",1);
-		}
-	
+		 
+		
+//		boolean hasP = PermissionUtil.hasDataPermission(null, "user:manage");
+//		if(hasP) {
+//			request.setAttribute("hasP",1);
+//		}
+		List<String> listUserPerCode = selectPerCodeByUserId(userId);
+		request.setAttribute("listUserPerCode", listUserPerCode);
 		return "home/allDevice";
 	}
 	
@@ -235,11 +245,18 @@ public class DeviceController {
 	@ApiOperation(value="设备心跳",httpMethod="GET",produces="text/json")
 	@ResponseBody
 	@RequestMapping(value="heart",method=RequestMethod.GET)
-	public Result deviceHeart(@RequestParam(value="deviceSerial") String deviceSerial,
+	public Result deviceHeart(@RequestParam(value="deviceSerial",defaultValue="") String deviceSerial,
 								HttpServletRequest request) {
+		if(StringUtils.isEmpty(deviceSerial)) {
+			return Result.instance(ResponseCode.missing_parameter.getCode(), ResponseCode.missing_parameter.getMsg());
+		}
 		String ip = request.getRemoteAddr();
-		mSysDeviceMapper.updateDeviceTimeById(deviceSerial,ip);
-		return Result.success();
+		Long result = mSysDeviceMapper.updateDeviceTimeById(deviceSerial,ip);
+		if(result>0) {
+			return Result.success();
+		}else {
+			return Result.instance(ResponseCode.device_not_exist.getCode(),ResponseCode.device_not_exist.getMsg());
+		}
 	}
 	
 	

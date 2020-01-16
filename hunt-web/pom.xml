@@ -287,7 +287,8 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.4</version>
                 <configuration>
-                    <warName>hunt-admin</warName>
+<!--                     <warName>hunt-admin</warName> -->
+                    <warName>zicoo</warName>
                 </configuration>
             </plugin>
         </plugins>

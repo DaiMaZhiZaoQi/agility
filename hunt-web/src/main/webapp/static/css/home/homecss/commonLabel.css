@@ -40,6 +40,7 @@
 	box-shadow:none;
 	background: #6dcdf3;
 	border-color: transparent;
+	cursor: pointer;
 	
 }
 
@@ -57,7 +58,7 @@
 	box-shadow:none;
 	background: #5abb71;
 	border-color: transparent;
-	
+	cursor: pointer;
 }
 .tree-checkbox{
 	
@@ -68,7 +69,7 @@
     font-size: 18px;
 }
 .btn-green-allDevice{
-	    margin-left: 20px;
+	margin-left: 20px;
     height: 45px;
     width: 90px;
     color: white;
@@ -77,6 +78,7 @@
     box-shadow: none;
     background: #5abb71;
     border-color: transparent;
+    cursor: pointer;
 }
 
 #btn_red_alldevice{
@@ -89,6 +91,7 @@
 	box-shadow:none;
 	background: #d75b5b;
 	border-color: transparent;
+	cursor: pointer;
 	
 }
 
@@ -102,6 +105,7 @@
 	box-shadow:none;
 	background: #d75b5b;
 	border-color: transparent;
+	cursor: pointer;
 }
 
 
@@ -110,20 +114,21 @@
 .btn_blue_alldevice{
 	margin-left:20px;
 	height:45px;
-	width:90px;
+	width:100px;
 	color:white;
 	font-size:18px;
 	border-radius:5px;
 	box-shadow:none;
 	background: #6dcdf3;
 	border-color: transparent;
+	cursor: pointer;
 }
 .pageDisplay{
 	font-size: 20px;
 }
 .pageOption{
 	color: #007ad5;
-	font-size: 24px;
+	font-size: 21px;
 }
 
 .horLine{

@@ -193,7 +193,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "跳转至用户状态模块", httpMethod = "GET", produces = "text/html")
-    @RequiresPermissions("user:loginStatu:list")
+    @RequiresPermissions("user:manage")
     @RequestMapping(value = "online", method = RequestMethod.GET)
     public String online() {
         return "system/online";
@@ -207,7 +207,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "在线用户列表", httpMethod = "GET", produces = "application/json", response = PageInfo.class)
-    @RequiresPermissions("user:loginStatu:list")
+    @RequiresPermissions("user:manage")
     @ResponseBody
     @RequestMapping(value = "online/list", method = RequestMethod.GET)
     public PageInfo onlineList(@RequestParam(defaultValue = "1") int page,
@@ -223,7 +223,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "强制用户下线", httpMethod = "GET", produces = "application/json", response = Result.class)
-    @RequiresPermissions("user:loginout")
+    @RequiresPermissions("user:manage")
     @ResponseBody
     @RequestMapping(value = "forceLogout", method = RequestMethod.GET)
     public Result forceLogout(@RequestParam String userIds) {
@@ -241,7 +241,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "跳转至日志页面", httpMethod = "GET", produces = "text/html")
-    @RequiresPermissions("log:list")
+    @RequiresPermissions("system:manage")
     @RequestMapping(value = "log")
     public String log() {
         return "system/log";
@@ -261,7 +261,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "查询日志列表", httpMethod = "GET", produces = "application/json", response = PageInfo.class)
-    @RequiresPermissions("log:list")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "log/list", method = RequestMethod.GET)
     public PageInfo logList(@RequestParam(defaultValue = "1") int page,
@@ -284,7 +284,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "新增字典组", httpMethod = "POST", produces = "application/json", response = Result.class)
-    @RequiresPermissions("data:group:insert")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "dataGroup/insert", method = RequestMethod.POST)
     public Result dataGroupInsert(@RequestParam String name,
@@ -308,7 +308,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "字典组列表", httpMethod = "GET", produces = "application/json", response = Result.class)
-    @RequiresPermissions("data:group:list")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "dataGroup/list", method = RequestMethod.GET)
     public List<SysDataGroup> dataGroupList() {
@@ -332,7 +332,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "新增数据字典", httpMethod = "POST", produces = "application/json", response = Result.class)
-    @RequiresPermissions("data:insert")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "data/insert", method = RequestMethod.POST)
     public Result dataInsert(@RequestParam String key,
@@ -360,7 +360,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "删除字典", httpMethod = "GET", produces = "application/json", response = Result.class)
-    @RequiresPermissions("data:delete")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "data/delete", method = RequestMethod.GET)
     public Result dataDelete(@RequestParam Long id) {
@@ -379,7 +379,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "更新字典", httpMethod = "POST", produces = "application/json", response = Result.class)
-    @RequiresPermissions("data:update")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "data/update", method = RequestMethod.POST)
     public Result dataUpdate(@RequestParam Long id,
@@ -413,7 +413,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "查询字典详情", httpMethod = "GET", produces = "application/json", response = Result.class)
-    @RequiresPermissions("data:select")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "data/select", method = RequestMethod.GET)
     public Result dataSelect() {
@@ -428,7 +428,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "字典列表", httpMethod = "GET", produces = "application/json", response = PageInfo.class)
-    @RequiresPermissions("data:list")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "data/list", method = RequestMethod.GET)
     public PageInfo dataList(@RequestParam(defaultValue = "1") int page,
@@ -443,7 +443,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "跳转至ip模块", httpMethod = "GET", produces = "text/html")
-    @RequiresPermissions("ip:list")
+    @RequiresPermissions("system:manage")
     @RequestMapping(value = "ip", method = RequestMethod.GET)
     public String ip() {
         return "system/ip";
@@ -458,7 +458,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "插入ip", httpMethod = "POST", produces = "application/json", response = Result.class)
-    @RequiresPermissions("ip:insert")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "ip/insert", method = RequestMethod.POST)
     public Result ipInsert(@RequestParam String ip,
@@ -473,6 +473,10 @@ public class SystemController extends BaseController {
         sysIpForbidden.setExpireTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(expireTime));
         sysIpForbidden.setDescription(description);
         Long id = systemService.insertIp(sysIpForbidden);
+        // 激活ip拦截
+        if(id>0) {
+        	systemService.insertIpIntercept();
+        }
         return Result.success(id);
     }
 
@@ -483,7 +487,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "删除ip", httpMethod = "GET", produces = "application/json", response = Result.class)
-    @RequiresPermissions("ip:delete")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "ip/delete", method = RequestMethod.GET)
     public Result ipDelete(@RequestParam long id) {
@@ -501,7 +505,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "更新ip", httpMethod = "POST", produces = "application/json", response = Result.class)
-    @RequiresPermissions("ip:update")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "ip/update", method = RequestMethod.POST)
     public Result ipUpdate(@RequestParam long id,
@@ -518,6 +522,7 @@ public class SystemController extends BaseController {
         sysIpForbidden.setExpireTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(expireTime));
         sysIpForbidden.setDescription(description);
         systemService.updateIp(sysIpForbidden);
+        systemService.insertIpIntercept();
         return Result.success();
     }
 
@@ -529,7 +534,7 @@ public class SystemController extends BaseController {
      * @return
      */
     @ApiOperation(value = "查询ip列表", httpMethod = "GET", produces = "application/json", response = PageInfo.class)
-    @RequiresPermissions("ip:list")
+    @RequiresPermissions("system:manage")
     @ResponseBody
     @RequestMapping(value = "ip/list", method = RequestMethod.GET)
     public PageInfo ipSelect(@RequestParam(defaultValue = "1") int page,

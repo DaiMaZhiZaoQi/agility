@@ -3,16 +3,17 @@ $(document).ready(function () {
     $("#logout-btn").click(function () {
         $.messager.confirm('确认对话框', "您确认退出系统吗?", function (r) {
             if (r) {
-                $.ajax({
-                    data: {},
-                    method: 'get',
-                    url: getRootPath() + '/system/logout',
-                    async: false,
-                    dataType: 'json',
-                    success: function (result) {
-                        location = getRootPath();
-                    },
-                });
+            	window.location.href=getRootPath();
+//                $.ajax({
+//                    data: {},
+//                    method: 'get',
+//                    url: getRootPath() + '/system/logout',
+//                    async: false,
+//                    dataType: 'json',
+//                    success: function (result) {
+//                        location = getRootPath();
+//                    },
+//                });
             }
         });
     });

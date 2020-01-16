@@ -1,9 +1,10 @@
 <%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<%@page import="com.hunt.model.dto.LoginInfo"%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="utf-8" %>
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>云录音</title>
+    <title>铱方云录音控制台</title>
     <link type="image/x-icon" rel="shortcut icon" href="${pageContext.request.contextPath}/static/image/favicon.ico">
     <link type="image/x-icon" rel="bookmark" href="${pageContext.request.contextPath}/static/image/favicon.ico">
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/css/easyui.css"/>
@@ -27,7 +28,7 @@
     								margin-right: 20px;"> 
 <div data-options="region:'north',border:false" style="height:55px;line-height:55px; background:#007ad5;padding: 0;">
     <div style="height: auto; float: left;" >
-        <span style="font-weight:bolder; font-size: large; padding-left: 20px;color: #ffffff">云录音后台</span>
+        <span style="font-weight:bolder; font-size: large; padding-left: 20px;color: #ffffff">铱方云录音控制台</span>
     </div>
     <div style="float:right;height: 40px;padding: 0;">
 
@@ -35,14 +36,14 @@
     <div style="float:right;height: 40px;padding-top: 0;">
         <span style="color: #ffffff ;font-weight: bolder;font-size: 18px;">欢迎您:${sessionScope.get("loginInfo").loginName}</span> &nbsp;&nbsp;
         <input
-            id="logout-btn" class="easyui-menubutton logout" style="visibility: hidden;" value="安全退出">
+            id="logout-btn" class="easyui-menubutton logout" value="安全退出">
     </div>
 </div>
 <div data-options="region:'west',border:true,split:true" style="text-align: center;width:160px;">
     <div class="easyui-accordion" data-options="border:false,fit:true,">
         <div title="系统管理" style="padding: 0 0 0 0px;background-color: #288bde;">
             <ul style="list-style: none;padding: 0 0 0 0 ;">
-                <shiro:hasPermission name="user:list">
+                <shiro:hasPermission name="user:manage">
                     <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
@@ -51,25 +52,25 @@
                         </li>
                     </div>
                 </shiro:hasPermission>
-                <shiro:hasPermission name="job:list">
-                    <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
+                <%-- <shiro:hasPermission name="job:list">
+                    <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;visibility: hidden;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0; "
                                  href="${pageContext.request.contextPath}/job/job">职位管理
                             </div>
                         </li>
                     </div>
-                </shiro:hasPermission>
-                <shiro:hasPermission name="organization:list">
+                </shiro:hasPermission> --%>
+                <shiro:hasPermission name="org:manage">
                     <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
-                                 href="${pageContext.request.contextPath}/organization/organization">机构管理
+                                 href="${pageContext.request.contextPath}/organization/organization">部门管理
                             </div>
                         </li>
                     </div>
                 </shiro:hasPermission>
-                <shiro:hasPermission name="role:list">
+                <shiro:hasPermission name="role:manage">
                     <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'"
@@ -79,7 +80,7 @@
                         </li>
                     </div> 
                 </shiro:hasPermission>
-                <shiro:hasPermission name="permission:list">
+               <%--  <shiro:hasPermission name="permission:list">
                     <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
@@ -87,10 +88,10 @@
                             </div>
                         </li>
                     </div>
-                </shiro:hasPermission>
+                </shiro:hasPermission> --%>
                 <!-- 设备管理 -->
-                <shiro:hasPermission name="device:list">
-                	<div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
+               <%--  <shiro:hasPermission name="device:list">
+                	<div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;visibility: hidden;">
                 	 	<li class="nav-list">
                 	 		<div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
                 	 			 href="${pageContext.request.contextPath}/systemdevice/device">话机管理
@@ -98,27 +99,27 @@
                 	 	</li>
                 	</div>
                 
-                </shiro:hasPermission>
+                </shiro:hasPermission> --%>
                 
-                <shiro:hasPermission name="data:list">
-                    <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
+              <%--   <shiro:hasPermission name="data:list">
+                    <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;visibility: hidden;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
                                  href="${pageContext.request.contextPath}/system/data">数据字典
                             </div>
                         </li>
                     </div>
-                </shiro:hasPermission>
-                <shiro:hasPermission name="user:loginStatu:list">
-                    <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
+                </shiro:hasPermission> --%>
+<%--                 <shiro:hasPermission name="user:loginStatu:list">
+                    <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;visibility: hidden;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
                                  href="${pageContext.request.contextPath}/system/online">在线状态
                             </div>
                         </li>
                     </div>
-                </shiro:hasPermission>
-                <shiro:hasPermission name="log:list">
+                </shiro:hasPermission> --%>
+                <shiro:hasPermission name="system:manage">
                     <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
@@ -127,7 +128,7 @@
                         </li>
                     </div>
                 </shiro:hasPermission>
-                <shiro:hasPermission name="ip:list">
+                <shiro:hasPermission name="system:manage">
                     <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
@@ -136,7 +137,7 @@
                         </li>
                     </div>
                 </shiro:hasPermission>
-                <shiro:hasPermission name="db:select">
+                <shiro:hasPermission name="system:manage">
                     <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
                         <li class="nav-list">
                             <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
@@ -145,15 +146,15 @@
                         </li>
                     </div>
                 </shiro:hasPermission>
-                 <shiro:hasPermission name="db:select">
-	                <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;">
+           <%--       <shiro:hasPermission name="db:select">
+	                <div style="padding: 5 10 5 10px;border-bottom: 1px solid #106dba;visibility: hidden;">
 	                    <li class="nav-list">
 	                        <div class="easyui-linkbutton" data-options="iconCls:'icon-reload'" style="border: 0;"
 	                             href="${pageContext.request.contextPath}/swagger-ui.html">接口文档
 	                        </div>
 	                    </li>
 	                </div>
-	             </shiro:hasPermission>
+	             </shiro:hasPermission> --%>
                <%--  <shiro:hasPermission name="">
                 
                 </shiro:hasPermission> --%>
@@ -175,4 +176,14 @@
     </div>
 </div>
 </body>
+	<script type="text/javascript">
+		<%
+			LoginInfo lf=(LoginInfo)session.getAttribute("loginInfo");
+			Long userId=lf.getId();
+		%>
+		var userd="<%=userId%>";
+		console.log("userId-->"+userd);
+		common_tool.setCurrUserId(userd);
+	</script>
+	
 </html>

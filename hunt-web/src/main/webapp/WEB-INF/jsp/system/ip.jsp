@@ -20,15 +20,15 @@
     <form id="ip_form">
         <input type="hidden" name="id" id="ip-id">
         <div style="float: left;height: 100%;">
-            <p style="padding: 10px;">&nbsp;&nbsp;&nbsp;IP:<input name="ip" id="ip-name"
+            <p style="padding: 10px;">&nbsp;&nbsp;&nbsp;IP:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input name="ip" id="ip-name"
                                                                   style="width: 300px;height: 35px"
                                                                   data-options="required:true"
                                                                   class="easyui-textbox easyui-validatebox"></p>
-            <p style="padding: 10px ;">到期时间:<input name="expireTime" id="ip-expireTime"
+            <p style="padding: 10px ;">到期时间:&nbsp;&nbsp;<input name="expireTime" id="ip-expireTime"
                                                    style="width: 300px;height: 35px"
                                                    data-options="required:true"
                                                    class="easyui-datetimebox"></p>
-            <p style="padding: 10px;"> &nbsp;&nbsp;描述:<input name="description" id="ip-description"
+            <p style="padding: 10px;"> &nbsp;&nbsp;描述:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input name="description" id="ip-description"
                                                              style="width: 300px;height: 130px"
                                                              data-options="required:true,multiline:true"
                                                              class="easyui-textbox easyui-validatebox">

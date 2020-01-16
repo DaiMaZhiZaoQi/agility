@@ -104,7 +104,7 @@
 		    	if(callDuration<60){
 		    		return "00:"+(callDuration<10?("0"+callDuration):(callDuration));
 		    	}else{
-		    		if(callDuration>60&&callDuration<3600){
+		    		if(callDuration>=60&&callDuration<=3600){
 		    			var minute=callDuration/60;
 		    			var second=callDuration%60;
 		    			var mi=Math.floor(minute);
@@ -139,8 +139,8 @@
 					    var callDate=recordCommon.getMoth(row.callDate);
 					    var callDuration=row.callDuration==0?"无通话时间":row.callDuration;
 					    var secondIsValid=recordCommon.secondIsValid(callDuration);
-					    var callDuration=recordCommon.secondToMinute(111111);
-						var recoAudioLength=recordCommon.secondToMinute(111111);
+					    var callDuration=common_tool.secondToMinute(111111);
+						var recoAudioLength=common_tool.secondToMinute(111111);
 						tr.append("<td>"+(i+1)+"</td>");
 					    tr.append('<td>'+type+'</td>');
 					    tr.append('<td>'+callNumber+'</td>');

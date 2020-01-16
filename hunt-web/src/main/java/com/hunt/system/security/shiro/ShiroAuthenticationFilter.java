@@ -38,8 +38,8 @@ public class ShiroAuthenticationFilter extends PassThruAuthenticationFilter {
             } else {										//  web访问，返回html
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/html;charset=UTF-8");
-                ((HttpServletResponse) response).sendRedirect("/hunt-admin");
-//                ((HttpServletResponse) response).sendRedirect("/zicoo");
+//                ((HttpServletResponse) response).sendRedirect("/hunt-admin");
+                ((HttpServletResponse) response).sendRedirect("/zicoo");
                 log.info("isLoginRequest-->");
             }
             return false;

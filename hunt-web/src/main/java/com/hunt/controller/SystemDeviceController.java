@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.ibatis.javassist.expr.NewArray;
@@ -25,14 +26,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.annotation.SessionScope;
 
+import com.hunt.dao.SysDeviceMapper;
+import com.hunt.dao.SysDeviceRoleOrgMapper;
+import com.hunt.dao.SysUserInOrgMapper;
 import com.hunt.dao.SysUserMapper;
 import com.hunt.model.dto.LoginInfo;
 import com.hunt.model.dto.PageInfo;
 import com.hunt.model.entity.SysDevice;
 import com.hunt.model.entity.SysDeviceRoleOrg;
+import com.hunt.model.entity.SysOrganization;
 import com.hunt.model.entity.SysUser;
+import com.hunt.model.entity.SysUserInOrg;
 import com.hunt.model.entity.SysUserRoleOrganization;
+import com.hunt.service.SysUserService;
 import com.hunt.service.SystemDeviceService;
+import com.hunt.util.PermissionCode;
 import com.hunt.util.PermissionUtil;
 import com.hunt.util.ResponseCode;
 import com.hunt.util.Result;
@@ -51,6 +59,14 @@ public class SystemDeviceController extends BaseController{
 	private SystemDeviceService mSysDeviceService;
 	@Autowired
 	private SysUserMapper mSysUserMapper;
+	@Autowired
+	private SysUserInOrgMapper mSysUserInOrgMapper;
+	@Autowired 
+	private SysUserService mSysUserService;
+	@Autowired
+	private SysDeviceMapper mSysDeviceMapper;
+	@Autowired
+	private SysDeviceRoleOrgMapper mSysDeviceRoleOrgMapper;
 	
 	@ApiOperation(value="设备列表静态页",httpMethod="GET",produces="text/html")
 	@RequestMapping(value="device",method=RequestMethod.GET)
@@ -72,44 +88,111 @@ public class SystemDeviceController extends BaseController{
 	@ApiOperation(value="添加设备",httpMethod="POST",produces="application/json",response=Result.class)
 	@ResponseBody
 //	@RequiresPermissions("device:insert") 
-	@RequestMapping(value="insert",method=RequestMethod.POST)
-	public Result insert(@RequestParam String deviceName,
-						@RequestParam(required=true)  String deviceSerial,
-						@RequestParam(required=false)  String description,
-						@RequestParam(required=false)  Long sysOrgId,
-						@RequestParam(required=false)  Long userId) {
-		boolean existDevice = mSysDeviceService.isExistDevice(deviceSerial);
-		if(existDevice) {						//  存在该设备
-			return Result.instance(ResponseCode.success.getCode(), "连接成功"); 
-		}
-		
-		if(userId!=null&&userId>0) {
-			SysUser sysUser = mSysUserMapper.selectById(userId);
-			if(sysUser==null) {
-				return Result.error(ResponseCode.data_not_exist.getMsg());
-//				return Result.success(sysUser);
+	@RequestMapping(value="insert",method={RequestMethod.POST,RequestMethod.GET})
+	public Result insert(@RequestParam(required=true,defaultValue="") String deviceName,
+						@RequestParam(required=true,defaultValue="")  String deviceSerial,
+						@RequestParam(required=false,defaultValue="我的话机")  String description,
+						@RequestParam(required=false) String userName,
+						@RequestParam(required=false) String password,
+						HttpServletRequest request
+						) {
+		String ip = request.getRemoteAddr();
+		SysDevice sysDevice= mSysDeviceMapper.selectByDeviceSerial(deviceSerial);
+		if(sysDevice!=null) {						//  存在该设备
+			List<SysDeviceRoleOrg> selectByDeviceId = mSysDeviceRoleOrgMapper.selectByDeviceId(sysDevice.getId());
+			if(selectByDeviceId!=null&&selectByDeviceId.size()>0) {		//  存在该设备已绑定
+				SysDeviceRoleOrg sysDeviceRoleOrg = selectByDeviceId.get(0);
+				Long sysUserId = sysDeviceRoleOrg.getSysUserId();
+				SysUser userDb = mSysUserMapper.selectById(sysUserId);
+				if (userDb.getLoginName().equals(userName)) {	// 用户已绑定
+					 Boolean checkPassWord = checkPassWord(userDb,password);
+					 if(!checkPassWord) {
+						 return Result.instance(ResponseCode.password_incorrect.getCode(), ResponseCode.password_incorrect.getMsg());
+					 }else {
+						 updateHeart(request,deviceSerial);
+						 return Result.instance(ResponseCode.success.getCode(), "连接成功");
+					}
+				}else {				//  用户已绑定，解绑原来的绑定
+				
+				}
+			}
+			
+			//  验证用户名密码，判断用户添加设备权限  重新绑定用户
+			SysUser user = mSysUserMapper.selectUserByLoginName(userName);
+			if(user==null) {
+				return Result.instance(ResponseCode.name_no_exist.getCode(), ResponseCode.name_no_exist.getMsg());
+			}else {
+				SysUserInOrg sysUserInOrg = mSysUserInOrgMapper.selectByUserId(user.getId());
+				 if(sysUserInOrg==null) {
+					 return Result.instance(ResponseCode.user_no_in_org.getCode(), ResponseCode.user_no_in_org.getMsg());
+				 }
+				 Boolean checkPassWord = checkPassWord(user,password);
+				 if(!checkPassWord) {
+					 return Result.instance(ResponseCode.password_incorrect.getCode(), ResponseCode.password_incorrect.getMsg());
+				 }else {
+					if(!mobileHasPermission(user.getId(), PermissionCode.DEVICE_INSERT.pName)) {
+						return Result.instance(PermissionCode.DEVICE_INSERT.pCode, PermissionCode.DEVICE_INSERT.pMsg);
+					}else {
+						sysUserInOrg = mSysUserInOrgMapper.selectByUserId(user.getId());
+						sysDevice.setSysOrgId(sysUserInOrg.getSysOrgId());
+						sysDevice.setSysOrgCode(sysUserInOrg.getSysOrgCode());
+						
+						sysDevice.setDeviceMsg(ip);
+						Long updateDevice = mSysDeviceService.updateDevice(sysUserInOrg.getSysOrgId(),sysDevice,user.getId());
+						if(updateDevice>0) {
+							return Result.instance(ResponseCode.success.getCode(), "连接成功");
+						}
+					}
+				}
+				
+			}
+		}else {				//  不存在该设备
+			//  验证用户名密码，判断用户添加设备权限
+			SysUser user = mSysUserMapper.selectUserByLoginName(userName);
+			if(user==null) {
+				return Result.instance(ResponseCode.name_no_exist.getCode(), ResponseCode.name_no_exist.getMsg());
+			}else {
+				SysUserInOrg sysUserInOrg = mSysUserInOrgMapper.selectByUserId(user.getId());
+				 if(sysUserInOrg==null) {
+					 return Result.instance(ResponseCode.user_no_in_org.getCode(), ResponseCode.user_no_in_org.getMsg());
+				 }
+				 Boolean checkPassWord = checkPassWord(user, password);
+				 if(!checkPassWord) {
+					 return Result.instance(ResponseCode.password_incorrect.getCode(), ResponseCode.password_incorrect.getMsg());
+				 }else {
+					 if(!mobileHasPermission(user.getId(), PermissionCode.DEVICE_INSERT.pName)) {
+							return Result.instance(PermissionCode.DEVICE_INSERT.pCode, PermissionCode.DEVICE_INSERT.pMsg);
+						}
+						SysDevice sysDeviceN = new SysDevice();
+						sysDeviceN.setDeviceName(deviceName);
+				        sysDeviceN.setCreateBy(user.getId());
+				        sysDeviceN.setCreateBy(user.getId());
+				        sysDeviceN.setDeviceSerial(deviceSerial);
+				        sysDeviceN.setDescription(description);
+						sysDeviceN.setStatus(1);
+						sysDeviceN.setDeviceMsg(ip);
+						Long deviceId = mSysDeviceService.insertDevice(sysDeviceN,user.getId(),sysUserInOrg);
+						if(deviceId<=0) {
+							Result result = new Result(30003,"序列号已存在");
+							return result;
+						}
+				}
+			
 			}
 		}
-		SysDevice sysDevice = new SysDevice();
-		sysDevice.setDeviceName(deviceName);
-        Subject subject = SecurityUtils.getSubject();
-        LoginInfo loginInfo=(LoginInfo)subject.getSession().getAttribute("loginInfo");
-        if (loginInfo!=null) {
-        	Long createId = loginInfo.getId(); 
-        	sysDevice.setCreateBy(createId);
-		}
-		sysDevice.setDeviceSerial(deviceSerial);
-		sysDevice.setDescription(description);
-		if(sysOrgId!=null&&sysOrgId>0) {
-			sysDevice.setStatus(1);
-		}
-		Long deviceId = mSysDeviceService.insertDevice(sysDevice,userId,sysOrgId);
-		if(deviceId<=0) {
-			Result result = new Result(30003,"序列号已存在");
-			return result;
-		}
-		return Result.success(sysDevice);
+		 return Result.instance(ResponseCode.success.getCode(), "连接成功");
 	}
+	
+	private Boolean checkPassWord(SysUser sysUser,String password) {
+		String passwordSalt = sysUser.getPasswordSalt();
+		String userDbPassWord = sysUser.getPassword();
+		String createPassword = StringUtil.createPassword(password, passwordSalt, 2);
+		if(!createPassword.equals(userDbPassWord)) { // 密码不正确
+			return false;
+		}	
+		return true;
+	}
+	
 	
 	/**
 	 * 修改设备绑定
@@ -132,26 +215,42 @@ public class SystemDeviceController extends BaseController{
 			@RequestParam(value="userName",required=false,defaultValue="") String userName, 
 			@RequestParam(value="passWord",required=false) String password,
 			@RequestParam(required=false)  Long userId) {
-//		boolean existDevice = mSysDeviceService.isExistDevice(deviceSerial);
-//		if(existDevice) {						//  存在该设备
-//			return Result.error(ResponseCode.name_already_exist.getMsg());
-//		}
+		
 		log.info("update-->"+sysOrgId);
-//		if(userId!=null&&userId>0) {
-//			SysUser sysUser = mSysUserMapper.selectById(userId);
-//			if(sysUser==null) {
-//				return Result.error(ResponseCode.data_not_exist.getMsg());
-//			}
-//		}
 		if(StringUtils.isEmpty(deviceSerial)) {
 			return Result.instance(ResponseCode.missing_parameter.getCode(), "缺少机器序列号");
-		}
-		if(!StringUtils.isEmpty(userName)) {	//  自动绑定
-			return mSysDeviceService.autoBind(deviceSerial, deviceName, userName, password);
 		}
 		if(deviceId==null||deviceId==0) {
 			return Result.error(ResponseCode.data_not_exist.getMsg());
 		} 
+		
+		SysUserInOrg sysUserInOrg=null;
+		SysUser user=null;
+		if(!StringUtils.isEmpty(userName)) {	//  自动绑定
+					//  验证用户名密码，判断用户添加设备权限
+					user = mSysUserMapper.selectUserByLoginName(userName);
+					if(user==null) {
+						return Result.instance(ResponseCode.name_no_exist.getCode(), ResponseCode.name_no_exist.getMsg());
+					}else {
+						userId=user.getId();
+						 sysUserInOrg = mSysUserInOrgMapper.selectByUserId(userId);
+						 if(sysUserInOrg==null) {
+							 return Result.instance(ResponseCode.user_no_in_org.getCode(), ResponseCode.user_no_in_org.getMsg());
+						 }
+						String passwordSalt = user.getPasswordSalt();
+						String userDbPassWord = user.getPassword();
+						String createPassword = StringUtil.createPassword(password, passwordSalt, 2);
+						if(!createPassword.equals(userDbPassWord)) {	// 密码不正确
+							return Result.instance(ResponseCode.password_incorrect.getCode(), ResponseCode.password_incorrect.getMsg());
+						} else {										//查询用户设备添加权限
+							if(!mobileHasPermission(user.getId(), PermissionCode.DEVICE_INSERT.pName)) {
+								return Result.instance(PermissionCode.DEVICE_INSERT.pCode, PermissionCode.DEVICE_INSERT.pMsg);
+							}
+						}
+					}
+			
+			return mSysDeviceService.autoBind(deviceSerial, deviceName, user,sysUserInOrg);
+		}
 		SysDevice sysDevice = new SysDevice();
 		sysDevice.setId(deviceId);
 		sysDevice.setDeviceName(deviceName);

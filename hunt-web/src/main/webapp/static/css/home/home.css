@@ -7,8 +7,8 @@
     font-family: "Microsoft YaHei","SF Pro Display",Roboto,Noto,Arial,"PingFang SC",sans-serif;
 }
  
- .clearfix:before,
-        .clearfix:after {
+
+        .clearfix:before, .clearfix:after {
             display: table;
             content: "";    /*不用有内容也可以*/
         }
@@ -51,7 +51,7 @@ a{
 }
 /* 选中时的颜色 */
 .datagrid-row-selected{
-	background: #88d8ff;
+	background: #c4e4ff;  
 }
 
 /*id选择器与标签选择器混合用 */
@@ -101,7 +101,7 @@ a{
 .device-item{
 	padding-bottom:10px;
 	margin-top: 20px;
-    border-left: 5px solid #007ad5;
+    border-left: 4px solid #007ad5;
 	background-color: #fafafa;
 	}
 #sp_device_title{
@@ -149,19 +149,24 @@ a{
 			font-size:14px;
 			padding-left: 25px;
     		padding-right: 25px;
-    		white-space: nowrap;
+    		word-break: keep-all;
+			white-space:nowrap;
 	}
 	
 	.deviceCallLog .changeTd{
 		overflow: hidden;
-		max-width: 80px;
-		min-width: 80px;
+		/* max-width: 80px;
+		min-width: 80px; */
+		max-width: 110px;
+    	min-width: 30px;
 	}
 	
 	.deviceCallLog .bigTd{
 		vertical-align: middle;
-		max-width: 130px;
-		min-width: 130px;
+	   	max-width: 125px;
+	    min-width: 70px;
+		/* max-width: 130px;
+		min-width: 130px; */
 	}
 	
   .deviceCallLog th {
@@ -172,5 +177,71 @@ a{
 			padding-bottom:5px;
 			margin-right: 5px;
 			font-size:15px;
-		}
-
+			white-space: nowrap;
+	}
+	
+	.roleManage{
+		display: none;
+	}
+	
+	/**用户管理 */
+	.userManage{
+		display: none;
+	}
+	/**设备管理*/
+	.deviceManage{
+		display: none;
+	}
+	
+	/**查询通话记录*/
+	.callLogSelect{
+		display: none;
+	}
+	/**通话记录维护  */
+	.callLogDelete{
+		display: none;
+	}
+	
+	/**录音查询  */
+	.recordSelect{
+		display: none;
+	}
+	
+	/**发布通讯录*/
+	.contactInsert{
+		display:none;
+	}
+	
+	/**查找通讯录*/
+	.contactSelect{
+		display: none;
+	}
+	/**通讯录维护  */
+	.contactDelete{
+		display: none;
+		cursor: pointer;
+	}
+	
+	
+	.inscribe a{
+		font-size: 14px;
+		color: #000000;
+		
+	}
+	.inscribe span{
+		font-size: 14px;
+		color: #000000;
+		
+	}
+	
+	br{
+		height: 5px;
+		line-height: 5px;
+	}
+	
+	
+	
+	
+	
+	
+	

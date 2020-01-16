@@ -1,5 +1,6 @@
 
 var csxAudioSp=window.NameSpace||{};
+
 csxAudioSp.data={
 				playpg:getRootPath()+"/static/css/home/csxAudio/play.png",
 				stoppg:getRootPath()+"/static/css/home/csxAudio/stop.png",
@@ -27,6 +28,7 @@ csxAudio={
 		if(audio==undefined){
 			return;
 		}
+		audio.load();
 		// var audio=document.getElementById("audio");			//7
 		// var time=document.getElementById("time");		// 5
 		var time=audiosx.children[5];		// 5
@@ -93,7 +95,7 @@ csxAudio={
 		}
 		
 		function changTime(timeV){
-			curTime.innerHTML=secondToMinute(timeV)+"&nbsp;/&nbsp";
+			curTime.innerHTML=secondToMinute(timeV)+"/&nbsp;";
 		}
 		var changeV=0;
 		function changeColor(barLable){
@@ -105,27 +107,29 @@ csxAudio={
 			changeV++;
 		}
 		
+	
+		
 		/**秒数转分钟*/    
-		function secondToMinute(callDuration){
-			if(callDuration<60){
-				callDuration=parseInt(callDuration);
-				return "00:"+(callDuration<10?("0"+callDuration):(callDuration));
-			}else{
-				if(callDuration>60&&callDuration<3600){
-					var minute=callDuration/60;
-					var second=callDuration%60;
-					var mi=Math.floor(minute);
-					var sec=parseInt(Math.floor(second));
-					console.log("sec"+sec);
-					return (mi<10?("0"+mi):mi)+":"+(sec<10?("0"+sec):sec);
-				}else{
-					var hour=callDuration/3600;
-					var m=callDuration%3600;
-					var minute=deviceCallLog.secondToMinute(m);
-					return Math.floor(hour)+":"+minute;
-				}
-			}
-		}
+	    function secondToMinute(callDuration){
+	    	
+	    	if(callDuration<60){
+	    		callDuration=Math.round(callDuration);
+	    		return "00:"+(callDuration<10?("0"+callDuration):callDuration);
+	    	}else{
+	    		if(callDuration>=60&&callDuration<=3600){
+	    			var minute=callDuration/60;
+	    			var second=callDuration%60;
+	    			var mi=Math.floor(minute);
+	    			var sec=Math.round(second);
+	    			return (mi<10?("0"+mi):mi)+":"+(sec<10?("0"+sec):sec);
+	    		}else{
+	    			var hour=callDuration/3600;
+	    			var m=callDuration%3600;
+	    			var minute=recordCommon.secondToMinute(m);
+	    			return Math.floor(hour)+":"+minute;
+	    		}
+	    	}
+	    }
 		    
 		
 			// 没有资源
@@ -134,25 +138,29 @@ csxAudio={
 				play.disabled="disabled";
 				bar.onclick="disabled";
 			}
+		
 			var audioDuration=0;
 			audio.oncanplay=function(){ 	//  音频长度
 				audioDuration=audio.duration;
-				var minute=secondToMinute(audio.duration);
+				var minute=secondToMinute(audioDuration);
+				if(audioDuration>=3600){
+					time.style.right="29px";
+				}else{
+					
+				}
 				time.innerHTML=minute; 
 				if(audioDuration>0){
 					csxAudioSp.data.autoplay=true;
 				}
 			}	
-			// audio.onseeked 
-			audio.onplay=function(){
-			}
-			audio.onplaying=function(){
-			}
+		
+		
 			audio.ontimeupdate=function(){
 				// if(fromUser)return;
 //				if(csxAudioSp.data.playBtn==null)return;
-				var curTimeV=audio.currentTime;
+				var curTimeV=audio.currentTime;			//   音频不能拖放原因
 				console.log("curTime"+curTimeV);
+				if(audioDuration<=0)return;
 				var rate=(curTimeV/audioDuration);
 				console.log("rate-->"+rate);
 				var stepTime=(rate*100);
@@ -215,7 +223,8 @@ csxAudio={
 	},
 	
 	init:function(parentId){
-		var audioTag=document.getElementsByClassName("audiosx");
+//		var audioTag=document.getElementsByClassName("audiosx");
+		var audioTag=document.getElementsByName(parentId);
 		if(audioTag==undefined||audioTag.length<=0){
 			console.log("没有找到资源");
 			return;

@@ -2,12 +2,20 @@ package com.hunt.controller;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.ibatis.annotations.Param;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.junit.validator.PublicClassValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,23 +37,37 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.hunt.dao.SysDeviceMapper;
+import com.hunt.dao.SysDeviceRoleOrgMapper;
+import com.hunt.dao.SysOrganizationMapper;
+import com.hunt.dao.SysUserInOrgMapper;
 import com.hunt.dao.SysUserMapper;
+import com.hunt.model.dto.PageDto;
 import com.hunt.model.dto.PageInfo;
+import com.hunt.model.dto.SysContactDto;
 import com.hunt.model.dto.SysContactUserDto;
+import com.hunt.model.dto.SysUserGroupDto;
 import com.hunt.model.dto.SysUserOrgDto;
 import com.hunt.model.dto.UpFileResultDto;
 import com.hunt.model.entity.SysContact;
 import com.hunt.model.entity.SysContactUser;
+import com.hunt.model.entity.SysDevice;
 import com.hunt.model.entity.SysDeviceRoleOrg;
+import com.hunt.model.entity.SysOrganization;
 import com.hunt.model.entity.SysUser;
+import com.hunt.model.entity.SysUserInOrg;
+import com.hunt.properties.PropertiesUtil;
 import com.hunt.service.DeviceContactService;
 import com.hunt.service.DeviceManageService;
 import com.hunt.service.SystemService;
+import com.hunt.util.AESCipher;
 import com.hunt.util.DateUtil;
+import com.hunt.util.PermissionCode;
 import com.hunt.util.PermissionUtil;
 import com.hunt.util.ResponseCode;
 import com.hunt.util.Result;
 import com.hunt.util.StringUtil;
+import com.hunt.util.UtReadCsv;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -56,6 +79,12 @@ public class DeviceContactControler extends BaseController{
 
 	@Autowired
 	private SysUserMapper mSysUserMapper;
+	
+	@Autowired
+	private SysUserInOrgMapper mSysUerInOrgMapper;
+	@Autowired
+	private SysOrganizationMapper mSysOrganizationMapper;
+	
 	@Autowired
 	private SystemService mSystemService;
 	
@@ -64,6 +93,13 @@ public class DeviceContactControler extends BaseController{
 	
 	@Autowired
 	private DeviceManageService mDeviceManageService;
+	@Autowired
+	private SysDeviceMapper mSysDeviceMapper;
+	@Autowired
+	private SysDeviceRoleOrgMapper mSysDeviceRoleOrgMapper;
+	
+	@Autowired
+	private PropertiesUtil mPropertiesUtil;
 	
 	
 	@ApiOperation(value="通讯录管理",produces="text/html",httpMethod="GET")
@@ -81,10 +117,12 @@ public class DeviceContactControler extends BaseController{
 	@ResponseBody
 	public Result upFile(@RequestParam("file") MultipartFile[] mf,
 						@RequestParam("userId") Long userId,
-//						@RequestParam(value="sysFileName",required=false,defaultValue="") String sysFileName,//  修改该文件时的该文件名 
 						@RequestParam(value="contactId",required=false,defaultValue="") Long contactId,
 						HttpServletRequest request)  {
-		if(mf==null||mf.length==0) {
+		if(!mobileHasPermission(userId, PermissionCode.CONTACT_INSERT.pName)) {
+			return Result.instance(PermissionCode.CONTACT_INSERT.pCode, PermissionCode.CONTACT_INSERT.pMsg);
+		}
+		if(mf==null||mf.length==0) {  
 			return new Result(ResponseCode.missing_parameter.getCode(),"缺少文件");
 		}
 		System.out.println("文本内容-->"+Arrays.toString(mf)); 
@@ -93,31 +131,96 @@ public class DeviceContactControler extends BaseController{
 				File absoFile=null;
 				String fileName="";
 				SysContact sysContact=null;
+				SysUserInOrg sysUserInOrg = mSysUerInOrgMapper.selectByUserId(userId);
+				SysOrganization sysOrganization = mSysOrganizationMapper.selectById(sysUserInOrg.getSysOrgId());
 				if(contactId!=null&&contactId>0) {
-					 sysContact= mDeviceContactService.selectContact(contactId);
+					 sysContact= mDeviceContactService.selectContactNoStatus(contactId);
 					String absolutePath = sysContact.getAbsolutePath();
 					fileName=sysContact.getOriFileName();
 					absoFile=new File(absolutePath);
 					
 				}else {
 					if(i>0)return new Result(ResponseCode.missing_parameter.getCode(),"缺少文件");
-					SysUser sysUser = mSysUserMapper.selectById(userId);
-					String fileTop=sysUser.getLoginName()+"_"+userId;
+//					SysUser sysUser = mSysUserMapper.selectById(userId);
+				
+//					String fileTop=sysUser.getLoginName()+"_"+userId; 
+					String fileTop=sysOrganization.getName()+"_"+sysOrganization.getId();
 					fileName= mf[0].getOriginalFilename();
 					String fileType=fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase().trim();
-					if(!fileType.equals("csv"))return new Result(ResponseCode.missing_parameter.getCode(),"不支持的格式,请联系管理员");
+					if(!fileType.equals("csv"))return new Result(ResponseCode.missing_parameter.getCode(),"不支持的格式,请上传csv文件");
 					absoFile = createFile(fileTop, request, fileType);
 				}
 			
 				//  获取文件保存的真实路径
 				try { 
+					
 					mf[0].transferTo(absoFile);
+					String enCodeType= UtReadCsv.getFileEncode2(absoFile.getAbsolutePath());
+					BufferedReader read =null;
+					BufferedWriter writer=null;
+					FileOutputStream fOut=null;
+					FileInputStream fRead=null;
+					File newFile=null;
+					try {
+						if(!"utf-8".equals(enCodeType)) {
+							System.out.println("编码格式-->"+enCodeType);
+							read= new BufferedReader(new InputStreamReader(new FileInputStream(absoFile),enCodeType));
+							String str="";
+							
+							String parent = absoFile.getParent();
+							
+							newFile=new File(parent,"TEMP"+System.currentTimeMillis()+".csv");
+							writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile),"UTF-8"));
+							
+							while((str=read.readLine())!=null) { 
+//								System.out.println("读物文件--->str"+str);
+								writer.write(str+"\n");
+							}
+							writer.flush();
+							String name = absoFile.getName(); 
+							absoFile.delete();
+							File fileResult = new File(parent,name);
+							fOut= new FileOutputStream(fileResult);
+							fRead = new FileInputStream(newFile);
+							int len=0;
+							byte[] bs=new byte[1024*8];
+							while((len=fRead.read(bs))!=-1) {
+								fOut.write(bs,0,bs.length);
+							}
+							fOut.flush();
+							fRead.close();
+							
+							absoFile=fileResult;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}finally {
+						if(read!=null) {
+							read.close();
+						}
+						if(writer!=null) {
+							writer.close();
+						}
+						if(fOut!=null) {
+							fOut.close();
+						}
+						if(fRead!=null) {
+							fRead.close();
+						}
+						if(newFile!=null) {
+							newFile.delete();
+							if(newFile.exists()) {
+								System.out.println("文件-->"+newFile.getAbsolutePath());
+							}
+						}
+					}
+				
 					//  存入数据库，并加入缓存
 					if(sysContact==null) { 
 						sysContact = new SysContact(null,"",absoFile.getName(),fileName,"",absoFile.getAbsolutePath(),userId,userId);
 					}
 					
-					Result result = mDeviceContactService.insertContact(sysContact,userId);
+					Result result = mDeviceContactService.insertContact(sysContact,userId,sysOrganization);
 					if(result.getCode()==ResponseCode.success.getCode()) {
 						/*mDeviceContactService.selectContact(contactId);*/
 						UpFileResultDto upFileResultDto = new UpFileResultDto();
@@ -152,6 +255,9 @@ public class DeviceContactControler extends BaseController{
 		if(!StringUtils.isEmpty(deviceSerial)) {
 			SysDeviceRoleOrg sysDeviceRoleOrg = mDeviceManageService.selectBySerial(deviceSerial);
 			Long userId=sysDeviceRoleOrg.getSysUserId();
+			if(!mobileHasPermission(userId, PermissionCode.CONTACT_INSERT.pName)) {
+				return Result.instance(PermissionCode.CONTACT_INSERT.pCode, PermissionCode.CONTACT_INSERT.pMsg);
+			}
 			if(files.length<=0) {
 				return new Result(ResponseCode.missing_parameter.getCode(),"缺少文件");
 			}
@@ -168,18 +274,20 @@ public class DeviceContactControler extends BaseController{
 					}
 				} 
 			}
-			SysUser sysUser = mSysUserMapper.selectById(userId);
-			String fileTop=sysUser.getLoginName()+"_"+userId;
+			SysUserInOrg sysUserInOrg = mSysUerInOrgMapper.selectByUserId(userId);
+			SysOrganization sysOrganization = mSysOrganizationMapper.selectById(sysUserInOrg.getSysOrgId());
+//			SysUser sysUser = mSysUserMapper.selectById(userId);
+			String fileTop=sysOrganization.getName()+"_"+sysOrganization.getId();
 			String fileName= files[0].getOriginalFilename();
 			String fileType=fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase().trim();
-			if(!fileType.equals("csv"))return new Result(ResponseCode.missing_parameter.getCode(),"不支持的格式,请联系管理员");
+			if(!fileType.equals("csv"))return new Result(ResponseCode.missing_parameter.getCode(),"不支持的格式,请上传csv文件");
 			File absoFile = createFile(fileTop, request, fileType);
 			try {
 				files[0].transferTo(absoFile);
 				String contactName=absoFile.getName();
 				String filePath=absoFile.getAbsolutePath();
 				SysContact sysContact = new SysContact(0l, "",contactName, fileName,synCode,filePath, userId, userId);
-				return mDeviceContactService.mInsertContact(sysContact, userId);
+				return mDeviceContactService.mInsertContact(sysContact, userId,sysOrganization);
 //				return Result.success(sysContact);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -216,11 +324,17 @@ public class DeviceContactControler extends BaseController{
 		if(contactId==null||contactId<=0) {
 			return new Result(ResponseCode.missing_parameter.getCode(),"请先上传文件");
 		}
+		if(!mobileHasPermission(userId, PermissionCode.CONTACT_INSERT.pName)) {
+			return Result.instance(PermissionCode.CONTACT_INSERT.pCode, PermissionCode.CONTACT_INSERT.pMsg);
+		}
 //			SysUser sysUser = mSysUserMapper.selectById(userId);
 			SysContactUserDto sysContactUserDto = new SysContactUserDto();
 			sysContactUserDto.setSysContact(new SysContact(contactId,"","","",contactSychPassword,"",userId,userId));
-			sysContactUserDto.setSysContactUser(new SysContactUser(null,userId,null));
-			mSystemService.clearAuthorizationInfoCacheByUserId(userId);
+			SysUserInOrg sysUserInOrg = mSysUerInOrgMapper.selectByUserId(userId);
+			SysContactUser sysContactUser = new SysContactUser(contactId,sysUserInOrg.getSysOrgId());
+			sysContactUser.setSysUserId(userId);
+			sysContactUserDto.setSysContactUser(sysContactUser);
+//			mSystemService.clearAuthorizationInfoCacheByUserId(userId);
 			return mDeviceContactService.uploadContact(sysContactUserDto);
 	}
 	
@@ -229,25 +343,67 @@ public class DeviceContactControler extends BaseController{
 	@RequestMapping(value="deleteContact")
 	public Result deleteContact(@RequestParam(value="userId",defaultValue="0") Long userId,
 								@RequestParam(value="contactId",defaultValue="0") Long contactId) {
-		String permName="contact:"+contactId+":delete";
-		boolean hasDataPermission = PermissionUtil.hasDataPermission(userId, permName);
-		if(!hasDataPermission)return Result.instance(ResponseCode.can_not_edit.getCode(), "您没有删除权限，请联系作者");
+		if(!mobileHasPermission(userId, PermissionCode.CONTACT_DELETE.pName)) {
+			return Result.instance(PermissionCode.CONTACT_DELETE.pCode, PermissionCode.CONTACT_DELETE.pMsg);
+		}
 		Result result=mDeviceContactService.updateContact(contactId, userId);
-		mSystemService.clearAuthorizationInfoCacheByUserId(userId);
+//		mSystemService.clearAuthorizationInfoCacheByUserId(userId);
 		return result;
 	}
 	
 	@RequestMapping("download")
 	@ResponseBody
-	public void downLoad(@RequestParam("contactId") Long contactId,
+	public Result downLoad(@RequestParam("contactId") Long contactId,
+						 @RequestParam(value="deviceSerial",required=false,defaultValue="0") String deviceSerial,
+						 @RequestParam(value="userId",required=false,defaultValue="0") Long userId,
+						 @RequestParam(value="password",required=false,defaultValue="") String password,
+						 @RequestParam(value="passwordOk",required=false,defaultValue="0") String passwordOk,
 						HttpServletRequest request,
 						HttpServletResponse resp) {
 		//  判断文件下载权限
+		if(!"0".equals(deviceSerial)&&"0".equals(userId+"")) {		//   移动端
+			//  移动端下载
+			SysDevice sysDevice= mSysDeviceMapper.selectByDeviceSerial(deviceSerial);
+			if(sysDevice!=null) {						//  存在该设备
+				List<SysDeviceRoleOrg> selectByDeviceId = mSysDeviceRoleOrgMapper.selectByDeviceId(sysDevice.getId());
+				if(selectByDeviceId!=null&&selectByDeviceId.size()>0) {		//  存在该设备已绑定
+					SysDeviceRoleOrg sysDeviceRoleOrg = selectByDeviceId.get(0);
+					Long sysUserId = sysDeviceRoleOrg.getSysUserId();
+					if(!mobileHasPermission(sysUserId, PermissionCode.CONTACT_SELECT.pName)) {
+						return Result.instance(PermissionCode.CONTACT_SELECT.pCode, PermissionCode.CONTACT_SELECT.pMsg);
+					}
+					passwordOk="1";
+					updateHeart(request,deviceSerial);
+				}
+			}else {
+				return Result.instance(ResponseCode.device_not_exist.getCode(), ResponseCode.device_not_exist.getMsg());
+			}
+		}else if("0".equals(deviceSerial)&&!"0".equals(userId+"")){			//  web端
+			//  pc端下载
+			if(!mobileHasPermission(userId, PermissionCode.CONTACT_SELECT.pName)) {
+				return Result.instance(PermissionCode.CONTACT_SELECT.pCode, PermissionCode.CONTACT_SELECT.pMsg);
+			}
+		}else {
+			return Result.instance(ResponseCode.missing_parameter.getCode(), "缺少参数，设备序列号deviceSerial");
+		}
+		
 		SysContact sysContact = mDeviceContactService.selectContact(contactId);
-		if(sysContact==null) return ;
+		if(sysContact==null)return Result.instance(ResponseCode.file_not_exist.getCode(), ResponseCode.file_not_exist.getMsg());
 		String absolutePath = sysContact.getAbsolutePath();
 		File file = new File(absolutePath);
-		if(!file.exists())return;
+		boolean passDownLoad=false;
+		if(!file.exists())return Result.instance(ResponseCode.file_not_exist.getCode(), ResponseCode.file_not_exist.getMsg());
+		if(!StringUtils.isEmpty(password)) {  // 密码验证
+			String contactSychPassword = sysContact.getContactSychPassword();
+			if(!password.equals(contactSychPassword)) {
+				return Result.instance(ResponseCode.password_incorrect.getCode(), ResponseCode.password_incorrect.getMsg());
+			}
+			if("0".equals(passwordOk)) {
+				return Result.success();
+			}
+			file = AESCipher.deFile(absolutePath, contactSychPassword);
+			passDownLoad=true;
+		}
 		FileInputStream read=null;
 		ServletOutputStream write=null;
 		try {
@@ -268,7 +424,7 @@ public class DeviceContactControler extends BaseController{
 			} else {
 				filename = URLEncoder.encode(filename, "UTF-8");//其他浏览器
 			}
-			resp.setHeader("Content-Disposition", "attachment;fileName="+filename);
+			resp.setHeader("Content-Disposition", "attachment;fileName="+sysContact.getOriFileName());
 			byte[] bs=null;
 			while(read.available()>0) {
 				System.out.println("readlength-->"+read.available());
@@ -292,6 +448,7 @@ public class DeviceContactControler extends BaseController{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
+			
 			if(read!=null) {
 				try {
 					read.close();
@@ -308,24 +465,60 @@ public class DeviceContactControler extends BaseController{
 					e.printStackTrace();
 				}
 			}
+			if(passDownLoad) {
+				file.delete();
+			}
 		}
+		return Result.success();
 		
 	}
 	
 	
 	
 	@ApiOperation(value="移动端查询所有通讯录",httpMethod="GET",produces="application/json")
-	@RequestMapping(value="list",method=RequestMethod.GET)
+	@RequestMapping(value="list",method= {RequestMethod.GET,RequestMethod.POST})
 	@ResponseBody
 	public PageInfo list(@RequestParam(value="userId",defaultValue="0") Long userId,
-						@RequestParam(value="deviceSerial",defaultValue="") String deviceSerial) {
+						@RequestParam(value="deviceSerial",defaultValue="") String deviceSerial,
+						@RequestParam(value="pageDto",defaultValue="",required=false) String pageDtoJson,
+						HttpServletRequest request
+						) {
 		int visiteTyep=1;
 		if(!StringUtils.isEmpty(deviceSerial)) {
 			SysDeviceRoleOrg sysDeviceRoleOrg = mDeviceManageService.selectBySerial(deviceSerial);
+			if(sysDeviceRoleOrg==null) {
+				PageInfo pageInfo=new PageInfo(ResponseCode.device_not_bind.getCode(), new ArrayList<>());
+				pageInfo.setOtherRows("设备没有绑定到用户,或者设备已删除");
+				return pageInfo;
+			}
 			userId=sysDeviceRoleOrg.getSysUserId();
 			visiteTyep=0;
+		}else if("0".equals(userId+"")){
+			return new PageInfo(0, ResponseCode.missing_parameter.getMsg()+",deviceSerial");
 		}
-		List<SysContact> listContact = mDeviceContactService.selectByUserId(userId,visiteTyep);
+		if(!mobileHasPermission(userId, PermissionCode.CALLLOG_SELECT.pName)) {
+			return new PageInfo(PermissionCode.CALLLOG_SELECT.pCode,Result.instance(PermissionCode.CALLLOG_SELECT.pCode, PermissionCode.CALLLOG_SELECT.pMsg));
+		}
+		
+		if(visiteTyep==1) {
+			PageDto pageDto = JsonUtils.readValue(pageDtoJson, PageDto.class);
+			Integer total=0;
+			if(pageDto!=null) {
+				if(pageDto.getPage()==1) {	// 首次加载
+					 total= mDeviceContactService.selectTotal(userId);
+				}
+			}
+			List<SysContactDto> listSysContactDto = mDeviceContactService.selectByOrgId2(userId, pageDto);
+			return new PageInfo(total==0?listSysContactDto.size():total, listSysContactDto);
+			
+		}
+		
+		if(visiteTyep==0) {
+			updateHeart(request,deviceSerial);
+		}
+		
+//		List<SysContact> listContact = mDeviceContactService.selectByUserId(userId,visiteTyep);
+		List<SysContactDto> listContact = mDeviceContactService.selectByOrgId(userId);
 		return new PageInfo(listContact.size(),listContact);
 	}
 	
@@ -364,7 +557,13 @@ public class DeviceContactControler extends BaseController{
 		String createFilePath = DateUtil.createFilePath(currTime);
 		String realPath=obj+createFilePath;
 		// 文件夹的结构 登录名称_userId/    
-		String realPathParent=new File(path).getParent()+File.separator+realPath;
+		String realPathParent=null;
+		if(!StringUtils.isEmpty(mPropertiesUtil.getCsvFilePath())) {
+			realPathParent=mPropertiesUtil.getCsvFilePath()+File.separator+realPath;
+		} else {
+			realPathParent=new File(path).getParent()+File.separator+realPath;
+		}
+		
 		File file = new File(realPathParent);
 		if(!file.exists()) {
 			file.mkdirs();
@@ -377,18 +576,49 @@ public class DeviceContactControler extends BaseController{
 	}
 	
 
+//	@ResponseBody
+//	@ApiOperation(value="授权通讯录",produces="application/json",httpMethod="GET")
+//	@RequestMapping(value="auth",method=RequestMethod.POST)
+//	public Result auth(
+////			@RequestBody List<SysUserOrgDto> sysUserOrgDto,
+//			@RequestParam(value="sysUserOrgDto")String sysUserOrgDto,
+//						@RequestParam(value="contactId",defaultValue="0") Long contactId) {
+//		if(contactId==0)return Result.instance(ResponseCode.missing_parameter.getCode(), "请选择要授权的文件");
+//		List<SysUserOrgDto> listSysUserOrgDto=Arrays.asList(JsonUtils.readValue(sysUserOrgDto, SysUserOrgDto[].class));
+//		
+//		return  mDeviceContactService.auth(listSysUserOrgDto,contactId);
+//	}
+	
 	@ResponseBody
-	@ApiOperation(value="授权通讯录",produces="application/json",httpMethod="GET")
+	@ApiOperation(value="授权通讯录",produces="application/json",httpMethod="POST")
 	@RequestMapping(value="auth",method=RequestMethod.POST)
-	public Result auth(
-//			@RequestBody List<SysUserOrgDto> sysUserOrgDto,
-			@RequestParam(value="sysUserOrgDto")String sysUserOrgDto,
-						@RequestParam(value="contactId",defaultValue="0") Long contactId) {
-		if(contactId==0)return Result.instance(ResponseCode.missing_parameter.getCode(), "请选择要授权的文件");
-		List<SysUserOrgDto> listSysUserOrgDto=Arrays.asList(JsonUtils.readValue(sysUserOrgDto, SysUserOrgDto[].class));
-		
-		return  mDeviceContactService.auth(listSysUserOrgDto,contactId);
+	public Result authContact(
+			  @RequestParam(value="contactId",required=true) Long contactId,
+			  @RequestParam(value="sysUserId",required=true) Long sysUserId,
+//			  @RequestParam(value="listSysOrgPerStr",required=true,defaultValue="")String listSysOrgPerStr,
+			  @RequestParam(value="listSysUserInOrg",required=false,defaultValue="") String listSysUserInOrgStr,
+			  @RequestParam(value="listSysUserInOrgAll",required=false,defaultValue="")String listSysUserInOrgAllStr
+			) {
+			  
+			if(StringUtils.isEmpty(listSysUserInOrgStr)) {
+				return Result.instance(ResponseCode.missing_parameter.getCode(), ResponseCode.missing_parameter.getMsg());
+			}
+			if(!mobileHasPermission(sysUserId, PermissionCode.CONTACT_DELETE.pName)) {
+				return Result.instance(PermissionCode.CONTACT_DELETE.pCode, PermissionCode.CONTACT_DELETE.pMsg);
+			}
+//			   SysUserInOrg sysUserInOrg = mSysUerInOrgMapper.selectByUserId(sysUserId);
+			   List<SysUserGroupDto> listUserGroupDto=Arrays.asList(JsonUtils.readValue(listSysUserInOrgStr, SysUserGroupDto[].class));
+			   List<SysUserGroupDto> newList=new ArrayList<>(listUserGroupDto);
+			   System.out.println("newlist"+newList.toString()); 
+			   
+			   List<SysUserGroupDto> listUserGroupDtoAll=Arrays.asList(JsonUtils.readValue(listSysUserInOrgAllStr, SysUserGroupDto[].class));
+			   List<SysUserGroupDto> newListAll=new ArrayList<>(listUserGroupDtoAll);
+			   mDeviceContactService.authUserInOrg(contactId,newList,newListAll);
+			   return Result.success();
+		  
 	}
+	
+	
 	
 	@ApiOperation(value="解除授权通讯录",produces="application/json",httpMethod="GET")
 	@RequestMapping(value="unAuth",method=RequestMethod.POST)

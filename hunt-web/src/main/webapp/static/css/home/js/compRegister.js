@@ -207,6 +207,8 @@
 			                 ]],
 			               
 			    			 'onCheck':function(rowIndex,rowData){
+			    				 
+			    				 
 			    					 $("#alDevice_manage_dialog table[id=deviceJobs]").datagrid("uncheckAll");
 			    					 if(currRowIndex==rowIndex){
 			    						 $("#alDevice_manage_dialog table[id=device_user_list]").datagrid('uncheckAll');
@@ -215,12 +217,7 @@
 			    					 }
 			    					 console.log("当前选中"+JSON.stringify(rowData));
 			    					 if(rowData==null) return ;
-			    	        	  var userRoleOrgs=rowData.userRoleOrganizations;
-			    	        	  var str=JSON.stringify(userRoleOrgs);
-			    	        	  console.log("已选中-->"+str);
-			    	        	  for (var i = 0; userRoleOrgs.length>0&&i < userRoleOrgs.length; i++) {
-			    	                     $("#alDevice_manage_dialog table[id=deviceJobs]").treegrid("select", userRoleOrgs[i].sysRoleOrganizationId);
-			    	                 }
+			    	        	  $("#alDevice_manage_dialog table[id=deviceJobs]").treegrid("select", rowData.sysOrgId);
 			    	        	  currRowIndex=rowIndex;
 			    	          },
 			    	          onLoadSuccess:function(data){
@@ -242,23 +239,45 @@
 			        		 }
 			        	 }
 			        	 
+//			        	 var params="?id="+common_tool.getCurrUserId();
+//			        	 $("#user_orgs").treegrid({
+//	                     		url:getRootPath()+"/organization/list"+params,
+//	                 			method:"GET",
+//	                 		    idField:'id',
+//				                treeField:"name",
+//				             	singleSelect: true,
+//				                fitColumns: true,
+//				                rownumbers: true,
+//				                columns:[[
+//				                	{field:'id',title:'选择',width:100,checkbox: "true"},
+//				             		{field:'name',title:'职位',width:100}
+//				                 ]],
+//				                 onLoadSuccess:function(row,data){
+//				                	 loadIndex++;
+//				                	 defalueClick();
+//				                	 console.log("职位列表加载成功"+loadIndex);
+//				                	 if(data.code==20005){
+//				                		 hasPermission=false;
+//				    	        		  common_tool.messager_show(data.msg);
+//				    	        	  }
+//				                 },
+//				                 rowStyler:function(row){
+//					     		        return 'background-color:#e3e3e3;color:#000000;font-weight:bold;';
+//					     		 },
+//			        	 })
+			        	 	 var params="?id="+common_tool.getCurrUserId();
 			        	 $("#alDevice_manage_dialog table[id=deviceJobs]").treegrid({
-			        		 url:getRootPath()+"/job/list",
+//			        		 url:getRootPath()+"/job/list",
+			        		 url:getRootPath()+"/organization/list"+params,
 			        		 method:'get',
 			                 idField:'id',
 			                 treeField:"name",
 			             	singleSelect: true,
 			                 fitColumns: true,
 			                 rownumbers: true,
-//			                 fit: true,
 			                 columns:[[
-			                	 {field:'id',title:'选择',width:100,checkbox: "true"}/*,formatter:function(value,row,index){
-			                		 return row.id;
-			                	 }}*/,
-			             		{field:'name',title:'职位',width:100}/*,formatter:function(value,row,index){
-			             			console.log("name-->"+JSON.stringify(row));
-			             			return row.name;
-			             		}}*/
+			                	 {field:'id',title:'选择',width:100,checkbox: "true"},
+			             		{field:'name',title:'职位',width:100}
 			                 ]],
 			                 onLoadSuccess:function(row,data){
 			                	 loadIndex++;

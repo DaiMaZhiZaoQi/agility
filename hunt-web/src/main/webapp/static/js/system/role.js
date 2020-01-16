@@ -2,6 +2,7 @@
 role_tool = {
     form_clear: function () {
         $("#role_edit_form").form("clear");
+        
         $("#role-permissions").datagrid("uncheckAll");
         $("#role_grid").datagrid("uncheckAll");
     },
@@ -62,11 +63,12 @@ role_tool = {
                     iconCls: 'icon-save',
                     closable: true,
                     width: 900,
-                    height: 500,
+                    height: 550,
                     cache: false,
                     modal: true,
                     resizable: false,
                     'onOpen': function () {
+                    	$("#role-permissions").datagrid("reload");
                         var role = $("#role_grid").datagrid("getChecked")[0];
                         for (var i = 0; i < role.sysPermissions.length; i++) {
                             $("#role-permissions").datagrid("selectRecord", role.sysPermissions[i].id);
@@ -82,7 +84,8 @@ role_tool = {
                              iconCls: 'icon-add',
                              handler: function () {
                                  $("#role_edit_dialog").dialog('close');
-                                 role_tool.form_clear();
+//                                 role_tool.form_clear();
+                                 $("#role_grid").datagrid("reload");
                              }
                          }
                     ],
@@ -107,7 +110,8 @@ role_tool = {
             dataType: 'json',
             success: function (result) {
                 if (result.code == 10000) {
-                    role_tool.init_main_view();
+//                    role_tool.init_main_view();
+                	$("#role_grid").datagrid("reload");
                     common_tool.messager_show(result.msg);
                     return false;
                 }
@@ -148,7 +152,8 @@ role_tool = {
                     if (result.code == 10000) {
                         $("#role_edit_dialog").dialog("close");
                         role_tool.form_clear();
-                        role_tool.init_main_view();
+//                        role_tool.init_main_view();
+                        $("#role_grid").datagrid("reload");
                         common_tool.messager_show(result.msg);
                         return false;
                     }
@@ -192,7 +197,8 @@ role_tool = {
                     if (result.code == 10000) {
                         $("#role_edit_dialog").dialog("close");
                         role_tool.form_clear();
-                        role_tool.init_main_view();
+//                        role_tool.init_main_view();
+                        $("#role_grid").datagrid("reload");
                         common_tool.messager_show(result.msg);
                         return false;
                     }
@@ -215,18 +221,51 @@ role_tool = {
             iconCls: 'icon-save',
             closable: true,
             width: 900,
-            height: 500,
+            height: 550,
             cache: false,
             modal: true,
             resizable: false,
+          
             'onOpen': function () {
 
-                if (type == 2) {
-                    var role = $("#role_grid").datagrid("getChecked")[0];		//   选中的item
-                    for (var i = 0; i < role.sysPermissions.length; i++) {
-                        $("#role-permissions").datagrid("selectRecord", role.sysPermissions[i].id); //  对话框中设置选中
-                    }
-                }
+            	$("#role_edit_dialog table[id='role-permissions']").datagrid({
+            		onLoadSuccess:function(){
+            			 if (type == 2) {
+                             var role = $("#role_grid").datagrid("getChecked")[0];		//   选中的item
+                             for (var i = 0; i < role.sysPermissions.length; i++) {
+                                 $("#role-permissions").datagrid("selectRecord", role.sysPermissions[i].id); //  对话框中设置选中
+                             }
+                         }
+            		},
+            	});
+            	
+//                if (type == 2) {
+//                    var role = $("#role_grid").datagrid("getChecked")[0];		//   选中的item
+//                    for (var i = 0; i < role.sysPermissions.length; i++) {
+//                        $("#role-permissions").datagrid("selectRecord", role.sysPermissions[i].id); //  对话框中设置选中
+//                    }
+//                }
+                
+                // 机构加载并选择成功
+//                $("#role_orgs").treegrid({
+//                	"onLoadSuccess":function(){
+//                		$("#role_edit_dialog table[id=role-org-permissions]").datagrid({
+//                			url:getRootPath()+"/organization/listOrgPermission",
+//                			method:"GET",
+//                			'columns':[[
+////                				{field:'ck',checkbox: true,title:'选择',width:100},
+//                				{field:'name',title:'权限名称',width:200},
+//                		    ]],
+//                			onLoadSuccess:function(data){
+//                				console.log(data);
+//                			},
+//                			groupFormatter:function(value,rows){
+//                				console.log(value);
+//                				console.log(rows);
+//                			}
+//                		});
+//                	}
+//                });
             },
             buttons: [
                 {

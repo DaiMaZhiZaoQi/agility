@@ -97,7 +97,7 @@ deviceCallLog={
     	if(callDuration<60){
     		return "00:"+(callDuration<10?("0"+callDuration):(callDuration));
     	}else{
-    		if(callDuration>60&&callDuration<3600){
+    		if(callDuration>=60&&callDuration<=3600){
     			var minute=callDuration/60;
     			var second=callDuration%60;
     			var mi=Math.floor(minute);

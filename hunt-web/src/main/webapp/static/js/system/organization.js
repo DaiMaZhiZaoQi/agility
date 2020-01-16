@@ -54,7 +54,7 @@ organization_tool = {
         $("#organization").treegrid({
             // data: organization_tool.init_data(),
         	
-            url: getRootPath() + '/organization/list',
+            url: getRootPath() + '/organization/list?id='+common_tool.getCurrUserId(),
             method: 'get',
             idField: "id",
             nodeId: 'id',
@@ -117,6 +117,7 @@ organization_tool = {
                     modal: true,
                     resizable: false,
                     'onOpen': function () {
+                    	$("#organization_save_right").treegrid("reload");
                     	  console.log("organizationArray--string"+organizationArray[0].parentId);
                         $("#organization_save_right").treegrid('select', organizationArray[0].parentId);
                     },
@@ -141,9 +142,9 @@ organization_tool = {
         console.log("treegrid列表在处理");
     },
     init_edit_view: function (data, parentId) {
-    	var titleName="新增组织机构";
+    	var titleName="新增部门";
     	if(data==2){
-    		titleName="修改组织机构";
+    		titleName="修改部门信息";
     	}
         $("#organization_save").dialog({
             title: titleName,
@@ -156,8 +157,8 @@ organization_tool = {
             resizable: false,
             'onOpen': function () {
             	console.log("添加机构展开"+data+"parentId"+parentId);
+            	$("#organization_save_right").treegrid("reload");
                 if (parentId != null) {
-                	
                     $("#organization_save_right").treegrid('select', parentId);
                 }
             },
@@ -174,7 +175,9 @@ organization_tool = {
                             organization_tool.save();
                         }
                         if (data == 2) {
-                            organization_tool.update();
+                        	if(confirm("是否修改部门数据")){
+                        		organization_tool.update();
+                        	}
                         }
                     }
                 },
@@ -210,7 +213,8 @@ organization_tool = {
             dataType: 'json',
             success: function (result) {
                 if (result.code == 10000) {
-                    organization_tool.init_mian_view();
+//                    organization_tool.init_mian_view();
+                	  $("#organization").treegrid("reload");
                 }
                 else {
                     common_tool.messager_show(result.msg);
@@ -239,7 +243,7 @@ organization_tool = {
                 description: description,
                 isFinal: isFinal,
                 parentId: parentId,
-                parentOrgId:orgCode,
+                parentOrgCode:orgCode,
             },
             method: 'post',
             url: getRootPath() + '/organization/insert',
@@ -249,7 +253,8 @@ organization_tool = {
                 if (result.code == 10000) {
                     $("#organization_save").dialog("close");
                     organization_tool.form_clear();
-                    organization_tool.init_mian_view();
+                    $("#organization").treegrid("reload");
+//                    organization_tool.init_mian_view();
                 }else {
                     common_tool.messager_show(result.msg);
                 }
@@ -281,7 +286,8 @@ organization_tool = {
                 if (result.code == 10000) {
                     $("#organization_save").dialog("close");
                     organization_tool.form_clear();
-                    organization_tool.init_mian_view();
+                    $("#organization").treegrid("reload");
+//                    organization_tool.init_mian_view();
                 }
                 else {
                     common_tool.messager_show(result.msg);
@@ -324,7 +330,8 @@ $(document).ready(function () {
     });
     $(".select-btn").click(function () {
         organization_tool.form_clear();
-        organization_tool.init_mian_view();
+//        organization_tool.init_mian_view();
+        $("#organization").treegrid("reload");
     });
 });
 

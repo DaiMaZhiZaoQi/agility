@@ -145,6 +145,8 @@ device_tool={
 	         modal: true,
 	         resizable: false,
 	         'onOpen': function () {
+	        	 $("#device_user_list").datagrid("reload");
+	        	 $("#deviceJobs").treegrid("reload");
 	        	 if(type==2){
 		        	 var device = $("#device_grid").datagrid("getChecked")[0];
 		        	 var json=JSON.stringify(device);
@@ -288,7 +290,8 @@ device_tool={
 						$("#device_edit_dialog").dialog("close");
 						 common_tool.messager_show(data.msg);
 						 device_tool.form_clear();
-						 device_tool.init_device_view();
+						 $("#device_grid").datagrid("reload");
+//						 device_tool.init_device_view();
 	                        return false;
 					}else{
 						 common_tool.messager_show(data.msg);
@@ -335,7 +338,8 @@ device_tool={
 						$("#device_edit_dialog").dialog("close");
 						 common_tool.messager_show(data.msg);
 						 device_tool.form_clear();
-						 device_tool.init_device_view();
+//						 device_tool.init_device_view();
+						 $("#device_grid").datagrid("reload");
 	                        return false;
 					}else{
 						 common_tool.messager_show(data.msg);
@@ -382,7 +386,8 @@ $(document).ready(function() {
 	
 	$("#device-select-btn").click(function(){		//	刷新
 		device_tool.form_clear();
-		device_tool.init_device_view();
+//		device_tool.init_device_view();
+		 $("#device_grid").datagrid("reload");
 	});
 	
 	 $("#device-search-btn").click(function () {

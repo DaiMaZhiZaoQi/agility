@@ -53,12 +53,12 @@
 		    /**菜单栏点击，获取设备状态*/
 		    menuDeviceStateClick:function(){
 		    	if(currHref!=null){
-//		    		$(".main-container").load(currHref);	//加载失败时的处理，性能可以优化，放easyui tabs标签的使用
-		    		$("#div_device_manage_state div[id=div_device_state_child]").load(currHref);	//加载失败时的处理，性能可以优化，放easyui tabs标签的使用
+		    		$("#div_device_manage_state div[id=div_device_state_child]").load(currHref,function(){ 	//加载失败时的处理，性能可以优化，放easyui tabs标签的使用
+//		    			 $("#searchContainer hr[id='hr_alldevice']").css("visibility","visible");
+		    		});	//加载失败时的处理，性能可以优化，放easyui tabs标签的使用
 		    	}
 		    	var clickDeviceState=$("#menu td[id=iDeviceState]");
 		    	homeDevic.setCssDefault(clickDeviceState);
-//		    	clickDeviceState.css("background","#3395de");
 		    	homeDevic.displayManage("div_device_state");
 		    	comSpace.data.currDisplay="";
 		    },
@@ -72,10 +72,20 @@
 		    		if(!childHidden){
 		    			if(objId!=undefined&&objId!=childId){
 		    				$("#div_home_content div[id="+childId+"]").hide();
+		    				
 		    			}
 		    		}
 		    	}
-		    	
+		    	console.log("没有audio控件");
+		    	try {
+		    		var audioStop=$(".audiosx audio[id=audioPlay]");
+		    		console.log("audioStop-->"+audioStop.length);
+		    		for(var i=0;i<audioStop.length;i++){
+		    			audioStop[i].pause();
+		    		}
+				} catch (e) {
+					console.log("没有audio控件");
+				}
 		    	for(var i=0;i<childrens.length;i++){
 		    		var childId=childrens[i].id;
 		    		var childHidden=$("#div_home_content div[id="+childId+"]").is(":hidden");
@@ -177,10 +187,12 @@
 			homeDevic.menuDeviceStateClick();
 			var clickId=0;
 			var text=$(".sysOrgId").text();							  //  处理身兼多职的问题  
+			var userId=common_tool.getCurrUserId();
+			console.log("userId-->"+userId);
 			console.log("text-->"+text);
 			$("#tt").tree({
 				method:"GET",
-				url:getRootPath() + '/organization/list?id='+text+'&queryType=1',    //  不同id显示内容不同，在登录时注意接收不同的id
+				url:getRootPath() + '/organization/list?id='+userId+'&queryType=0',    //  不同id显示内容不同，在登录时注意接收不同的id
 				loadFilter: function(data){
 				
 				 return data.rows;
@@ -192,13 +204,13 @@
 		  			homeDevic.init();
 		  			common_tool.setHomeRoleOrgId(data[0].id);
 		  			common_tool.set_orgPersonId("orgId="+data[0].id);
-		  			console.log("onLoadSuccess-->"+data[0].id);
+		  			console.log("onLoadSuccess-->"+data[0].id+"---userId-->"+userId);
 		  			deviceOrgId=data[0].id;
 		  			globOptType=0;
 		  			glolbalId=deviceOrgId;
-		  			var href=getRootPath()+"/device/allDevice?orgId="+data[0].id+"&isLoadAll=1";
+		  			var href=getRootPath()+"/device/allDevice?orgId="+data[0].id+"&isLoadAll=1&userId="+userId;
 		  			currHref=href;
-					 $(".main-container").load(href);
+					 $("#div_device_state_child").load(href);
 	//				 $(".main-container").html("<iframe scrolling='true' frameborder='0'  src="+href +" style='width:100%;height:100%;'></iframe>");
 					 $("#tt li:eq(0)").find("#_easyui_tree_1").addClass("tree-node-selected");
 					 
@@ -228,33 +240,28 @@
 							parametes="personalId="+id;
 						}
 						common_tool.set_orgPersonId(parametes);
-						var href=getRootPath()+"/device/allDevice?"+parametes;
+						var href=getRootPath()+"/device/allDevice?"+parametes+"&userId="+userId;
 						currHref=href;
 						
 						if(1==selectStatus){				// 刷新通话语音记录
 							var optType=orgType==0?0:1;
 							console.log("selectStatus--->"+optType+"--id-->"+id);
-							/* refreshCallLog:function(optType,id,sort,order,options,definePage)   */
-	//						$("#select_value").val("2");
-	//						$("#divYearSelect span[class=select_txt]").text("近七天记录");
 							recordModult.initSearContent();
-							recordModult.refreshPage(optType,id);	
-							recordModult.refreshTotal(optType,id);
-							recordModult.refreshCallLog(optType,id,"call_date","DESC",1,-1);
+							var result=recordModult.refreshCallLog(optType,id,"call_date","DESC",1,-1); // 刷新数据列表
 							$("#td_allDevice_title span[id=span_title]").text(nodeName+"通话记录");
 							 clickId=id;
-	//		  				$("#td_allDevice_title").text(nodeName);
-	//						$('#tt').tree(node.state === 'closed' ? 'expand' : 'collapse', node.target);
+							if(result==0){
+								return
+							}
+							recordModult.refreshPage(optType,id);	// 刷新数据总数页面数量
+							recordModult.refreshTotal(optType,id);	// 刷新通话数量总数							
 						}else{								//	查询设备
 							
 							var text=$(".tree-title").text();
-							 $(".main-container").load(href,function(){		//   加载成功后回调
+							 $("#div_device_state_child").load(href,function(){		//   加载成功后回调
 								 $("#td_allDevice_title").text(nodeName);
 							 });
 							 clickId=id;
-	//		  				  console.log("当前选中的节点-->"+selected.target.id);
-	//		  				$("#td_allDevice_title").text(nodeName);
-	//						$('#tt').tree(node.state === 'closed' ? 'expand' : 'collapse', node.target);
 						}
 						
 					}
@@ -321,6 +328,7 @@
 				if(divContactCont.prop("nodeName")==undefined){
 					homeDevic.loadContactManage();
 				}
+//				$("#inscribe").css({ 'position': 'absolute', 'bottom': '15px', 'padding-top':'0px','padding-bottom':'0px'});
 			});
 			
 			/**
@@ -344,6 +352,11 @@
 			$("#idHomeTable a[id=goCenter]").click(function(){
 //				window.location.href=getRootPath()+"/system/welcome";
 				window.open (getRootPath()+"/system/welcome");
+			});
+			
+			$("#idHomeTable a[id=goBack]").click(function(){
+				window.location.href=getRootPath();
+//				window.open (getRootPath());
 			});
 	})
 })();

@@ -155,6 +155,7 @@ permission_tool = {
             cache: false,
             modal: true,
             resizable: false,
+          
             buttons: [
                 {
                     text: '保存',
@@ -202,8 +203,8 @@ permission_tool = {
             modal: true,
             resizable: false,
             'onOpen': function () {
+            	$("#permission-group").datagrid("reload");
                 if (groupId != null) {
-
                     $("#permission-group").datagrid('selectRecord', groupId);
                 }
             },

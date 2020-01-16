@@ -18,16 +18,16 @@
     <form id="job_form">
         <input type="hidden" name="id" id="job_id">
         <div style="float: left;height: 250px;width: 200px;">
-            <p style="padding: 10px;">&nbsp;&nbsp;简称:<input name="name" id="job_name" style="width: 300px;height: 35px"
+            <p style="padding: 10px;">&nbsp;&nbsp;职位简称:&nbsp;<input name="name" id="job_name" style="width: 300px;height: 35px"
                                                             data-options="required:true"
                                                             class="easyui-textbox easyui-validatebox"></p>
-            <p style="padding: 10px ;">&nbsp;&nbsp;全称:<input name="fullName" id="job_fullName"
+            <p style="padding: 10px ;">&nbsp;&nbsp;职位全称:&nbsp;<input name="fullName" id="job_fullName"
                                                              style="width: 300px;height: 35px"
                                                              data-options="required:true"
                                                              class="easyui-textbox easyui-validatebox"></p>
-            <p style="padding: 10px;"> &nbsp;&nbsp;描述:<input name="description" id="job_description"
+            <p style="padding: 10px;"> &nbsp;&nbsp;职位描述:&nbsp;<input name="description" id="job_description"
                                                              style="width: 300px;height: 130px"
-                                                             data-options="required:true,multiline:true"
+                                                             data-options="multiline:true"
                                                              class="easyui-textbox easyui-validatebox">
             </p>
         </div>

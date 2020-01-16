@@ -119,10 +119,12 @@
 	    <!-- 当服务器发生了404 -->
 	    <error-code>404</error-code>
 	    <!-- 指定异常了，跳转的页面 -->
-	    <location>/WEB-INF/jsp/error/404.jsp</location>
+	    <location>/WEB-INF/jsp/system/404.jsp</location>
 	</error-page>
 	<error-page>  
 	    <error-code>405</error-code>  
-	    <location>/WEB-INF/jsp/error/404.jsp</location>  
+	    <location>/WEB-INF/jsp/system/404.jsp</location>  
 	</error-page>
+	
+	<display-name>zicoo</display-name>
 </web-app>

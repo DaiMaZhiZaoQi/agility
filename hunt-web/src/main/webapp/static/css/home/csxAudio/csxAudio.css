@@ -33,6 +33,7 @@
 				position:absolute;
 				top: 3.5px;
 				left: 35px;
+				cursor: pointer;
 			} 
 			.audio .audiosx .mask{
 				width: 0;
@@ -46,13 +47,13 @@
 			.audio .audiosx .currTime{
 				      position: absolute;
 					    font-size: 13px;
-    					right: 70px;
+    					right: 72px;
 					    top: 20px;
 			}
 			.audio .audiosx .time{
 				       position: absolute;
 					    font-size: 13px;
-					    right: 38px;
+					    right: 40px;
 					    top: 20px;
 			}
 			.audio .audiosx .down{

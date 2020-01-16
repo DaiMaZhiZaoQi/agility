@@ -8,23 +8,27 @@ device={
 //			var roleOrgId=common_tool.getHomeRoleOrgId();
 			var roleOrgId=common_tool.get_orgPersonId();
 			searchContent=searchContent.trim();
-			var parametes=roleOrgId+"&isLoadAll=0&searchContent="+searchContent+"&searchType=0";
+			var parametes=roleOrgId+"&isLoadAll=0&searchContent="+searchContent+"&searchType=0&userId="+common_tool.getCurrUserId();
 			var href=getRootPath()+"/device/allDevice?"+parametes;
 			console.log("searchAll-->"+href);
 			var text=$(".tree-title").text();
-			 $(".main-container").load(href,function(){		//加载成功后回调
+//			 $(".main-container").load(href,function(){		//加载成功后回调
+			$("#div_device_state_child").load(href,function(){		//加载成功后回调
 				 var ttId=$("#tt").tree('getSelected');
 				 $("#td_allDevice_title").text(ttId.name);
+				 $("#searchContainer hr[id=hr_alldevice]").css("visibility","visible");
 			 });
 		},
 		
 		searchOnLine:function(){
 //			var roleOrgId=common_tool.getHomeRoleOrgId();
 			var roleOrgId=common_tool.get_orgPersonId();
-			var parametes=roleOrgId+"&isLoadAll=0&searchContent=searchContent&searchType=1";
+			var parametes=roleOrgId+"&isLoadAll=0&searchContent=searchContent&searchType=1&userId="+common_tool.getCurrUserId();
 			var href=getRootPath()+"/device/allDevice?"+parametes;
 			var text=$(".tree-title").text();
-			 $(".main-container").load(href,function(){		//加载成功后回调
+//			 $(".main-container").load(href,function(){		//加载成功后回调
+				 $("#div_device_state_child").load(href,function(){		//加载成功后回调
+					 $("#searchContainer hr[id=hr_online]").css("visibility","visible");
 				 var ttId=$("#tt").tree('getSelected');
 				 $("#td_allDevice_title").text(ttId.name);
 //				 console.log("titleNAME-->"+ttId.name);
@@ -32,16 +36,17 @@ device={
 		},
 		
 		searchOFFline:function(){
-//			var roleOrgId=common_tool.getHomeRoleOrgId();
 			var roleOrgId=common_tool.get_orgPersonId();
-			var parametes=roleOrgId+"&isLoadAll=0&searchContent=searchContent&searchType=2";
+			var parametes=roleOrgId+"&isLoadAll=0&searchContent=searchContent&searchType=2&userId="+common_tool.getCurrUserId();
 			var href=getRootPath()+"/device/allDevice?"+parametes;
-//			var text=$(".tree-title").text();
-			 $(".main-container").load(href,function(){		//加载成功后回调
+//			 $(".main-container").load(href,function(){		//加载成功后回调
+				 $("#div_device_state_child").load(href,function(){		//加载成功后回调
+					 $("#searchContainer hr[id=hr_outline]").css("visibility","visible");
 				 var ttId=$("#tt").tree('getSelected');
 				 $("#td_allDevice_title").text(ttId.name);
 			 });
 		},
+		
 		
 		remoManage:function(url){
 			var remoUrl=url.split(".");
@@ -66,7 +71,7 @@ device={
 			if($("#contoner"+id+" div:has(table)").length>0){
 				if($("#contoner"+id+" div").is(":visible")){		//   显示
 					$("#contoner"+id+" div").slideUp(500,function(){});
-				}else{		//
+				}else{	
 					
 					$("#contoner"+id+" div").slideDown(300,function(){});
 				}
@@ -102,7 +107,7 @@ device={
 	
 		
 		loadRecord:function(deviceId){
-			 $('#contoner'+1+' div').attr("id",deviceId);
+			 $("#contonerDialog div").attr("id","record_container");
 			 console.log("loadRecord--->"+deviceId);
 			$("#recordDialog").dialog({
 				title:'通话记录',
@@ -115,13 +120,13 @@ device={
 		         resizable: false,
 		         'onOpen':function(){
 		        	 $("#div_device_state_one div[id=recordDialog]").remove();
-		        	 $('#contoner'+1+' div').attr("id",deviceId);
-		        	 console.log("callInit--->");
+//		        	 $("#contonerDialog div").attr("id",deviceId);
+		        	 console.log("callInit--->"+deviceId);
 		        	 var i=0;
-		        	 $('#contoner'+1+' div').load("deviceCallLog.html",function(){
+		        	 $("#contonerDialog div").load("deviceCallLog.html",function(){
 //							$("#contoner"+1+" div").slideDown(500,function(){});
 		        		 if(i==0){
-		        			 deviceCallLog. callInit();
+		        			 deviceCallLog. callInit(deviceId);
 		        		 }
 		        		 i++;
 						});
@@ -129,6 +134,8 @@ device={
 		         },
 		         'onClose':function(){
 		        	 console.log("关闭");
+		        	 $("#deviceCallLogDevice").remove();
+//		        	 $("#record_container").children().remove();
 		         },
 		         'buttons':[
 		        	   {
@@ -146,106 +153,60 @@ device={
 			$(".panel div[id=recordDialog]").dialog("center");
 
 		},
-		showdialog:function(deviceId){
-			$('#contoner'+1+' div').attr("id",deviceId);
-			console.log("loadRecord--->"+deviceId);
-			$("#recordDialog").dialog({
-				title:'通话记录',
-				iconCls: 'icon-save',
-				closable: true,
-				width: 1200,
-				height: 500,
-				cache: false,
-				modal: true,
-				resizable: false,
-				'onOpen':function(){
-					$('#contoner'+1+' div').attr("id",deviceId);
-					console.log("callInit--->");
-					var i=0;
-					$('#contoner'+1+' div').load("deviceCallLog.html",function(){
-//							$("#contoner"+1+" div").slideDown(500,function(){});
-						if(i==0){
-							deviceCallLog. callInit();
-						}
-						i++;
-					});
-					
-				},
-				'onClose':function(){
-					console.log("关闭");
-				},
-				'buttons':[
-					{
-						text: '关闭',
-						width: 100,
-						iconCls: 'icon-add',
-						handler: function () {
-							console.log("handler-->");
-							$("#recordDialog").dialog("close");
-						}
-					}
-					]
-			});
-		}
+		
+		optionBgColor:function(tag){
+			$("#searchContainer hr").css("visibility","hidden");
+		},
 }
 
 $(document).ready(function(){
-//	$("#showDialog").click(function(){
-//		device.showdialog();
-//	});
-//	$("#testtest7").click(function(){
-//		var deviceId="7";
-//		 $('#contoner'+1+' div').attr("id",deviceId);
-//	     
-//			$("#recordDialog").dialog({
-//				title:'通话记录',
-//				 iconCls: 'icon-save',
-//		         closable: true,
-//		         width: 1200,
-//		         height: 500,
-//		         cache: false,
-//		         modal: true,
-//		         resizable: false,
-//		         'onOpen':function(){
-////		        	 device.load(1, "obj");
-//		        	 $('#contoner'+1+' div').attr("id",deviceId);
-//		        	 $('#contoner'+1+' div').load("deviceCallLog.html",function(){
-////							$("#contoner"+1+" div").slideDown(500,function(){});
-//		        		 deviceCallLog. callInit();
-//						});
-//		        	 
-//		         },
-//		         'onClose':function(){
-//		        	 console.log("关闭");
-//		         },
-//		         buttons:[
-//		        	   {
-//		                    text: '关闭',
-//		                    width: 100,
-//		                    iconCls: 'icon-add',
-//		                    handler: function () {
-//		                        $("#recordDialog").window("close");
-//		                    }
-//		                }
-//		         ]
-//			});
-//	});
-	$("#searchContainer input[name=allDevice]").click(function() {
+	$("#searchContainer input[name=allDevice]").click(function() {  // #6dcdf3
 		var searchContent=$("#searchContainer input[type=text]").val();
-		if(searchContent.length>0){
-			device.searchAll(searchContent);
-		}else{
-			alert("请输入搜索内容");
-		}
+		device.optionBgColor();
+		device.searchAll(searchContent);
+		
 	});
 	
 	$("#searchContainer input[name=alldevice_online]").click(function(){
+		device.optionBgColor();
 		device.searchOnLine();
+
 	});
 	
 	$("#searchContainer input[name=alldevice_outline]").click(function(){
+		device.optionBgColor();
 		device.searchOFFline();
+		
 	});
+	
+	var gloPer=common_tool.getGloPer();
+	console.log("gloPer-->"+JSON.stringify(gloPer));
+	if(gloPer.indexOf("user:manage")>-1){
+		$(".userManage").show();
+	}
+	
+	if(gloPer.indexOf("device:manage")>-1){
+		$(".deviceManage").show();
+	}
+	
+	if(gloPer.indexOf("callLog:select")>-1){
+		$(".callLogSelect").show();
+	}
+//	if(gloPer.indexOf("contact:insert")>-1){
+//		$(".contactInsert").show();
+//	}
+//	if(gloPer.indexOf("contact:select")>-1){
+//		$(".contactSelect").show();
+//	}
+//	if(gloPer.indexOf("contact:delete")>-1){
+//		$(".contactDelete").show();
+//	}
+	
+	
+	
+//	glpPer.forEach(function(item,index) {
+//		
+//	});
 });
 
 

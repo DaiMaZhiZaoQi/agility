@@ -33,7 +33,7 @@ public class PermissionController extends BaseController {
     private SysPermissionService sysPermissionService;
 
     @ApiOperation(value = "跳转至权限模块", httpMethod = "GET", produces = "text/html")
-    @RequiresPermissions("permission:list")
+    @RequiresPermissions("user:manage")
     @RequestMapping(value = "permission", method = RequestMethod.GET)
     public String permission() {
         return "system/permission";
@@ -153,7 +153,7 @@ public class PermissionController extends BaseController {
      */
     @ApiOperation(value = "查询权限列表", httpMethod = "GET", produces = "application/json", response = Result.class)
     @ResponseBody
-    @RequiresPermissions("permission:list")
+    @RequiresPermissions("user:manage")
     @RequestMapping(value = "list", method = RequestMethod.GET)
     public PageInfo list(@RequestParam(defaultValue = "1") int page,
                            @RequestParam(defaultValue = "30") int rows) {
@@ -193,7 +193,7 @@ public class PermissionController extends BaseController {
      */
     @ApiOperation(value = "查询权限组", httpMethod = "GET", produces = "application/json", response = Result.class)
     @ResponseBody
-    @RequiresPermissions("permission:group:list")
+    @RequiresPermissions("user:manage")
     @RequestMapping(value = "group/list", method = RequestMethod.GET)
     public List<SysPermissionGroup> selectGroup() {
         List<SysPermissionGroup> list = sysPermissionService.selectGroup();

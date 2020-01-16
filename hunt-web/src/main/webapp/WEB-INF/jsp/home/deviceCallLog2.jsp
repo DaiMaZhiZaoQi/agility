@@ -86,7 +86,7 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
     	if(callDuration<60){
     		return "00:"+(callDuration<10?("0"+callDuration):(callDuration));
     	}else{
-    		if(callDuration>60&&callDuration<3600){
+    		if(callDuration>=60&&callDuration<=3600){
     			Long minute=callDuration/60;
     			Long second=callDuration%60;
     			Long mi=Math.floorDiv(minute,1);

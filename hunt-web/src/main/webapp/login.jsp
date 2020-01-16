@@ -5,7 +5,7 @@
      <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>云录音</title>
+    <title>铱方云录音管理系统</title>
     <link type="image/x-icon" rel="shortcut icon" href="${pageContext.request.contextPath}/static/image/favicon.ico">
     <link type="image/x-icon" rel="bookmark" href="${pageContext.request.contextPath}/static/image/favicon.ico">
     <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/static/css/easyui.css"/>
@@ -29,7 +29,7 @@
             }
             </style>
 </head>
-<body style="background-color: #f1f0f0">
+<body style="background-color: #f1f0f0" id="loginContainer">
 	<div id="login_head" 
 		style="height: 60px;width: 1366px;background-color: #ffffff;margin-left: auto;margin-right: auto;"align="center">
 		<img alt="铱方科技" src="static/css/home/image/logo.png" style="
@@ -90,7 +90,7 @@
 		
 	</div>
 	<div id="login_head" 
-		style="height: 35px;width: 1366px;background-color: #ffffff;margin-left: auto;margin-right: auto;">
+		style="height: 35px;width: 1366px;background-color: #ffffff;margin-left: auto;margin-right: auto;visibility: hidden;">
 		<a href="https://ir2.co/?page_id=19"  target="_blank" style="float: left;
 			    margin-left: 20px;
 			    margin-top: 5px;
@@ -111,9 +111,9 @@
 		console.log("浏览器"+brower);
 		if(brower=="Chrome"){
 //			document.getElementById('bodyContainer').setAttribute('content', 'width=device-width, initial-scale=0.8, maximum-scale=0.8, user-scalable=no');
-			document.getElementById('bodyContainer').style.zoom=0.9;
+			document.getElementById("loginContainer").style.zoom=0.9;
 		}else if(brower=="Edge"){
-			document.getElementById('bodyContainer').style.zoom=0.9;
+			document.getElementById("loginContainer").style.zoom=0.9;
 		}
 		
 	});

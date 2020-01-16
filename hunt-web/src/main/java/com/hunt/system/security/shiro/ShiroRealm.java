@@ -36,6 +36,10 @@ public class ShiroRealm extends AuthorizingRealm {
     private SysPermissionMapper sysPermissionMapper;
     @Autowired
     private SysUserRoleOrganizationMapper sysUserRoleOrganizationMapper;
+    
+    @Autowired
+    private SysUserRoleMapper mSysUserRoleMapper;
+    
     @Autowired
     private SysRoleMapper sysRoleMapper;
     @Autowired
@@ -68,30 +72,53 @@ public class ShiroRealm extends AuthorizingRealm {
             	permissions.add(sysPermission.getCode());
             }
         }
-        List<SysUserRoleOrganization> userRoleOrganizations = sysUserRoleOrganizationMapper.selectByUserId(user.getId());
-        for (SysUserRoleOrganization sysUserRoleOrganization : userRoleOrganizations) {
-        	Long sysRoleOrganizationId = sysUserRoleOrganization.getSysRoleOrganizationId();
-        	log.info("sysRoleOrganizationId-->"+sysRoleOrganizationId);
-            SysRoleOrganization sysRoleOrganization = sysRoleOrganizationMapper.selectById(sysRoleOrganizationId);
-            Long sysRoleId = sysRoleOrganization.getSysRoleId();
-            SysRole sysRole = sysRoleMapper.selectById(sysRoleId);
-            if(sysRole==null)continue;
-            log.info("sysRoleId-->"+sysRoleId+"sysRole-->"+sysRole);
-            roles.add(sysRole.getName()); 
-            Long roleId = sysRole.getId();
-            log.info("roleId-->"+roleId); 
-            List<SysRolePermission> sysRolePermissions = sysRolePermissionMapper.selectByRoleId(roleId);
-            for (SysRolePermission sysRolePermission : sysRolePermissions) {
-                SysPermission sysPermission = sysPermissionMapper.selectById(sysRolePermission.getSysPermissionId());
-                if(sysPermission!=null) {
-                	permissions.add(sysPermission.getCode());				   //   角色权限
-                }
-            }
+        
+        List<SysUserRole> listSysUserRole = mSysUserRoleMapper.selectByUserId(user.getId());
+        for(SysUserRole sysUserRole:listSysUserRole) {
+        	SysRole sysRole = sysRoleMapper.selectById(sysUserRole.getSysRoleId());
+        	  if(sysRole==null)continue;
+              log.info("sysRoleId-->"+sysUserRole.getSysRoleId()+"sysRole-->"+sysRole);
+              roles.add(sysRole.getName()); 
+              Long roleId = sysRole.getId();
+              log.info("roleId-->"+roleId); 
+              List<SysRolePermission> sysRolePermissions = sysRolePermissionMapper.selectByRoleId(roleId);
+              for (SysRolePermission sysRolePermission : sysRolePermissions) {
+                  SysPermission sysPermission = sysPermissionMapper.selectById(sysRolePermission.getSysPermissionId());
+                  if(sysPermission!=null) {
+                  	permissions.add(sysPermission.getCode());				   //   角色权限
+                  }
+              }
         }
+        
         info.addRoles(roles);
         info.addStringPermissions(permissions);
         log.debug("角色信息: \n {}", roles.toString());
         log.debug("权限信息: \n{}", permissions.toString());
+        
+//        List<SysUserRoleOrganization> userRoleOrganizations = sysUserRoleOrganizationMapper.selectByUserId(user.getId());
+//        for (SysUserRoleOrganization sysUserRoleOrganization : userRoleOrganizations) {
+//        	Long sysRoleOrganizationId = sysUserRoleOrganization.getSysRoleOrganizationId();
+//        	log.info("sysRoleOrganizationId-->"+sysRoleOrganizationId);
+//            SysRoleOrganization sysRoleOrganization = sysRoleOrganizationMapper.selectById(sysRoleOrganizationId);
+//            Long sysRoleId = sysRoleOrganization.getSysRoleId();
+//            SysRole sysRole = sysRoleMapper.selectById(sysRoleId);
+//            if(sysRole==null)continue;
+//            log.info("sysRoleId-->"+sysRoleId+"sysRole-->"+sysRole);
+//            roles.add(sysRole.getName()); 
+//            Long roleId = sysRole.getId();
+//            log.info("roleId-->"+roleId); 
+//            List<SysRolePermission> sysRolePermissions = sysRolePermissionMapper.selectByRoleId(roleId);
+//            for (SysRolePermission sysRolePermission : sysRolePermissions) {
+//                SysPermission sysPermission = sysPermissionMapper.selectById(sysRolePermission.getSysPermissionId());
+//                if(sysPermission!=null) {
+//                	permissions.add(sysPermission.getCode());				   //   角色权限
+//                }
+//            }
+//        }
+//        info.addRoles(roles);
+//        info.addStringPermissions(permissions);
+//        log.debug("角色信息: \n {}", roles.toString());
+//        log.debug("权限信息: \n{}", permissions.toString());
         return info;
     }
 

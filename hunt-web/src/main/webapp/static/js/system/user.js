@@ -6,11 +6,18 @@ user_tool = {
         $("#init_password_form").form('clear');
         $("#user-search-form").form('reset');
         $("#user-search-form").form('clear');
-        $("#user-permissions").datagrid("uncheckAll");
-        $("#jobs").treegrid("uncheckAll");
+        
+//        $("#user-permissions").datagrid("uncheckAll");
+        $("#user_roles").datagrid("uncheckAll");
+        $("#user_orgs").treegrid("uncheckAll");
+        $("#user_in_orgs").treegrid("uncheckAll");
+//        $("#user_orgs").treegrid("unselectAll");
+//        $("#jobs").treegrid("uncheckAll");
+        
         $("#user_grid").treegrid("uncheckAll");
         
         $("#save-permission-form").form('clear');
+        $("#org-permissions").treegrid("uncheckAll");
         var pg=$("#permission-group");
         if(pg!=undefined){
         	pg.datagrid("uncheckAll");
@@ -45,6 +52,7 @@ user_tool = {
                 email: email,
                 phone: phone,
                 address: address,
+                userId:common_tool.getCurrUserId(),
             },
             columns: [[
                 {title: "选择", field: "ck", checkbox: true},
@@ -126,40 +134,143 @@ user_tool = {
                     password: '111111111111',
                 });
                 $("#user_edit_dialog").dialog({
-                    title: '查看用户详情',
+                    title: "用户详情",
                     iconCls: 'icon-save',
                     closable: true,
-                    width: 1100,
+                    width: 1200,
                     height: 700,
                     cache: false,
                     modal: true,
                     resizable: false,
                     'onBeforeOpen': function () {
-
+                    	
                     },
                     'onOpen': function () {
-                        var users = $("#user_grid").datagrid('getChecked')[0];
-                        
-                        for (var i = 0; i < users.permissions.length; i++) {
-                            $("#user-permissions").datagrid("selectRecord", users.permissions[i].id);
-                        }
-                        for (var i = 0; i < users.userRoleOrganizations.length; i++) {
-                            $("#jobs").treegrid("select", users.userRoleOrganizations[i].sysRoleOrganizationId);
-                        }
+                    	
+                    	$.extend($.fn.validatebox.defaults.rules, {
+                    		logName: {
+                    			validator: function(value){
+                    				var reg = new RegExp(/^[a-zA-Z0-9_-]{4,16}$/);
+                    				if (!reg.test(value)) {
+                    					return false;
+                    				}
+                    				return true;
+                    			},
+                    		}
+                    	});
+                    	
+                    	var currSelectId=null;
+                    	
+                    	
+                    	$("#user_roles").datagrid({
+                    		 url:getRootPath()+"/role/list?userId="+common_tool.getCurrUserId(),
+                    		 method:"GET",
+                    		 "onLoadSuccess":function(){
+                    			 var params="?id="+common_tool.getCurrUserId();
+                    			 $("#user_orgs").treegrid({
+                             		url:getRootPath()+"/organization/list"+params,
+                         			method:"GET",
+                         			"onCheck":function(rowData){
+                         				if(rowData==null)return;
+                         				rowData.checkState=1;
+                         				rowData.checked=true;
+                         				if(rowData.children.length!=0){	// 子节点全部选中
+                         					var children=$("#user_orgs").treegrid("getChildren",rowData.id);
+                         					console.log(children);
+                         					for(var j=0;j<children.length;j++){
+        	                 					$("#user_orgs").treegrid("select",children[j].id);
+                         					}
+                         					 var orgs=$("#user_edit_dialog table[id='user_orgs']").treegrid("getChecked");
+                         				}
+                         			},
+                         			"onUnselectAll":function(rowData){
+                         				for(var i=0;i<rowData.length;i++){
+                         					rowData[i].checkState=0;
+                             				rowData[i].checked=false;
+                         					
+                         				}
+                         			},
+                         			"onSelectAll":function(rowData){
+                         				for(var i=0;i<rowData.length;i++){
+                         					rowData[i].checkState=1;
+                             				rowData[i].checked=true;
+                         				}
+                         			},
+                         			"onUncheck":function(rowData){
+                         				rowData.checkState=0;
+                         				rowData.checked=false;
+                         				var parent= $("#user_orgs").treegrid("find",rowData.parentId);
+                         				if(parent!=null&&parent.checked==true){
+                         					rowData.checked=true;
+                         					rowData.checkState=1;
+                         					$("#user_orgs").treegrid("unselect",rowData.parentId);
+                         					return;
+                         				}
+                         				if(rowData.children.length!=0){   //  是父节点
+                         					for(var j=0;j<rowData.children.length;j++){
+                         						$("#user_orgs").treegrid("unselect",rowData.children[j].id);
+                         					}
+                         					return;
+                         				}
+                         			},
+                         			
+                         			"onClickRow":function(row){
+                         				var parent= $("#user_orgs").treegrid("find",row.parentId);
+                         				if(parent!=null&&parent.checked==true){
+                         					row.checked=true;
+                         					row.checkState=1;
+                         					$("#user_orgs").treegrid("select",row.id);
+                         				}
+                         			},
+                         		
+                         		
+                         			"onLoadSuccess":function(){
+                                             var users = $("#user_grid").datagrid('getChecked')[0];
+                                             for(var i=0;i<users.listUserRole.length;i++){ //  默认选中用户所处的角色
+                                             	$("#user_roles").datagrid("selectRecord",users.listUserRole[i].sysRoleId);
+                                             }
+                                             for(var i=0;i<users.listUserOrg.length;i++){
+                                             	$("#user_orgs").treegrid("select",users.listUserOrg[i].sysOrgId);
+                                             }
+                                         $("#user_edit_dialog table[id='user_in_orgs']").treegrid({
+                                     		url:getRootPath()+"/organization/list"+params,
+                                  			method:"GET",
+                                  			"onLoadSuccess":function(){
+                                                      var users = $("#user_grid").datagrid('getChecked')[0];
+                                                  	$("#user_edit_dialog table[id='user_in_orgs']").treegrid("select",users.mSysUserInOrg.sysOrgId);
+                                                  	
+                                  			},
+                                  			"onCheck":function(rowData){
+                                  					if(rowData==null)return;
+                                  					 if(currSelectId!=null){
+                                  						 $("#user_orgs").treegrid("unselect",currSelectId);
+                                  					 }
+                                  					 currSelectId=rowData.id;
+                                  					 $("#user_orgs").treegrid("select",currSelectId);
+                                  			},
+                                     	});
+                             		},
+                             	});
+                    		 },
+                    	});
+                    	
                     },
                     'onClose': function () {
                         user_tool.form_clear();
                     },
-                    buttons:[
-                    	 {
-                             text: '取消',
-                             width: 100,
-                             iconCls: 'icon-add',
-                             handler: function () {
-                                 user_tool.form_clear();
-                                 $("#user_edit_dialog").dialog('close');
-                             }
-                         }
+                    
+                    
+                    buttons: [
+                       
+                        {
+                            text: '取消',
+                            width: 100,
+                            iconCls: 'icon-add',
+                            handler: function () {
+                                user_tool.form_clear();
+                                $("#user_edit_dialog").dialog('close');
+                            }
+                        }
                     ],
                 });
                 $("#user_edit_dialog").dialog("center");
@@ -176,7 +287,7 @@ user_tool = {
             title: titleName,
             iconCls: 'icon-save',
             closable: true,
-            width: 1100,
+            width: 1200,
             height: 700,
             cache: false,
             modal: true,
@@ -185,18 +296,137 @@ user_tool = {
             	
             },
             'onOpen': function () {
-            
-                if (type == 2) {
-                    var users = $("#user_grid").datagrid('getChecked')[0];
-                    var json=JSON.stringify(users);
-//                    console.log("user_grid"+json);
-                    for (var i = 0; i < users.permissions.length; i++) {
-                        $("#user-permissions").datagrid("selectRecord", users.permissions[i].id);
-                    }
-                    for (var i = 0; i < users.userRoleOrganizations.length; i++) {
-                        $("#jobs").treegrid("select", users.userRoleOrganizations[i].sysRoleOrganizationId);
-                    }
-                }
+            	
+            	$.extend($.fn.validatebox.defaults.rules, {
+            		logName: {
+            			validator: function(value){
+            				var reg = new RegExp(/^[a-zA-Z0-9_-]{4,16}$/);
+            				if (!reg.test(value)) {
+            					return false;
+            				}
+            				return true;
+            			},
+            		}
+            	});
+            	
+            	console.log("user打开");
+            	var currSelectId=null;
+            	
+            	
+            	$("#user_roles").datagrid({
+            		 url:getRootPath()+"/role/list?userId="+common_tool.getCurrUserId(),
+            		 method:"GET",
+            		 "onLoadSuccess":function(){
+            			 var params="?id="+common_tool.getCurrUserId();
+            			 
+            			 
+            			 $("#user_orgs").treegrid({
+                     		url:getRootPath()+"/organization/list"+params,
+                 			method:"GET",
+                 			"onCheck":function(rowData){
+                 				if(rowData==null)return;
+                 				console.log("选中执行");
+                 				rowData.checkState=1;
+                 				rowData.checked=true;
+                 				if(rowData.children.length!=0){	// 子节点全部选中
+                 					console.log("有子节点");
+                 					var children=$("#user_orgs").treegrid("getChildren",rowData.id);
+                 					console.log(children);
+                 					for(var j=0;j<children.length;j++){
+	                 					$("#user_orgs").treegrid("select",children[j].id);
+                 					}
+                 				}
+                 				var orgs=$("#user_edit_dialog table[id='user_orgs']").treegrid("getChecked");
+                 				console.log("机构集合"+JSON.stringify(orgs));
+                 			},
+                 			"onUnselectAll":function(rowData){
+                 				console.log("取消全选");
+                 				for(var i=0;i<rowData.length;i++){
+                 					rowData[i].checkState=0;
+                     				rowData[i].checked=false;
+                 					
+                 				}
+                 			},
+                 			"onSelectAll":function(rowData){
+                 				for(var i=0;i<rowData.length;i++){
+                 					rowData[i].checkState=1;
+                     				rowData[i].checked=true;
+                 				}
+                 			},
+                 			"onUncheck":function(rowData){
+                 				rowData.checkState=0;
+                 				rowData.checked=false;
+                 				var parent= $("#user_orgs").treegrid("find",rowData.parentId);
+                 				if(parent!=null&&parent.checked==true){
+                 					rowData.checked=true;
+                 					rowData.checkState=1;
+//                 					$("#user_orgs").treegrid("select",rowData.id);
+                 					$("#user_orgs").treegrid("unselect",rowData.parentId);
+                 					return;
+                 				}
+                 				if(rowData.children.length!=0){   //  是父节点
+                 					for(var j=0;j<rowData.children.length;j++){
+                 						$("#user_orgs").treegrid("unselect",rowData.children[j].id);
+                 					}
+                 					return;
+                 				}
+                 			
+                 				console.log(parent);
+                 			},
+                 			
+                 			"onClickRow":function(row){
+                 				console.log("onClickRow-->"+row.parentId);
+                 				var parent= $("#user_orgs").treegrid("find",row.parentId);
+                 				console.log(parent);
+                 				if(parent!=null&&parent.checked==true){
+                 					row.checked=true;
+                 					row.checkState=1;
+                 					$("#user_orgs").treegrid("select",row.id);
+                 				}
+                 			},
+                 		
+                 		
+                 			"onLoadSuccess":function(){
+                 				var users = $("#user_grid").datagrid('getChecked')[0];
+                                 if (type == 2) {
+                                     var json=JSON.stringify(users);
+                                     console.log("user_grid"+json);
+                                     for(var i=0;i<users.listUserRole.length;i++){ //  默认选中用户所处的角色
+                                     	$("#user_roles").datagrid("selectRecord",users.listUserRole[i].sysRoleId);
+                                     }
+                                     for(var i=0;i<users.listUserOrg.length;i++){
+                                    	 var isSelectOrg=$("#user_edit_dialog table[id='user_orgs']").treegrid("find",users.listUserOrg[i].sysOrgId);
+                                    	 if(isSelectOrg!=undefined){
+                                    		 $("#user_orgs").treegrid("select",users.listUserOrg[i].sysOrgId);
+                                    	 }
+                                      }
+                                 }
+                                 $("#user_edit_dialog table[id='user_in_orgs']").treegrid({
+                             		url:getRootPath()+"/organization/list"+params,
+                          			method:"GET",
+                          			"onLoadSuccess":function(){
+                          				 if (type == 2) {
+//                                              var usersGrid = $("#user_grid").datagrid('getChecked')[0];
+                                          	$("#user_edit_dialog table[id='user_in_orgs']").treegrid("select",users.mSysUserInOrg.sysOrgId);
+                                          	
+                          				 }
+                          			},
+                          			"onCheck":function(rowData){
+                          					if(rowData==null)return;
+                          					 if(currSelectId!=null){
+                          						 $("#user_orgs").treegrid("unselect",currSelectId);
+                          					 }
+                          					 var selected=$("#user_orgs").treegrid("getSelected");
+                          					 console.log("selected-->"+selected);
+                          					 currSelectId=rowData.id;
+                          					 $("#user_orgs").treegrid("select",currSelectId);
+                          			},
+                             	});
+                     		},
+                     	});
+            		 },
+            	});
+            	
             },
             'onClose': function () {
                 user_tool.form_clear();
@@ -209,11 +439,28 @@ user_tool = {
                     width: 100,
                     iconCls: 'icon-save',
                     handler: function () {
+                    	   var userInOrg=$("#user_edit_dialog table[id=user_in_orgs]").treegrid("getChecked");
+                    	   
+                           if(userInOrg.length>0){
+                           		userInOrg=userInOrg[0];
+                           		var isSelectTag=$("#user_edit_dialog table[id='user_orgs']").treegrid("find",userInOrg.id);
+                           		if(isSelectTag!=null&&isSelectTag.checked==false){
+                           			console.log("isSelectTag"+JSON.stringify(isSelectTag));
+                           			$("#user_edit_dialog table[id='user_orgs']").treegrid("select",userInOrg.id);
+                           			alert(isSelectTag.name+"为必选机构权限");
+                           			return;
+                           		}
+                           }
+                    	
                         if (type == 1) {
+                        	
                             user_tool.save();
                         }
                         if (type == 2) {
-                            user_tool.update();
+
+                        	if(confirm("是否确定修改")){
+                        		user_tool.update();
+                        	}
                         }
                     }
                 },
@@ -240,16 +487,16 @@ user_tool = {
     },
 
     save: function () {
+    
         var form_isValid = $("#user_form").form('validate');
+    
         if (!form_isValid) {
             common_tool.messager_show("请输入必填参数")
-        } else if ($("#jobs").treegrid("getChecked").length == 0) {
-            common_tool.messager_show('请选择职位');
-        }
-        // else if ($("#user-permissions").datagrid("getChecked").length == 0) {
-        //     common_tool.messager_show('请选择权限');
-        // } 
-        else {
+        } else if ($("#user_in_orgs").treegrid("getChecked").length == 0) {
+            common_tool.messager_show('请选择机构');
+        }else if($("#user_roles").datagrid("getChecked").length==0){
+        	 common_tool.messager_show('请选择角色');
+        }else {
             var loginName = $('#user_edit_dialog input[id="loginName"]').val();
             var zhName = $('#user_edit_dialog input[id="zhName"]').val();
             var enName = $('#user_edit_dialog input[id="enName"]').val();
@@ -259,16 +506,35 @@ user_tool = {
             var phone = $('#user_edit_dialog input[id="phone"]').val();
             var address = $('#user_edit_dialog input[id="address"]').val();
             var password = $('#user_edit_dialog input[id="password"]').val();
-            var permissions = $('#user_edit_dialog table[id="user-permissions"]').datagrid("getChecked");
-            var permissionIds = new Array();
-            for (var i = 0; i < permissions.length; i++) {
-                permissionIds[i] = permissions[i].id;
+            var roles=$("#user_edit_dialog table[id='user_roles']").datagrid("getChecked");
+            var roleIds=new Array();
+            for(var i=0;i<roles.length;i++){
+            	roleIds[i]=roles[i].id;
             }
-            var jobs = $('#user_edit_dialog table[id="jobs"]').treegrid("getChecked");
-            var jobIds = new Array();
-            for (var i = 0; i < jobs.length; i++) {
-                jobIds[i] = jobs[i].id;
+            var userInOrg=$("#user_edit_dialog table[id=user_in_orgs]").treegrid("getChecked");
+            if(userInOrg.length>0){
+            	userInOrg=userInOrg[0];
+//            	console.log("userInOrg--->"+userInOrg.id);
+//            	$("#user_edit_dialog table[id='user_orgs']").treegrid("select",userInOrg.id);
             }
+            
+            var orgs=$("#user_edit_dialog table[id='user_orgs']").treegrid("getChecked");
+//            var arrOrgs=new Array();
+//            for(var i=0;i<orgs.length;i++){
+//            	var orgName=orgs[i].name;
+//            	if(orgName!=null&&orgName!=undefined){
+//            		arrOrgs.push();
+//            	}
+//            }
+//            console.log(arrOrgs);
+//            return;
+            var orgIds=new Array();
+            for(var i=0;i<orgs.length;i++){
+            	orgIds[i]=orgs[i].id;
+            }
+            if(!confirm("是否确定添加")){
+        		return;
+        	}
             $.ajax({
                 data: {
                     loginName: loginName,
@@ -280,19 +546,22 @@ user_tool = {
                     phone: phone,
                     address: address,
                     password: password,
-                    permissionIds: permissionIds.toString(),
-                    jobIds: jobIds.toString(),
+                    roleIds:roleIds.toString(),
+                    sysUserInOrgStr:JSON.stringify(userInOrg),
+                    listSysOrgPerStr:JSON.stringify(orgs)
                 },
                 traditional: true,
                 method: 'post',
                 url: getRootPath() + '/user/insert',
                 async: false,
                 dataType: 'json',
+//                contentType:'application/json;charset=utf-8',
                 success: function (result) {
                     if (result.code == 10000) {
                         $("#user_edit_dialog").dialog("close");
                         user_tool.form_clear();
-                        user_tool.init_main_view();
+//                        user_tool.init_main_view();
+                        $("#user_grid").datagrid("reload");
                         common_tool.messager_show(result.msg);
                         return false;
                     }
@@ -307,67 +576,115 @@ user_tool = {
     },
     update: function (data) {
         var form_isValid = $("#user_form").form('validate');
-        if (!form_isValid) {
-            common_tool.messager_show("请输入必填参数")
-        } else if ($("#jobs").treegrid("getChecked").length == 0) {
-            common_tool.messager_show('请选择职位');
+        var comUserId=common_tool.getCurrUserId();
+        var loginName = $('#user_edit_dialog input[id="loginName"]').val();
+        var superUser=false;
+        if("1"==comUserId&&"super"==loginName){
+        	superUser=true;
         }
-        // else if ($("#user-permissions").datagrid("getChecked").length == 0) {
-        //     common_tool.messager_show('请选择权限');
-        // }
-        else {
-            var id = $('#user_edit_dialog input[id="id"]').val();
-            var loginName = $('#user_edit_dialog input[id="loginName"]').val();
-            var zhName = $('#user_edit_dialog input[id="zhName"]').val();
-            var enName = $('#user_edit_dialog input[id="enName"]').val();
-            var sex = $('#user_edit_dialog select[id="sex"]').combobox('getValue');
-            var birth = $('#user_edit_dialog input[id="birth"]').datebox('getValue');
-            var email = $('#user_edit_dialog input[id="email"]').val();
-            var phone = $('#user_edit_dialog input[id="phone"]').val();
-            var address = $('#user_edit_dialog input[id="address"]').val();
-            var password = $('#user_edit_dialog input[id="password"]').val();
-            var permissions = $('#user_edit_dialog table[id="user-permissions"]').datagrid("getChecked");
-            var permissionIds = new Array();
-            for (var i = 0; i < permissions.length; i++) {
-                permissionIds[i] = permissions[i].id;
-            }
-            var jobs = $('#user_edit_dialog table[id="jobs"]').treegrid("getChecked");
-            var jobIds = new Array();
-            for (var i = 0; i < jobs.length; i++) {
-                jobIds[i] = jobs[i].id;
-            }
-            $.ajax({
-                data: {
-                    id: id,
-                    loginName: loginName,
-                    zhName: zhName,
-                    enName: enName,
-                    sex: sex,
-                    birth: birth,
-                    email: email,
-                    phone: phone,
-                    address: address,
-                    permissionIds: permissionIds.toString(),
-                    jobIds: jobIds.toString(),
-                },
-                traditional: true,
-                method: 'post',
-                url: getRootPath() + '/user/update',
-                async: false,
-                dataType: 'json',
-                success: function (result) {
-                    if (result.code == 10000) {
-                        $("#user_edit_dialog").dialog("close");
-                        user_tool.form_clear();
-                        user_tool.init_main_view();
-                        common_tool.messager_show(result.msg);
-                        return false;
-                    }
-                    else {
-                        common_tool.messager_show(result.msg);
-                    }
-                },
-            });
+        
+        if (!form_isValid&&!superUser) {
+            common_tool.messager_show("请输入必填参数")
+        } else if ($("#user_in_orgs").treegrid("getChecked").length == 0&&!superUser) {
+            common_tool.messager_show('请选择机构');
+        }else if($("#user_roles").datagrid("getChecked").length==0&&!superUser){
+        	 common_tool.messager_show('请选择角色');
+        }else {
+        	var id = $('#user_edit_dialog input[id="id"]').val();
+        	var loginName = $('#user_edit_dialog input[id="loginName"]').val();
+        	var zhName = $('#user_edit_dialog input[id="zhName"]').val();
+        	var enName = $('#user_edit_dialog input[id="enName"]').val();
+        	var sex = $('#user_edit_dialog select[id="sex"]').combobox('getValue');
+        	var birth = $('#user_edit_dialog input[id="birth"]').datebox('getValue');
+        	var email = $('#user_edit_dialog input[id="email"]').val();
+        	var phone = $('#user_edit_dialog input[id="phone"]').val();
+        	var address = $('#user_edit_dialog input[id="address"]').val();
+        	var password = $('#user_edit_dialog input[id="password"]').val();
+	       	 var roles=$("#user_edit_dialog table[id='user_roles']").datagrid("getChecked");
+	         var roleIds=new Array();
+	         for(var i=0;i<roles.length;i++){
+	         	roleIds[i]=roles[i].id;
+	         }
+        	if(superUser){
+        		   $.ajax({
+                       data: {
+                           id: id,
+                           loginName: loginName,
+                           zhName: zhName,
+                           enName: enName,
+                           sex: sex,
+                           birth: birth,
+                           email: email,
+                           phone: phone,
+                           address: address,
+                           roleIds:roleIds.toString(),
+                       },
+                       traditional: true,
+                       method: 'post',
+                       url: getRootPath() + '/user/update',
+                       async: false,
+                       dataType: 'json',
+                       success: function (result) {
+                           if (result.code == 10000) {
+                               $("#user_edit_dialog").dialog("close");
+                               user_tool.form_clear();
+                               $("#user_grid").datagrid("reload");
+                               common_tool.messager_show(result.msg);
+                               return false;
+                           }
+                           else {
+                               common_tool.messager_show(result.msg);
+                           }
+                       },
+                   });
+        	}else{
+        	
+                 var userInOrg=$("#user_edit_dialog table[id=user_in_orgs]").treegrid("getChecked");
+                 if(userInOrg.length>0){
+                 	userInOrg=userInOrg[0];
+                 }
+                 var orgs=$("#user_edit_dialog table[id='user_orgs']").treegrid("getChecked");
+                 console.log("机构集合"+JSON.stringify(orgs));
+                 $.ajax({
+                     data: {
+                         id: id,
+                         loginName: loginName,
+                         zhName: zhName,
+                         enName: enName,
+                         sex: sex,
+                         birth: birth,
+                         email: email,
+                         phone: phone,
+                         address: address,
+                         roleIds:roleIds.toString(),
+                         sysUserInOrgStr:JSON.stringify(userInOrg),
+                         listSysOrgPerStr:JSON.stringify(orgs)
+                     },
+                     traditional: true,
+                     method: 'post',
+                     url: getRootPath() + '/user/update',
+                     async: false,
+                     dataType: 'json',
+                     success: function (result) {
+                         if (result.code == 10000) {
+                             $("#user_edit_dialog").dialog("close");
+                             user_tool.form_clear();
+                             $("#user_grid").datagrid("reload");
+                             common_tool.messager_show(result.msg);
+                             return false;
+                         }
+                         else {
+                             common_tool.messager_show(result.msg);
+                         }
+                     },
+                 });
+        	}
+         
+            
+           
+            
+            
+         
 
         }
     },
@@ -377,14 +694,15 @@ user_tool = {
                 id: id,
             },
             traditional: true,
+            dataType: 'json',
             method: 'get',
             url: getRootPath() + '/user/delete',
             async: false,
-            dataType: 'json',
             success: function (result) {
                 if (result.code == 10000) {
                     user_tool.form_clear();
-                    user_tool.init_main_view();
+//                    user_tool.init_main_view();
+                    $("#user_grid").datagrid("reload");
                     common_tool.messager_show(result.msg);
                     return false;
                 }
@@ -557,7 +875,8 @@ user_tool = {
                 if (result.code == 10000) {
                     $("#password_edit_dialog").dialog("close");
                     user_tool.form_clear();
-                    user_tool.init_main_view();
+//                    user_tool.init_main_view();
+                    $("#user_grid").datagrid("reload");
                     common_tool.messager_show(result.msg);
                     return false;
                 }
@@ -580,7 +899,8 @@ user_tool = {
             success: function (result) {
                 if (result.code == 10000) {
                     user_tool.form_clear();
-                    user_tool.init_main_view();
+//                    user_tool.init_main_view();
+                    $("#user_grid").datagrid("reload");
                     common_tool.messager_show(result.msg);
                     return false;
                 }
@@ -603,7 +923,8 @@ user_tool = {
             success: function (result) {
                 if (result.code == 10000) {
                     user_tool.form_clear();
-                    user_tool.init_main_view();
+//                    user_tool.init_main_view();
+                    $("#user_grid").datagrid("reload");
                     common_tool.messager_show(result.msg);
                     return false;
                 }
@@ -617,9 +938,14 @@ user_tool = {
 };
 $(document).ready(function () {
     user_tool.init_main_view();
+    // 新增
     $("#user-save-btn").click(function () {
         user_tool.init_edit_view(1);
+        $("#user_form").form('load', {
+        	sex:"1",
+        });
     });
+    // 修改
     $("#user-update-btn").click(function () {
         var users = $("#user_grid").datagrid('getChecked');
         if (users.length == 0) {
@@ -640,6 +966,7 @@ $(document).ready(function () {
         });
         user_tool.init_edit_view(2);
     });
+    // 删除
     $("#user-delete-btn").click(function () {
         var users = $("#user_grid").datagrid('getChecked');
         if (users.length == 0) {
@@ -652,9 +979,7 @@ $(document).ready(function () {
             }
         });
     });
-    $("#user-detail-btn").click(function () {
-
-    });
+  
     $("#user-enable-btn").click(function () {
         var users = $("#user_grid").datagrid('getChecked');
         if (users.length == 0) {
@@ -690,7 +1015,8 @@ $(document).ready(function () {
     });
     $("#user-flash-btn").click(function () {
         user_tool.form_clear();
-        user_tool.init_main_view();
+//        user_tool.init_main_view();
+        $("#user_grid").datagrid("reload");
     });
     $("#log-select-btn").click(function () {
         user_tool.init_main_view();

@@ -10,13 +10,10 @@
 <!-- <script type="text/javascript" src="static/js/easyui/jquery.min.js"></script>  -->
  <!-- <script type="text/javascript" src="static/js/easyui/jquery.easyui.min.js"></script>  不能用，jsp会造成页面的叠加  -->
 <!-- <script type="text/javascript" src="static/js/system/common.js"></script> -->
-<link rel="stylesheet" type="text/css" href="static/css/home/csxAudio/csxAudio.css"/>
+<!-- <link rel="stylesheet" type="text/css" href="static/css/home/csxAudio/csxAudio.css"/> -->
 </head>
 <body id="idcallLog">     
-<!-- title="Basic DataGrid" 
-url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
--->
-<table id="deviceCallLog" class="deviceCallLog"
+<table id="deviceCallLogDevice" class="deviceCallLog"
 		style="border:0;width:100%;background-color: #ffffff;">
 		<thead >
 			<tr style="background-color: #f3f3f3;" >
@@ -27,15 +24,15 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 				<th onclick='deviceCallLog.clickChangeData(this,"reco_audio_length")'>录音时长<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 5px;"/></th>
 				<th onclick="deviceCallLog.clickChangeData(this,'call_date')">通话时间<img alt="正序排列" src="static/css/home/image/arrow_down.png" style="width:15px;height: 15px;margin-top: 10px;margin-left: 5px;"/></th>
 				<th>备注</th>
-				<th>录音</th>
-				<th>操作</th>
+				<th class="recordSelect">录音</th>
+				<th class="callLogDelete">操作</th>
 			</tr>
 		</thead>
 		
 		<tbody></tbody>
 	</table>
 	
-	<div id="pageTool" class="myPage" align="center" style="margin: 20px 0px 20px 0px; height: 30px;line-height: 30px;">
+	<div id="pageTool" class="myPage" align="center" style="margin: 40px 0px 20px 0px; height: 30px;line-height: 30px;">
 				<select id="iEveryCount" style="height: 40px;margin-right: 10px;font-size: 20px;" onchange="deviceCallLog.changePages()">
 					<option>6</option>
 					<option>12</option>
@@ -62,9 +59,10 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 	</div>		
 	
 	
-	<script type="text/javascript" src="static/css/home/csxAudio/csxAudio.js"></script>
+	<!-- <script type="text/javascript" src="static/css/home/csxAudio/csxAudio.js"></script> -->
 	
 	<script type="text/javascript">
+	
 (function(global){
 	var NameSpace = window.NameSpace || {};
 	NameSpace.data = {
@@ -112,6 +110,7 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 	
 	
 	deviceCallLog={
+			
 			remark:function(callLogId){
 					var str; //score变量，用来存储用户输入的成绩值。
 					var textDescription=$("#description"+callLogId).text();
@@ -175,7 +174,7 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 				}else{
 				    tr = $('<tr style="background-color: #f3f3f3;"></tr>');
 				}
-			    var type=deviceCallLog.callType(row.callType);
+			    var type=common_tool.callType(row.callType);
 			    var callLogId=row.id;
 			    var callNumber=row.callNumber==""?"无":row.callNumber;
 			    var callName=row.callName;
@@ -185,13 +184,23 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 			    var callDate=deviceCallLog.getMoth(row.callDate);
 			    var callDuration=row.callDuration==0?"0":row.callDuration;
 			    var secondIsValid=deviceCallLog.secondIsValid(callDuration);
-			    var callDuration=deviceCallLog.secondToMinute(secondIsValid==true?(callDuration/1000):callDuration);
+			    var callDuration=common_tool.secondToMinute(secondIsValid==true?(callDuration/1000):callDuration);
 			    
 			    var recoAudioLength=row.sysDeviceRecord==null?0:row.sysDeviceRecord.recoAudioLength;
 				//var recoIsValid=deviceCallLog.secondIsValid(recoAudioLength);		    
-				var recoAudioLength=deviceCallLog.secondToMinute(Math.floor(recoAudioLength/1000));
-				
-			    tr.append("<td>"+type+"</td>");
+				var recoAudioLength=common_tool.secondToMinute(Math.floor(recoAudioLength/1000));
+				if(row.callType==2){	//  呼出
+				    tr.append("<td><img style='vertical-align:middle;' width='18px' height='18px' src='static/image/out_phone.png'/><span style='vertical-align:middle;'>&nbsp;"+type+"</span></td>");
+				}else if(row.callType==1){	// 呼入
+					tr.append("<td><img style='vertical-align:middle;' width='18px' height='18px' src='static/image/in_phone.png'/><span style='vertical-align:middle;'>&nbsp;"+type+"</span></td>");
+				}else if(row.callType==3){	// 拒接
+					tr.append("<td><img style='vertical-align:middle;' width='18px' height='18px' src='static/image/no_accept.png'/><span style='vertical-align:middle;'>&nbsp;"+type+"</span></td>");
+				}else if(row.callType==5||row.callType==4){	// 1,未接  4,未接留言
+					tr.append("<td><img style='vertical-align:middle;' width='18px' height='18px' src='static/image/resu_accept.png'/><span style='vertical-align:middle;'>&nbsp;"+type+"</span></td>");
+				}else{
+					tr.append("<td><span>"+type+"<span></td>");
+				}
+			    
 			    tr.append("<td class='changeTd' title="+callName+">"+callName+"</td>");
 			    tr.append("<td class='changeTd' title="+callNumber+">"+callNumber+"</td>");
 			    
@@ -203,13 +212,13 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 			    
 			    var recoFilePath;
 	  			if(callHasRecord=="下载录音"){
-			    	if(row.sysDeviceRecord!=null){			//  可能会有多条录音，要求前端合成音频后上传。href='+recoFilePath+';  download='+recoFilePath+';   注意这个经典写法  <a onclick="deviceCallLog.playAudio('+fileType+');"><img src="static/image/play.png;" width="25px;" height="25px;" /></a>
+			    	if(row.sysDeviceRecord!=null){			//  可能会有多条录音，要求前端合成音频后上传。href='+recoFilePath+';  download='+recoFilePath+';   注意这个经典写法  <a onclick="deviceCallLogDevice.playAudio('+fileType+');"><img src="static/image/play.png;" width="25px;" height="25px;" /></a>
 			    		//recordId=row.sysDeviceRecord[0].id;
 			    		recoFilePath=getRootPath()+row.sysDeviceRecord.recoFilePath;
 			    		var record=getRootPath()+"/deviceRecord/audio?callLogId="+callLogId;
-				    	tr.append("<td class='audio bigTd'>"+
+				    	tr.append("<td class='audio bigTd recordSelect'>"+
 				    	
-				    			"<div class='audiosx' id='audiosx"+callLogId+"'>"+
+				    			"<div class='audiosx' name='deviceAudiosx' id='deviceAudiosx"+callLogId+"'>"+
 									"<button class='play' id='play'></button>"+
 									"<div class='scroll' id='scrollBar'></div>"+
 									"<div class='bar'></div>"+ 
@@ -217,21 +226,22 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 									"<span class='currTime' id='currTime'>00:00&nbsp;/&nbsp;</span>"+
 									"<span class='time' id='time'>00:00</span>"+
 									"<button class='down' id='down'></button>"+
-									"<audio id='audioPlay' src='"+record+"' style='visibility: hidden;' ></audio>"+
+									"<audio id='audioPlay' src='"+record+"' style='visibility: hidden;' controls></audio>"+
 								"</div>"+
 				    	
 				    	
 				    	
 				    /* 	"<audio style='width:260px;height: 32px;' id='audioPlay;'src='"+record+"' controls='controls'>Your browser does not support the audio element.</audio>"+ */
 				    	"</td>");
+				    	console.log("加载录音");
 			    	}else{
-			    		tr.append("<td class='bigTd'>"+"无"+"</td>");
+			    		tr.append("<td class='bigTd recordSelect'>"+"无"+"</td>");
 			    	}
 			    }else{
 				    tr.append("<td>"+callHasRecord+"</td>");
 			    }
 			    
-			    tr.append('<td style="vertical-align: bottom; margin-top:30px;">'+
+			    tr.append('<td class="callLogDelete" style="vertical-align: bottom; margin-top:30px;">'+
 			    		'<img title="修改备注" style="cursor:pointer" src="static/image/remark.png;" width="25px;" height="25px;" onclick="deviceCallLog.remark('+callLogId+');"/>'+
 			    		'<img title="删除" style="cursor:pointer;margin-left:8px;" src="static/image/delete.png;" width="25px;" height="25px;" onclick="deviceCallLog.deleteLogAndRecord('+callLogId+',this,'+i+')"/></td>');
 			
@@ -241,63 +251,39 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 			for(var i = 0; data.rows!=null&&i < data.rows.length; i ++ ){ 
 			    tbody.append(getRow(data.rows[i],i));
 			}
-			var nnode=$('#deviceCallLog'+deviceId+' tbody');
-			console.log("deviceCallLog-->"+nnode.prop("nodeName"));
+			var nnode=$('#deviceCallLogDevice tbody');
+			console.log("deviceCallLogDevice-->"+nnode.prop("nodeName"));
 			
-			$('#deviceCallLog'+deviceId+' tbody').replaceWith(tbody);
-		},
-		
-		
-		
-		callType:function(type){
-			switch (type) {
-			case 0:
-				return "未接电话";
-			case 1:
-				return "呼入";
-			case 2:
-				return "呼出";
-			case 3:
-				return "拒接";
-			case 4:
-				return "未接留言";
-			default:
-				return "未知";
+			$('#deviceCallLogDevice tbody').replaceWith(tbody);
+			var gloPer=common_tool.getGloPer();
+			if(gloPer.indexOf("callLog:delete")>-1){
+				$(".callLogDelete").show();
+			}
+			if(gloPer.indexOf("callLog:select")>-1){
+				$(".callLogSelect").show();
+			}
+			if(gloPer.indexOf("record:select")>-1){
+				$(".recordSelect").show();
 			}
 		},
 		
-		
-		/**毫秒数转时间*/
 		getMoth:function(str){  
 			var dateTime=new Date(str);
 			var year=dateTime.getFullYear();
 			var month=dateTime.getMonth() + 1;
+			month=month<10?("0"+month):month;
 			var day=dateTime.getDate();
+			day=day<10?("0"+day):day;
 			var hour=dateTime.getHours();
+			hour=hour<10?("0"+hour):hour;
 			var minute=dateTime.getMinutes();
+			minute=minute<10?("0"+minute):minute;
 			var second=dateTime.getSeconds(); 
+			second=second<10?("0"+second):second;
 			return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;
-	    },  
-	    
-		/**秒数转分钟*/    
-	    secondToMinute:function(callDuration){
-	    	if(callDuration<60){
-	    		return "00:"+(callDuration<10?("0"+callDuration):(callDuration));
-	    	}else{
-	    		if(callDuration>60&&callDuration<3600){
-	    			var minute=callDuration/60;
-	    			var second=callDuration%60;
-	    			var mi=Math.floor(minute);
-	    			var sec=Math.floor(second);
-	    			return (mi<10?("0"+mi):mi)+":"+(sec<10?("0"+sec):sec);
-	    		}else{
-	    			var hour=callDuration/3600;
-	    			var m=callDuration%3600;
-	    			var minute=deviceCallLog.secondToMinute(m);
-	    			return Math.floor(hour)+":"+minute;
-	    		}
-	    	}
 	    },
+		
+	
 	    
 	    /**验证是否为毫秒数，毫秒数转换为秒数*/
 	    secondIsValid:function(second){
@@ -329,6 +315,7 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 	   
 	    	var selectEdRows=$("#idPageTool"+deviceId+" select[id=iEveryCount] option:selected").val();		//  每页加载条数
 	    	if(options==2){
+	    		
 	    		NameSpace.data.add_currentPage();
 	    		if(NameSpace.data.get_currentPage()>NameSpace.data.get_totalPage()){
 		    		NameSpace.data.set_currentPage(NameSpace.data.get_totalPage());
@@ -361,7 +348,7 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 				success:function(data){
 					NameSpace.data.set_globalDeviceId(deviceId);
 					deviceCallLog.fillData(data,deviceId);
-					csxAudio.init("audiosx");
+					csxAudio.init("deviceAudiosx");
 					$("#audioPlay").volume=0.5;
 					$("#idPageTool"+deviceId+" span[id=currentPage]").text("当前"+(NameSpace.data.get_currentPage()<NameSpace.data.get_totalPage()?NameSpace.data.get_currentPage():NameSpace.data.get_totalPage())+"/"+NameSpace.data.get_totalPage()+"页");
 				},
@@ -398,16 +385,14 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 	    	deviceCallLog.loadData(NameSpace.data.get_globalDeviceId(),NameSpace.data.get_globalSort()==null?"call_date":NameSpace.data.get_globalSort(),NameSpace.data.get_globalOrder()==null?"desc":NameSpace.data.get_globalOrder(),-1,7);
 	    },
 	    
-	    callInit:function(){
+	    callInit:function(deviceId){
 	    	// 判断选择的哪个模块
 			console.log("加载通话记录");
-		//	var deviceId=$('#div_alldevice_head input[id="deviceId"]').val();
-			var deviceId=$('#contoner1 div').attr("id");
+		
+		//	console.log("deviceId-->"+deviceId);
+		//	$("#deviceCallLog").attr("id","deviceCallLog"+deviceId);
 			
-			console.log("deviceId-->"+deviceId);
-		/* 	$(".ul_device_list div[id="+deviceId+"]").css("padding-bottom","0px") */
-			$("#deviceCallLog").attr("id","deviceCallLog"+deviceId);
-			$("#pageTool").attr("id","idPageTool"+deviceId);
+			$("#record_container div[id=pageTool]").attr("id","idPageTool"+deviceId);
 			$.ajax({   
 				type:"GET",   
 				url:getRootPath()+"/deviceCallLog/list?deviceId="+deviceId+"&sort=call_date&order=desc"+"&page="+1+"&rows="+6,
@@ -424,10 +409,11 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 					deviceCallLog.fillData(data,deviceId);
 					$("#audioPlay").volume=0.5;
 					 var the_timeout=setTimeout(function(){
-							csxAudio.init("audiosx");
+							csxAudio.init("deviceAudiosx");
 							 
 						},30);
- 	 
+						//var deviceId=$('#contonerDialog div').attr("id");
+					
  				},
 			});
 	    }
@@ -436,15 +422,16 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 	
 
 		$(document).ready(function(){
+			
 			// 判断选择的哪个模块
 			console.log("加载通话记录");
 		//	var deviceId=$('#div_alldevice_head input[id="deviceId"]').val();
 		return;
-			var deviceId=$('#contoner1 div').attr("id");
+			var deviceId=$('#contonerDialog div').attr("id");
 			
 			console.log("deviceId-->"+deviceId);
 		/* 	$(".ul_device_list div[id="+deviceId+"]").css("padding-bottom","0px") */
-			$("#deviceCallLog").attr("id","deviceCallLog"+deviceId);
+			$("#deviceCallLogDevice").attr("id","deviceCallLogDevice"+deviceId);
 			$("#pageTool").attr("id","idPageTool"+deviceId);
 			$.ajax({   
 				type:"GET",   
@@ -462,7 +449,7 @@ url:'${pageContext.request.contextPath}/deviceCallLog/list?deviceId=23',
 					deviceCallLog.fillData(data,deviceId);
 					$("#audioPlay").volume=0.5;
 					 var the_timeout=setTimeout(function(){
-							csxAudio.init("audiosx");
+							csxAudio.init("deviceAudiosx");
 							 
 						},30);
  	 

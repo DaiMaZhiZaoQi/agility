@@ -45,7 +45,7 @@
 	           	<div>&nbsp;设备描述:</div> 
 	            <input name="description" id="description"
 	             	style="width: 300px;height: 130px;margin:5px 0px 0px 10px;"
-	                data-options="required:true,multiline:true"
+	                data-options="multiline:true"
 	                class="easyui-textbox easyui-validatebox">
              </div>
         </div>

@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -32,14 +33,22 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.gson.JsonObject;
 import com.hunt.dao.SysDeviceCallLogMapper;
 import com.hunt.dao.SysDeviceMapper;
+import com.hunt.dao.SysDeviceRoleOrgMapper;
+import com.hunt.dao.SysOrganizationMapper;
+import com.hunt.dao.SysUserInOrgMapper;
 import com.hunt.model.dto.LoginInfo;
 import com.hunt.model.entity.SysDevice;
 import com.hunt.model.entity.SysDeviceCallLog;
 import com.hunt.model.entity.SysDeviceRecord;
+import com.hunt.model.entity.SysDeviceRoleOrg;
+import com.hunt.model.entity.SysOrganization;
+import com.hunt.model.entity.SysUserInOrg;
+import com.hunt.properties.PropertiesUtil;
 import com.hunt.service.DeviceCallLogService;
 import com.hunt.service.DeviceRecordService;
 import com.hunt.util.AmrToMP3Utils;
 import com.hunt.util.DateUtil;
+import com.hunt.util.PermissionCode;
 import com.hunt.util.ResponseCode;
 import com.hunt.util.Result;
 import com.hunt.util.StringUtil;
@@ -51,14 +60,23 @@ import io.swagger.annotations.Api;
 @RequestMapping("deviceRecord")
 public class DeviceRecordController extends BaseController{
 
+	
+	
 	@Autowired
 	private DeviceRecordService mDeviceRecordService;
-	
+	@Autowired
+	private PropertiesUtil mPropUtil;
 	@Autowired
 	private SysDeviceMapper mSysDeviceMapper;
-	
+	@Autowired
+	private SysDeviceRoleOrgMapper mSysDeviceRoleOrgMapper;
 	@Autowired
 	private SysDeviceCallLogMapper mSysDeviceCallLogMapper;
+	
+	@Autowired
+	private SysUserInOrgMapper mSysUserInOrgMapper;
+	@Autowired
+	private SysOrganizationMapper mSysOrganizationMapper;
 	
 	@Autowired
 	private DeviceCallLogService mDeviceCallLogService;
@@ -69,10 +87,6 @@ public class DeviceRecordController extends BaseController{
 	public Result insert(
 			@RequestParam(value="sysDeviceCallLog",required=false,defaultValue="")String sysDeviceCallLogJson,
 			@RequestParam(value="record",required=false) String recordStr, 
-//			@RequestParam(value="uploadFile")MultipartFile[] uploadFile,
-//			@RequestPart("uploadFile") MultilFileBodyDto  uploadFiles,
-//			@RequestParam(value="uploadFile")String uploadFiles,
-//			@RequestParam(value="uploadFile",required=false)MultipartFile[] uploadFile,
 			@RequestParam(value="file",required=false)MultipartFile[] uploadFile,   
 			@RequestParam(value="deviceSerial",required=false,defaultValue="")String deviceSerial,  
 			HttpServletRequest request) throws IllegalStateException, IOException {
@@ -83,19 +97,29 @@ public class DeviceRecordController extends BaseController{
 		SysDevice sysDevice = mSysDeviceMapper.selectByDeviceSerial(deviceSerial);
 		if(sysDevice==null) {
 			return Result.instance(ResponseCode.missing_parameter.getCode(), "序列号错误,该设备不存在");
+		}else {
+			// 用户id 通话记录添加权限判断
+			List<SysDeviceRoleOrg> listSysDeviceRoleOrg = mSysDeviceRoleOrgMapper.selectOnByDeviceId(sysDevice.getId());
+			if(listSysDeviceRoleOrg!=null) {
+				SysDeviceRoleOrg sysDeviceRoleOrg = listSysDeviceRoleOrg.get(0);
+				Long sysUserId = sysDeviceRoleOrg.getSysUserId();
+				if(!mobileHasPermission(sysUserId, PermissionCode.CALLLOG_INSERT.pName)) {
+					return Result.instance(PermissionCode.CALLLOG_INSERT.pCode, PermissionCode.CALLLOG_INSERT.pMsg);
+				}
+				return	insertCallLogAndRecord(sysDeviceCallLogJson, recordStr, uploadFile, deviceSerial, request, sysDevice,sysDeviceRoleOrg);
+			}else {
+				return new Result(ResponseCode.data_not_exist.getCode(),ResponseCode.data_not_exist.getMsg());
+			}
+			
 		}
-		return	insertCallLogAndRecord(sysDeviceCallLogJson, recordStr, uploadFile, deviceSerial, request, sysDevice);
-		 
-		
 	}
-	//{"callNumber":"8006","callDate":1566193906232,"callType":2,"callDuration":6,"callHasRecord":1,"callRecordMs":2860,"callSubscriptionId":90,"callAddress":"","callDescription":""}
-	// {"callAddress":"深圳市宝安区","callDate":9258,"callDuration":89,"callNumber":"18733672809","callType":1,"callhasRecord":0,"description":"18733672809的通话记录"}
+	
 	@Transactional
 	private Result insertCallLogAndRecord(String sysDeviceCallLogJson, String recordStr, MultipartFile[] uploadFile,
-			String deviceSerial, HttpServletRequest request, SysDevice sysDevice) throws IOException {
+			String deviceSerial, HttpServletRequest request, SysDevice sysDevice,SysDeviceRoleOrg sysDeviceRoleOrg) throws IOException {
 		Long id = sysDevice.getId();   
 		Long callLogId=null;
-		//  添加设备通话记录
+		//  添加设备通话记录 
 		Result result=null;
 		SysDeviceCallLog sysDeviceCallLog=null;
 		if(!"".equals(sysDeviceCallLogJson)) { 	
@@ -109,25 +133,27 @@ public class DeviceRecordController extends BaseController{
 			}
 			sysDeviceCallLog.setDeviceId(id);
 			
-//			Subject subject = SecurityUtils.getSubject();
-//	        LoginInfo loginInfo=(LoginInfo)subject.getSession().getAttribute("loginInfo");
-//	        if (loginInfo!=null) {
-//	        	Long createId = loginInfo.getId(); 
-//	        	sysDevice.setCreateBy(createId);
-//	        	sysDevice.setUpdateBy(createId);
-//	        	sysDeviceCallLog.setCreateBy(createId);
-//	        	sysDeviceCallLog.setUpdateBy(createId);
-//			}
-	        
+
 			SysDeviceCallLog sysDeviceCallLogExist = mSysDeviceCallLogMapper.selectByCallDate(id,sysDeviceCallLog.getCallDate());
-			if(sysDeviceCallLogExist!=null) {
-				sysDeviceCallLog.setId(sysDeviceCallLogExist.getId());
-	        	callLogId=Long.parseLong(sysDeviceCallLogExist.getId()+"");
-	        	Long updateAllCallLog = mDeviceCallLogService.updateAllCallLog(sysDeviceCallLog);
-	        	if(updateAllCallLog>0) {
-	        		result=Result.instance(ResponseCode.success.getCode(), "修改成功");
-	        	}
+			if(sysDeviceCallLogExist!=null) {		//  不允许重新上传
+				return Result.success();
+//				sysDeviceCallLog.setId(sysDeviceCallLogExist.getId());
+//				sysDeviceCallLog.setOrgId(sysDeviceCallLogExist.getOrgId());
+//	        	callLogId=Long.parseLong(sysDeviceCallLogExist.getId()+"");
+//	        	Long updateAllCallLog = mDeviceCallLogService.updateAllCallLog(sysDeviceCallLog);
+//	        	if(updateAllCallLog>0) {
+//	        		result=Result.instance(ResponseCode.success.getCode(), "重传成功");
+//	        	}
 			}else {
+				Long sysUserId = sysDeviceRoleOrg.getSysUserId();
+				SysUserInOrg sysUserInOrg = mSysUserInOrgMapper.selectByUserId(sysUserId);
+				SysOrganization sysOrganization = mSysOrganizationMapper.selectById(sysUserInOrg.getSysOrgId());
+				
+				sysDeviceCallLog.setOrgId(sysOrganization.getId());
+				sysDeviceCallLog.setOrgName(sysOrganization.getName());
+				sysDeviceCallLog.setOrgCode(sysOrganization.getOrgCode());
+				sysDeviceCallLog.setUserId(sysUserId);
+				sysDeviceCallLog.setDevSerial(sysDevice.getDeviceSerial());
 				result= mDeviceCallLogService.insert(sysDeviceCallLog);
 				if(result.getCode()==ResponseCode.success.getCode()) {
 		        	callLogId=sysDeviceCallLog.getId();
@@ -139,7 +165,6 @@ public class DeviceRecordController extends BaseController{
 		}
 		
 	if((!"".equals(uploadFile))&&uploadFile!=null&&uploadFile.length>0&&sysDeviceCallLog!=null) { 
-//		SysDeviceRecord sysDeviceRecord = JsonUtils.readValue(recordStr, SysDeviceRecord.class);
 		Integer callhasRecord = sysDeviceCallLog.getCallHasRecord();
 		SysDeviceRecord sysDeviceRecord=null;
 		if(callhasRecord==1) {
@@ -177,12 +202,16 @@ public class DeviceRecordController extends BaseController{
 				String filename = mf.getOriginalFilename();
 				String fileType = filename.substring(filename.lastIndexOf(".")+1).toLowerCase().trim();// 文件类型
 					if(!mf.isEmpty()) {
-//						String path=request.getServletContext().getRealPath("/upload");
 						String path=request.getServletContext().getRealPath("/");
 						long minTime=System.currentTimeMillis();
 						String yearAndMonthToday = DateUtil.createFilePath(minTime); 
 						String relaPath=deviceSerial+yearAndMonthToday;
-						String realPathParent= new File(path).getParent()+File.separator+relaPath;
+						String realPathParent=null;
+						if(!StringUtils.isEmpty(mPropUtil.getRecordFilePath())){
+							realPathParent=mPropUtil.getRecordFilePath()+File.separator+relaPath;
+						}else {
+							realPathParent= new File(path).getParent()+File.separator+relaPath;
+						}
 						
 						File file=new File(realPathParent);
 						if(!file.exists()){
@@ -216,9 +245,9 @@ public class DeviceRecordController extends BaseController{
 			}
 			System.out.println("insert audio-->"+sysDeviceRecord.toEntityString());
 			if(isExistAudio) {						// 已存在该录音
-				mDeviceRecordService.update(sysDeviceRecord);
+				mDeviceRecordService.update(sysDeviceRecord,sysDeviceCallLog.getOrgId());
 			}else {									//	没有该录音
-				mDeviceRecordService.insert(sysDeviceRecord);
+				mDeviceRecordService.insert(sysDeviceRecord,sysDeviceCallLog.getOrgId());
 			}
 			String recoFilePath = sysDeviceRecord.getRecoFilePath();
 			if(!StringUtils.isEmpty(recoFilePath)) {
@@ -230,9 +259,9 @@ public class DeviceRecordController extends BaseController{
 				fileResponse.setFilePath(request.getContextPath()+"/deviceRecord/audio?callLogId="+callLogId);
 				fileResponse.setFileSize(sysDeviceRecord.getRecoPhoneSize());
 				return Result.success(fileResponse);
-//				return Result.success(sysDeviceRecord);
 			}
 		}
+			updateHeart(request,deviceSerial);
 			return result;
 	}
 	
@@ -276,9 +305,10 @@ public class DeviceRecordController extends BaseController{
 			outputStream = response.getOutputStream();
 			String mimeType = request.getServletContext().getMimeType(file.getName());
 			response.setHeader("Content-Disposition", "attachment;filename="+file.getName());
-			response.setContentType(mimeType);
+			response.setHeader("Accept-Ranges", "bytes");
+			response.setContentType(mimeType); 
 			response.setContentLength(Integer.parseInt(file.length()+""));
-			
+			response.setHeader("Content-Range", "bytes 0-"+(Integer.parseInt(file.length()+"")/2)+"/"+(Integer.parseInt(file.length()+"")/2));
 //			outputStream.setWriteListener(new WriteListener() {
 //				
 //				@Override
@@ -331,7 +361,6 @@ public class DeviceRecordController extends BaseController{
 			
 			if(outputStream!=null) {
 				try {
-//					outputStream.flush();
 					outputStream.close();
 				} catch (IOException e) {
 					logger.error("audioPlay--->"+e.getMessage());
@@ -339,11 +368,6 @@ public class DeviceRecordController extends BaseController{
 			}
 			
 		}
-	
-		
-//		String path=request.getServletContext().getRealPath("/");
-//		new File(path).getParent();
-		
 	}
 	
 	

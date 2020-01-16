@@ -193,10 +193,13 @@
 			             			return row.loginName;
 			             		}}
 			                 ]],
+			                 
 			        		 onLoadSuccess:function(data){
 			        			console.log("datagrid加载成功"); 
+			        			 var params="?id="+common_tool.getCurrUserId();
 			        			 $("#device_manage_dialog table[id=deviceJobs]").treegrid({
-					        		 url:getRootPath()+"/job/list",
+//					        		 url:getRootPath()+"/job/list",
+			        				 url:getRootPath()+"/organization/list"+params,
 					        		 method:'get',
 					                 idField:'id',
 					                 treeField:"name",
@@ -232,12 +235,7 @@
 			    						 currRowIndex="-1";
 			    						 return;
 			    					 }
-			    	        	  var userRoleOrgs=rowData.userRoleOrganizations;
-			    	        	  var str=JSON.stringify(userRoleOrgs);
-			    	        	  console.log("已选中-->"+str);
-			    	        	  for (var i = 0; userRoleOrgs.length>0&&i < userRoleOrgs.length; i++) {
-			    	                     $("#device_manage_dialog table[id=deviceJobs]").treegrid("select", userRoleOrgs[i].sysRoleOrganizationId);
-			    	                 }
+			    					 $("#device_manage_dialog table[id=deviceJobs]").treegrid("select", rowData.sysOrgId);
 			    	        	  currRowIndex=rowIndex;
 			    	          },
 			    	          
