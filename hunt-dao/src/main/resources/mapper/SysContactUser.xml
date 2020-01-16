@@ -6,6 +6,7 @@
 		<result column="sys_contact_id" property="sysContactId" jdbcType="BIGINT"/>
 		<result column="sys_user_id" property="sysUserId" jdbcType="BIGINT"/>
 		<result column="sys_org_id" property="sysOrgId" jdbcType="BIGINT"/>
+		<result column="sys_org_code" property="sysOrgCode" jdbcType="VARCHAR"/> 
 		<result column="status" property="status" jdbcType="INTEGER"/>
 		<result column="is_auth" property="isAuth" jdbcType="INTEGER"/>
 		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
@@ -55,6 +56,9 @@
 			<if test="sysOrgId!=null">
 				sys_org_id,
 			</if>
+			<if test="sysOrgCode!=null and sysOrgCode.length()!=0">
+				sys_org_code,
+			</if>
 			<if test="status!=null">
 				status,
 			</if>
@@ -71,6 +75,9 @@
 			</if>
 			<if test="sysOrgId!=null">
 				#{sysOrgId},
+			</if>
+			<if test="sysOrgCode!=null and sysOrgCode.length()!=0">
+				#{sysOrgCode},
 			</if>
 			<if test="status!=null">
 				#{status},
@@ -92,7 +99,14 @@
 				sys_org_id=#{sysOrgId},
 			</if>
 		</set>
-		where sys_contact_id=#{sysContactId} and sys_user_id=#{sysUserId}
+		where sys_contact_id=#{sysContactId} and sys_org_id=#{sysOrgId}
+	</update>
+	
+	<!-- 同步更新orgCode -->
+	<update id="updateByOrgCode" useGeneratedKeys="true" keyProperty="id">
+		UPDATE sys_contact_user
+		SET sys_org_code=#{sysOrgCode}
+		WHERE sys_org_code=#{oldOrgCode}
 	</update>
 	
 	<!-- 解除授权  -->
@@ -109,8 +123,18 @@
 	</update>
 	
 	<select id="selectByUserId" resultType="sysContactUser">
-		SELECT * FROM sys_contact_user WHERE sys_user_id=#{sysUserId}
+		SELECT * 
+		FROM sys_contact_user 
+		WHERE sys_user_id=#{sysUserId} AND status=1
 	</select>
+
+	<select id="selectByOrgId" resultType="sysContactUser">
+		SELECT * FROM sys_contact_user 
+		WHERE sys_org_id=#{sysOrgId}
+		AND sys_contact_user.`status`=1
+		AND sys_contact_user.`is_auth`=1
+	</select>
+
 	
 	<select id="selectContactIdByUser" resultType="java.lang.Long">
 		SELECT sys_contact_id FROM sys_contact_user WHERE sys_user_id=#{sysUserId} and status=1
@@ -140,6 +164,45 @@
 		AND sys_contact_user.`sys_user_id`=#{sysUserId}
 		AND sys_contact_user.`status`!=1
 	</select>
+	
+	<!-- 查询已授权的机构id -->
+	<select id="selectOrgIdByContactId" resultType="java.lang.Long">
+		SELECT sys_org_id FROM 
+		sys_contact_user 
+		WHERE sys_contact_id=#{contactId} 
+		AND STATUS=1
+	</select>
+	
+	
+	<!-- 查询已授权的机构id -->
+	<select id="selectUserIdByContactId" resultType="java.lang.Long">
+		SELECT DISTINCT sys_user_id FROM 
+		sys_contact_user 
+		WHERE sys_contact_id=#{contactId} 
+		AND STATUS=1
+	</select>
+	
+	
+	<select id="selectContactLikeByOrgCode" resultType="java.lang.Long">
+		SELECT DISTINCT sys_contact_user.`sys_contact_id` FROM sys_contact_user 
+		WHERE sys_org_code LIKE CONCAT(#{sysOrgCode},"%")
+		AND sys_contact_user.`status`=1
+		AND sys_contact_user.`is_auth`=1
+	</select>   
+	
+	<select id="selectContactByOrgCode" resultType="java.lang.Long">
+		SELECT DISTINCT sys_contact_user.`sys_contact_id` FROM sys_contact_user 
+		WHERE sys_org_code IN
+		<foreach collection="listOrgCode" item="orgCode" open="(" close=")" separator=",">
+			#{orgCode}
+		</foreach>		
+			AND sys_contact_user.`status`=1
+			AND sys_contact_user.`is_auth`=1
+	</select>
+	
+	
+	
+	
 	
 	
 </mapper>

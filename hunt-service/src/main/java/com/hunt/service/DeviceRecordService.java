@@ -10,16 +10,18 @@ public interface DeviceRecordService {
 	/**
 	 * 上传录音
 	 * @param sysDeviceRecord
+	 * @param orgId
 	 * @return
 	 */
-	public Long insert(SysDeviceRecord sysDeviceRecord);
+	public Long insert(SysDeviceRecord sysDeviceRecord,Long orgId);
 	
 	/**
 	 * 
 	 * @param sysDeviceRecord
+	 * @param orgId
 	 * @return
 	 */
-	public Long update(SysDeviceRecord sysDeviceRecord);
+	public Long update(SysDeviceRecord sysDeviceRecord,Long orgId);
 	
 	/**
 	 * 通过通话记录id查找录音

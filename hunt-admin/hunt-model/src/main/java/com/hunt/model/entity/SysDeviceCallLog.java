@@ -60,6 +60,12 @@ public class SysDeviceCallLog extends BaseEntity{
 	/**是否可修改1，可修改，2，不可修改*/
 	private Integer isFinal;
 	
+	private Long orgId;
+	private String orgName;
+	private String orgCode;
+	private Long userId;
+	private String devSerial;
+	
 	
 
 	public Long getId() {
@@ -247,6 +253,50 @@ public class SysDeviceCallLog extends BaseEntity{
 
 	public void setCallDescription(String callDescription) {
 		this.callDescription = callDescription;
+	}
+	
+	
+	
+	
+
+	public Long getOrgId() {
+		return orgId;
+	}
+
+	public void setOrgId(Long orgId) {
+		this.orgId = orgId;
+	}
+
+	public String getOrgName() {
+		return orgName;
+	}
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
+	}
+
+	public String getOrgCode() {
+		return orgCode;
+	}
+
+	public void setOrgCode(String orgCode) {
+		this.orgCode = orgCode;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public String getDevSerial() {
+		return devSerial;
+	}
+
+	public void setDevSerial(String devSerial) {
+		this.devSerial = devSerial;
 	}
 
 	

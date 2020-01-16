@@ -29,6 +29,16 @@ public interface SysDeviceMapper {
 	 */
 	public void update(SysDevice sysDevice);
 	
+	
+
+	/**
+	 * 同步更新orgCode
+	 * @param sysOrgCode
+	 * @param oldOrgCode
+	 * @return
+	 */
+	Long updateByOrgCode(@Param("sysOrgCode")String sysOrgCode,@Param("oldOrgCode") String oldOrgCode);
+	
 	/**
 	 * 更新设备时间，用于心跳上报
 	 * @param deviceSerial

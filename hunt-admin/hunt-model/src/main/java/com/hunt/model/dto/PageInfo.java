@@ -8,6 +8,8 @@ package com.hunt.model.dto;
 public class PageInfo {
     private int total;
     private Object rows;
+    
+    private Object otherRows;
 
     public PageInfo(int total, Object rows) {
         this.total = total;
@@ -37,4 +39,18 @@ public class PageInfo {
     public void setRows(Object rows) {
         this.rows = rows;
     }
+
+	public Object getOtherRows() {
+		return otherRows;
+	}
+
+	public void setOtherRows(Object otherRows) {
+		this.otherRows = otherRows;
+	}
+
+    
+    
+    
+    
+    
 }

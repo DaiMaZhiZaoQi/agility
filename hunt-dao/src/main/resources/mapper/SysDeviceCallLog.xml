@@ -30,6 +30,13 @@
 		<result column="status" property="status" jdbcType="INTEGER"/>
 		<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
 		<result column="description" property="description" jdbcType="VARCHAR"/>
+		
+		<result column="org_id" property="orgId" jdbcType="BIGINT"/>
+		<result column="org_name" property="orgName" jdbcType="VARCHAR"/>
+		<result column="org_code" property="orgCode" jdbcType="VARCHAR"/>
+		<result column="user_id" property="userId" jdbcType="BIGINT"/>
+		<result column="dev_serial" property="devSerial" jdbcType="VARCHAR"/>
+		
 	</resultMap>
 	
 	<sql id="sql_column_where">
@@ -99,6 +106,22 @@
 			<if test="isFinal!=null">
 				is_final,
 			</if>
+			<if test="orgId!=null">
+				org_id,
+			</if>
+			<if test="orgName!=null and orgName.length()!=0">
+				org_name,
+			</if>
+			<if test="orgCode!=null and orgCode.length()!=0">
+				org_code,
+			</if>
+			<if test="userId!=null">
+				user_id,
+			</if>
+			<if test="devSerial!=null and devSerial.length()!=0">
+				dev_serial,
+			</if>
+			
 			
 		</trim>
 		<trim prefix="values(" suffix=")" suffixOverrides=",">
@@ -155,7 +178,21 @@
 			<if test="isFinal!=null">
 				#{isFinal},
 			</if>
-			
+			<if test="orgId!=null">
+				#{orgId},
+			</if>
+			<if test="orgName!=null and orgName.length()!=0">
+				#{orgName},
+			</if>
+			<if test="orgCode!=null and orgCode.length()!=0">
+				#{orgCode},
+			</if>
+			<if test="userId!=null">
+				#{userId},
+			</if>
+			<if test="devSerial!=null and devSerial.length()!=0">
+				#{devSerial},
+			</if>
 		</trim>
 	</insert>
 	
@@ -223,6 +260,13 @@
 		</set>
 		where id=#{id} and status=1
 	
+	</update>
+	
+	<!-- 同步更新orgCode -->
+	<update id="updateByOrgCode" useGeneratedKeys="true" keyProperty="id">
+		UPDATE sys_device_calllog
+		SET org_code=#{sysOrgCode}
+		WHERE org_code=#{oldOrgCode}
 	</update>
 	
 	<update id="deleteOrNoDeleteDeviceCallLog" parameterType="SysDeviceCallLog" useGeneratedKeys="true" keyProperty="id">

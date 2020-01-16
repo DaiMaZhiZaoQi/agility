@@ -13,6 +13,7 @@ public class SysContactUser extends BaseEntity{
 	private Long sysContactId;
 	private Long sysUserId;
 	private Long sysOrgId;
+	private String sysOrgCode;
 	private Integer status;
 	private Integer isAuth;
 	private Date createTime;
@@ -24,10 +25,9 @@ public class SysContactUser extends BaseEntity{
 		super();
 	}
 	
-	public SysContactUser(Long sysContactId, Long sysUserId, Long sysOrgId) {
+	public SysContactUser(Long sysContactId, Long sysOrgId) {
 		super();
 		this.sysContactId = sysContactId;
-		this.sysUserId = sysUserId;
 		this.sysOrgId = sysOrgId;
 	}
 	public Long getId() {
@@ -42,18 +42,32 @@ public class SysContactUser extends BaseEntity{
 	public void setSysContactId(Long sysContactId) {
 		this.sysContactId = sysContactId;
 	}
+	
 	public Long getSysUserId() {
 		return sysUserId;
 	}
+
 	public void setSysUserId(Long sysUserId) {
 		this.sysUserId = sysUserId;
 	}
+
 	public Long getSysOrgId() {
 		return sysOrgId;
 	}
 	public void setSysOrgId(Long sysOrgId) {
 		this.sysOrgId = sysOrgId;
 	}
+	
+	
+	
+	public String getSysOrgCode() {
+		return sysOrgCode;
+	}
+
+	public void setSysOrgCode(String sysOrgCode) {
+		this.sysOrgCode = sysOrgCode;
+	}
+
 	public Integer getStatus() {
 		return status;
 	}

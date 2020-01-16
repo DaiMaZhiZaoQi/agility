@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.hunt.model.dto.PageDto;
 import com.hunt.model.dto.SysCallLogDeviceRecoDto;
 import com.hunt.model.entity.SysDeviceTotal;
 
@@ -58,6 +59,16 @@ public interface SysDeviceTotalMapper {
 	 * @return
 	 */
 	public SysDeviceTotal selectByDevIdCreateTime(@Param("deviceId") Long deviceId);
+	
+	
+	/**
+	 * 查询该机构当天的通话记录
+	 * @param orgId
+	 * @return
+	 */
+	public SysDeviceTotal selectByOrgIdCreateTime(@Param("orgId") Long orgId,@Param("deviceId") Long deviceId);
+	
+	
 	
 	/**
 	 * 查询指定日期的通话记录
@@ -212,6 +223,48 @@ public interface SysDeviceTotalMapper {
 	 * @return
 	 */
 	public List<SysCallLogDeviceRecoDto>  selectSearCallLogByUserSet(@Param("userSetId")Set<Long> userId, @Param("sort") String sort,@Param("order") String order,@Param("page") Integer page,@Param("rows") Integer rows,@Param("callNumber") String callNumber,@Param("deviceSerial") String deviceSerial,@Param("callName")String callName,@Param("beginTime")Long beginTime,@Param("endTime")Long endTime,@Param("callIsHaveRecord") Integer callIsHaveRecord);
+	
+	/**
+	 * 通话记录数量
+	 * @return
+	 */
+	public Long	selectSearCallCountN(@Param("orgIds") List<Long> orgIds,@Param("pageDto")PageDto pageDto);
+	
+	public Long	selectSearCallCountNN(@Param("orgIds") List<Long> orgIds,@Param("pageDto")PageDto pageDto);
+	
+	/**
+	 * 查询通话记录
+	 * @param orgIds
+	 * @param pageDto
+	 * @return
+	 */
+	public List<SysCallLogDeviceRecoDto> selectSearCallLogByUserSetN(@Param("orgIds") List<Long> orgIds,@Param("pageDto")PageDto pageDto);
+	
+	/**
+	 * 统计分析用查询通话记录
+	 * @param orgIds
+	 * @param pageDto
+	 * @return
+	 */
+	public List<SysCallLogDeviceRecoDto> selectTotalByUserSetN(@Param("orgIds") List<Long> orgIds,@Param("pageDto")PageDto pageDto);
+	
+	/**
+	 * 开始时间为空，查询前面几条
+	 * @param orgIds
+	 * @param pageDto
+	 * @return
+	 */
+	public List<SysCallLogDeviceRecoDto> selectTotalByUserSetNN(@Param("orgIds") List<Long> orgIds,@Param("pageDto")PageDto pageDto);
+	
+	/**
+	 * 查询通话记录总数
+	 * @param orgIds
+	 * @param pageDto
+	 * @return
+	 */
+	public List<SysDeviceTotal> selectTotalByPageDto(@Param("orgIds") List<Long> orgIds,@Param("pageDto") PageDto pageDto); 
+	
+	public List<SysDeviceTotal> selectTotalByPageDtoN(@Param("orgIds") List<Long> orgIds,@Param("pageDto") PageDto pageDto); 
 	
 	/**
 	 * 查询该角色所存在的机构

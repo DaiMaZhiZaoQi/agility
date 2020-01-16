@@ -229,7 +229,18 @@ public class SystemServiceImpl implements SystemService {
     @Override
     public boolean isForbiddenIp(String remoteAddr) {
         Boolean result = redisTemplate.opsForSet().isMember("ip_intercepter", remoteAddr);
-        log.debug("isForbiddenIp result : {}", result);
+    	if(result) {	// 判断拦截有效时间是否到期
+    		SysIpForbidden sysIpForbidden = new SysIpForbidden();
+    		sysIpForbidden.setIp(remoteAddr);
+    		SysIpForbidden ipForbidden = sysIpForbiddenMapper.select(sysIpForbidden);
+    		   long time = System.currentTimeMillis() - ipForbidden.getExpireTime().getTime();
+               log.debug("time:{}", time);
+               if (time > 0) {
+                   redisTemplate.opsForSet().remove("ip_intercepter", ipForbidden.getIp());
+               }
+    		
+    	}
+        log.debug("isForbiddenIp result : {}{}", result,remoteAddr);
         return result;
     }
 
@@ -257,8 +268,20 @@ public class SystemServiceImpl implements SystemService {
             }
         }
     }
-
     @Override
+	public void insertIpIntercept() {
+    	   redisTemplate.opsForValue().getOperations().delete("3-ip_forbidden");
+           List<SysIpForbidden> sysIpForbiddens = sysIpForbiddenMapper.selectAll();
+           for (SysIpForbidden sysIpForbidden : sysIpForbiddens) {
+               long time = System.currentTimeMillis() - sysIpForbidden.getExpireTime().getTime();
+               log.debug("time:{}", time);
+               if (time < 0) {
+                   redisTemplate.opsForSet().add("ip_intercepter", sysIpForbidden.getIp());
+               }
+           }
+	}
+
+	@Override
     public void closeIpIntercept() {
         //更新字典数据
         SysDataItem sysDataItem = new SysDataItem();

@@ -23,6 +23,8 @@ public class SysUserOrgDto extends BaseEntity{
     // en_name :英文名
     private String enName;
     
+  
+    
 	public Long getOrgId() {
 		return orgId;
 	}
@@ -66,7 +68,7 @@ public class SysUserOrgDto extends BaseEntity{
 	public void setEnName(String enName) {
 		this.enName = enName;
 	}
-	
+
 	
 	
 	

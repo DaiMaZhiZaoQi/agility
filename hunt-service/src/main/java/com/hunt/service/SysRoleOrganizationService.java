@@ -44,7 +44,7 @@ public interface SysRoleOrganizationService {
     
     /**
      * 查询当前机构下所有用户
-     * @param id
+     * @param id 机构id
      * @return
      */
     List<SysUser> selectSysUserByOrganization(Long id);

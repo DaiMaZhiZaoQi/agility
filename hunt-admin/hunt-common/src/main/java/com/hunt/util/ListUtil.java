@@ -1,6 +1,7 @@
 package com.hunt.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,13 +35,18 @@ public class ListUtil {
      * @param list	 客户端产生数据
      * @return dbList不同的数据
      */
-    public static List<Long> getUpdate(List<Long> dbList,List<?> list){
+    public static  List<Long> getUpdate(List<Long> dbList,List<? extends Object> list){
+    	List<Long> listWeb=new ArrayList<>();
+    	for(Object obj:list) {
+    		listWeb.add(Long.parseLong(obj+""));
+    	}
     	List<Long> listInsert=new ArrayList<>();
     	for(Long l:dbList) {
-    		if(!list.contains(l+"")){
+    		if(!listWeb.contains(l)){
     			listInsert.add(l);
     		}
-    	}
+    	} 
+    	System.out.println("getUpdate-->"+listInsert.toString());
     	return listInsert;
     }
 }

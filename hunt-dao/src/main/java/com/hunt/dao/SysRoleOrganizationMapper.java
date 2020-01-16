@@ -42,8 +42,8 @@ public interface SysRoleOrganizationMapper {
     List<SysRoleOrganization> selectByPId(@Param("parentId") Long parentId);
     
     /**
-     * 查询role_organization_id，根据机构id
-     * @param orgId
+     * 查询role_organization_id，
+     * @param orgId 机构id
      * @return
      */
     public List<Long> selectIdByOrgId(@Param("orgId") long orgId);

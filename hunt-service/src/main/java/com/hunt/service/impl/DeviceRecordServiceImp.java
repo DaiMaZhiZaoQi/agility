@@ -25,16 +25,19 @@ public class DeviceRecordServiceImp implements DeviceRecordService{
 	private SysDeviceTotalMapper mSysDeviceTotalMapper;
 	
 	@Override
-	public Long insert(SysDeviceRecord sysDeviceRecord) {
+	public Long insert(SysDeviceRecord sysDeviceRecord,Long orgId) {
 		mSysDeviceRecordMapper.insert(sysDeviceRecord);
 		Long deviceId = sysDeviceRecord.getDeviceId();
+		
 		Long recoAudioLength = sysDeviceRecord.getRecoAudioLength();
 		Long recoPhoneSize = sysDeviceRecord.getRecoPhoneSize();
 //		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDeviceId(deviceId);
-		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDevIdCreateTime(deviceId);
+		
+//		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDevIdCreateTime(deviceId);
+		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByOrgIdCreateTime(orgId,deviceId);
 		if(sysDeviceTotal==null) {					
 			sysDeviceTotal=new SysDeviceTotal();
-			
+			sysDeviceTotal.setOrgId(orgId);
 			sysDeviceTotal.setRecoAudioLength(recoAudioLength);
 			sysDeviceTotal.setRecoFileSize(recoPhoneSize);
 			sysDeviceTotal.setDeviceId(deviceId);
@@ -65,18 +68,18 @@ public class DeviceRecordServiceImp implements DeviceRecordService{
 
 
 	@Override
-	public Long update(SysDeviceRecord sysDeviceRecord) {
+	public Long update(SysDeviceRecord sysDeviceRecord,Long orgId) {
 		//		修改录音表
 		mSysDeviceRecordMapper.update(sysDeviceRecord);
 		//		修改统计表
-		Long deviceId = sysDeviceRecord.getDeviceId();
+		Long deviceId = sysDeviceRecord.getDeviceId(); 
 		Long recoAudioLength = sysDeviceRecord.getRecoAudioLength();
 		Long recoPhoneSize = sysDeviceRecord.getRecoPhoneSize();
 //		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDeviceId(deviceId);
-		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDevIdCreateTime(deviceId);
+		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByOrgIdCreateTime(orgId,deviceId);
 		if(sysDeviceTotal==null) {					
 			sysDeviceTotal=new SysDeviceTotal();
-			
+			sysDeviceTotal.setOrgId(orgId);
 			sysDeviceTotal.setRecoAudioLength(recoAudioLength);
 			sysDeviceTotal.setRecoFileSize(recoPhoneSize);
 			sysDeviceTotal.setDeviceId(deviceId);

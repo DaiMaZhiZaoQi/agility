@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.hunt.model.dto.PageDto;
 import com.hunt.model.entity.SysContact;
 
 public interface SysContactMapper {
@@ -13,6 +14,26 @@ public interface SysContactMapper {
 	
 	SysContact selectById(@Param("id") Long id);
 	
+	/**
+	 * 查询通话记录不分状态
+	 * @param id
+	 * @return
+	 */
+	SysContact selectByIdNoStatus(@Param("id") Long id);
+	
+	/**
+	 * 查询通讯录列表
+	 * @param listContactId 通讯录id
+	 * @return
+	 */
+	List<SysContact> selectByListId(@Param("list") List<Long> listContactId,@Param("pageDto")PageDto pageDto);
+	
+	/**
+	 * 查询所有通讯录数量
+	 * @param listContactId
+	 * @return
+	 */
+	Integer selectCount(@Param("list")List<Long> listContactId);
 	/**
 	 * 查询已激活的通讯录
 	 * @param id

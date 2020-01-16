@@ -4,6 +4,7 @@ import com.hunt.model.entity.SysUser;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 public interface SysUserMapper {
     //新增
@@ -20,6 +21,20 @@ public interface SysUserMapper {
 
     //查询全部
     public List<SysUser> selectAll(@Param("sort") String sort, @Param("order") String order, @Param("loginName") String loginName, @Param("zhName") String zhName, @Param("email") String email, @Param("phone") String phone, @Param("address") String address);
+    
+    /**
+     * 查询符合要求的所有用户
+     * @param sort
+     * @param order
+     * @param loginName
+     * @param zhName
+     * @param email
+     * @param phone
+     * @param address
+     * @param listUserId
+     * @return
+     */
+    public List<SysUser> selectAllUserId(@Param("sort") String sort, @Param("order") String order, @Param("loginName") String loginName, @Param("zhName") String zhName, @Param("email") String email, @Param("phone") String phone, @Param("address") String address,@Param("listUserId")Set<Long> listUserId);
 
     //查询数量
     public int selectCounts();

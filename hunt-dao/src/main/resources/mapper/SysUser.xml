@@ -316,6 +316,38 @@
             ${order}
         </if>
     </select>
+    
+    <select id="selectAllUserId" resultType="SysUser">
+        SELECT *
+        FROM sys_user
+        WHERE status != 2
+        <if test="loginName != null and loginName.length() != 0">
+            AND login_name LIKE concat('%', #{loginName},'%')
+        </if>
+        <if test="zhName != null and zhName.length() != 0">
+            AND zh_name LIKE concat('%', #{zhName},'%')
+        </if>
+        <if test="email != null and email.length() != 0">
+            AND email LIKE concat('%', #{email},'%')
+        </if>
+        <if test="phone != null and phone.length() != 0">
+            AND phone LIKE concat('%', #{phone},'%')
+        </if>
+        <if test="address != null and address.length() != 0">
+            AND address LIKE concat('%', #{address},'%')
+        </if>
+        	AND id IN
+        	<foreach collection="listUserId" open="(" close=")" item="userId" separator=",">
+        		#{userId}
+        	</foreach>
+        <if test="sort!=''">
+            ORDER BY ${sort}
+        </if>
+        <if test="order!=''">
+            ${order}
+        </if>
+        
+    </select>
 
     <select id="selectCounts" resultType="integer">
         SELECT count(*)

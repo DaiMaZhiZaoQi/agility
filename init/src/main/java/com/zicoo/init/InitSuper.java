@@ -69,17 +69,20 @@ public class InitSuper {
 			   System.out.println(url);
 	
 			   if(url.contains("jdbc:mysql://localhost:3306/zicoo_record")) {
+//				   if(url.contains("jdbc:mysql://localhost:3306/hunt")) {
 	
 				    Class.forName(driver).newInstance();
 		
 //				    conn= (Connection) DriverManager.getConnection(url, username, password);
 				    conn= (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306", username, password);
 				    PreparedStatement statement = conn.prepareStatement("SELECT * FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='zicoo_record'");
+//				    PreparedStatement statement = conn.prepareStatement("SELECT * FROM information_schema.SCHEMATA WHERE SCHEMA_NAME='hunt'");
 				    ResultSet query = statement.executeQuery();
 				    while(query.next()) {
 				    	String hunttest = query.getString(2);
 				    	System.out.println("zicoo_record-->"+hunttest);
 				    	if("zicoo_record".equals(hunttest)) {
+//				    		if("hunt".equals(hunttest)) {
 				    		System.out.println("数据库存在");
 				    		return;
 				    	}
@@ -100,7 +103,6 @@ public class InitSuper {
 		
 				    runner.setLogWriter(printWriter); 
 				    System.out.println("userName"+username);
-//				    runner.runScript(Resources.getResourceAsReader("ddl/mysql/jpetstore-mysql-schema.sql"));
 				    InputStream sqlIn = this.getClass().getResourceAsStream("/initsql.sql");
 				    if(sqlIn==null) {
 				    	System.out.println("sql文件不存在");

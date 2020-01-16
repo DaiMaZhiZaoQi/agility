@@ -16,6 +16,9 @@ public class SysDeviceTotal extends BaseEntity{
 	/**device_id*/
 	private Long deviceId;
 	
+	/**机构id*/
+	private Long orgId;
+	
 	/***call_log_count 通话记录数量*/
 	private Long callLogCount;
 	
@@ -109,6 +112,14 @@ public class SysDeviceTotal extends BaseEntity{
 	
 	
 
+
+	public Long getOrgId() {
+		return orgId;
+	}
+
+	public void setOrgId(Long orgId) {
+		this.orgId = orgId;
+	}
 
 	public Long getCallDuration() {
 		return callDuration;

@@ -158,14 +158,14 @@ public class SysRoleOrganizationServiceImpl implements SysRoleOrganizationServic
 		  List<SysUser> listUser=new ArrayList<>();
 		  for(Long userId:listUserId) {
 				//   TODO 嵌入查询权限，没有查询权限在该处开启过滤，对当前操作的主体进行权限规则判断，有这个数据权限，则添加
-				boolean hasDataPermission = hasDataPermission(userId,"device:"+userId+":list");
-				if(hasDataPermission) {
+//				boolean hasDataPermission = hasDataPermission(userId,"device:"+userId+":list");
+//				if(hasDataPermission) {
 //					SysUser sysUser= roleOrganizationMapper.selectUserById(userId);
 					SysUser sysUser= roleOrganizationMapper.selectUserOnLineById(userId);
 					if(sysUser!=null) {
 						listUser.add(sysUser);
 					}
-				}
+//				}
 			}
 			if(listUser.size()>0) {
 				return listUser;

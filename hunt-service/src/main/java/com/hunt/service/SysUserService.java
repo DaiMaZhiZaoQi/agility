@@ -6,6 +6,7 @@ import com.hunt.model.dto.PerFeatureDto;
 import com.hunt.model.dto.SysCallLogDeviceRecoDto;
 import com.hunt.model.dto.SysDeviceAndCallDto;
 import com.hunt.model.dto.SysDeviceCallLogAndRecordDto;
+import com.hunt.model.entity.SysOrganization;
 import com.hunt.model.entity.SysPermissionGroup;
 import com.hunt.model.entity.SysUser;
 import com.hunt.util.Result;
@@ -22,6 +23,16 @@ public interface SysUserService {
 	Result init(String loginName,String password);
 
     long insertUser(SysUser user, String jobIds, String permissionIds);
+    
+    /**
+     * 添加用户关联机构和角色
+     * @param user 
+     * @param roleIds 角色id
+     * @param orgIds  机构id
+     * @param permiOrgIds 机构权限
+     * @return
+     */
+    long insertUserOrgRole(SysUser user, String roleIds, SysOrganization sysOrganization,List<SysOrganization> listSysOrg);
 
     /**插入用户权限 权限码格式  device:targetUserId:list
      * @param 用户user
@@ -95,7 +106,29 @@ public interface SysUserService {
 
     void updateUser(SysUser user, String jobIds, String permissionIds);
 
+    Result updateUserByOrgRole(SysUser user,String roleIds,String orgIds,String permiOrgIds);
+    
+    Result updateUserDetail(SysUser user,String roleIds,SysOrganization sysOrganization,List<SysOrganization> listSysOrg);
+    
+    Result updateSuperUser(SysUser user,String roleIds);
+    
     PageInfo selectPage(int page, int rows, String sort, String order, String loginName, String zhName, String email, String phone, String address);
+    
+    /**
+     * 查询该用户下的机构，机构中存在的用户
+     * @param page
+     * @param rows
+     * @param sort
+     * @param order
+     * @param loginName
+     * @param zhName
+     * @param email
+     * @param phone
+     * @param address
+     * @param userId
+     * @return
+     */
+    PageInfo selectPage(int page, int rows, String sort, String order, String loginName, String zhName, String email, String phone, String address,long userId);
 
     /**
      * 查询当前用户所在的机构的下有哪些用户包括权限
@@ -109,6 +142,13 @@ public interface SysUserService {
      * @return
      */
     List<SysUser> selectSysUserByOrgId(Long orgId);
+    
+    /**
+     * 查询机构下的用户
+     * @param id
+     * @return
+     */
+    List<SysUser> selectSysUserByOrganization(Long id);
     
     void updateUser(SysUser user);
 

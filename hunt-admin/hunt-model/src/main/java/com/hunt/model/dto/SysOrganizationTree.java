@@ -9,7 +9,7 @@ import java.util.List;
  * @Date 2016/10/12/9:13
  * @Description
  */
-public class SysOrganizationTree {
+public class SysOrganizationTree {   
     // id :
     private Long id;
 
@@ -69,6 +69,10 @@ public class SysOrganizationTree {
 				+ ", status=" + status + ", orgCode=" + orgCode + ", orgType=" + orgType + ", children=" + children
 				+ "]";
 	}
+
+	
+
+
 
 	public String getFullName() {
         return fullName;

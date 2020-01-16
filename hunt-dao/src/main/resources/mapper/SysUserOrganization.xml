@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunt.dao.SysUserOrganizationMapper">
+	<resultMap type="com.hunt.model.entity.SysUserOrganization" id="baseResultMap">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="sys_user_id" property="sysUserId" jdbcType="BIGINT"/>
+		<result column="sys_org_id" property="sysOrgId" jdbcType="BIGINT"/>
+		<result column="sys_permission_org_id" property="sysPermissionOrgId" jdbcType="BIGINT"/>
+		<result column="sys_org_code" property="sysOrgCode" jdbcType="VARCHAR"/>
+		<result column="rank" property="rank" jdbcType="INTEGER"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+		<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+		<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+		
+	</resultMap>
+
+	<insert id="insert" parameterType="SysUserOrganization" keyProperty="id" useGeneratedKeys="true">
+		insert into sys_user_organization
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="sysUserId!=null">
+				sys_user_id,
+			</if>
+			<if test="sysOrgId!=null">
+				sys_org_id,
+			</if>
+			<if test="sysPermissionOrgId!=null">
+				sys_permission_org_id,
+			</if>
+			<if test="sysOrgCode!=null and sysOrgCode.length()!=0">
+				sys_org_code,
+			</if>
+			<if test="rank!=null">
+				rank,
+			</if>
+			
+			
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="sysUserId!=null">
+				#{sysUserId},
+			</if>
+			<if test="sysOrgId!=null">
+				#{sysOrgId},
+			</if>
+			<if test="sysPermissionOrgId!=null">
+				#{sysPermissionOrgId},
+			</if>
+			<if test="sysOrgCode!=null and sysOrgCode.length()!=0">
+				#{sysOrgCode},
+			</if>
+			<if test="rank!=null">
+				#{rank},
+			</if>
+		</trim>
+	</insert>
+	
+	
+	<!-- 同步更新orgCode -->
+	<update id="updateByOrgCode" useGeneratedKeys="true" keyProperty="id">
+		UPDATE sys_user_organization
+		SET sys_org_code=#{sysOrgCode}
+		WHERE sys_org_code=#{oldOrgCode}
+	</update>
+	
+	
+	<select id="selectByUserId" resultType="SysUserOrganization">
+		SELECT * FROM sys_user_organization WHERE sys_user_organization.`sys_user_id`=#{sysUserId} AND sys_user_organization.`STATUS`=1
+	</select>
+	
+
+	<select id="selectOrgIdByUserId" resultType="java.lang.Long">
+		SELECT sys_user_organization.`sys_org_id` 
+		FROM sys_user_organization 
+		WHERE sys_user_organization.`sys_user_id`=#{sysUserId}
+		AND sys_user_organization.`STATUS`=1
+	</select>
+	
+	<select id="selectByUserIdOrderByOrgCode" resultType="SysUserOrganization">
+		SELECT * 
+		FROM sys_user_organization 
+		WHERE sys_user_id=#{sysUserId} AND STATUS=1
+		ORDER BY sys_org_code ASC
+	</select>
+	
+	
+	
+	<select id="selectLikeOrgCode" resultType="SysUserOrganization">
+		SELECT * 
+		FROM sys_user_organization 
+		WHERE sys_org_code 
+		LIKE concat(#{sysOrgCode},'%') 
+		AND STATUS =1 AND sys_user_id=#{sysUserId} 
+		ORDER BY sys_org_code ASC
+	</select>
+	
+	<select id="selectByOrgId" resultType="SysUserOrganization">
+		SELECT * 
+		FROM sys_user_organization 
+		WHERE sys_user_organization.`sys_org_id` IN
+			<foreach collection="listSysOrgId" open="(" close=")" separator="," item="orgId">
+				#{orgId}
+			</foreach>
+		AND sys_user_organization.`sys_user_id`=#{sysUserId}
+		AND sys_user_organization.`STATUS`=1
+	</select>
+	
+
+	<update id="updateByUserIdOrgId" useGeneratedKeys="true" keyProperty="id">
+		UPDATE sys_user_organization 
+		SET sys_user_organization.`STATUS`=2 
+		WHERE sys_user_organization.`sys_user_id`=#{sysUserId} 
+		AND sys_user_organization.`sys_org_id`=#{sysOrgId}
+	</update>
+	
+	<select id="selectMinOrgCode" resultType="java.lang.String">
+		SELECT MIN(sys_org_code) FROM sys_user_organization WHERE sys_user_id=#{sysUserId}
+		AND STATUS=1
+	</select>
+	
+	<!-- 查询orgCode -->
+	<select id="selectOrgCodeByUserId" resultType="java.lang.String">
+		SELECT sys_org_code 
+		FROM sys_user_organization WHERE sys_user_id=#{sysUserId}
+		AND STATUS =1
+	</select>
+	
+
+</mapper> 

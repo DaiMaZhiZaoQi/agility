@@ -14,7 +14,7 @@
         <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
         <result column="create_by" property="createBy" jdbcType="BIGINT"/>
         <result column="update_by" property="updateBy" jdbcType="BIGINT"/>
-        <result column="status" property="status" jdbcType="TINYINT"/>
+        <result column="status" property="status" jdbcType="BIGINT"/>
         <result column="org_code" property="orgCode" jdbcType="VARCHAR"/>   
     </resultMap>
     <!--  -->
@@ -187,17 +187,20 @@
                 create_by = #{createBy},
             </if>
             <if test="updateBy !=null">
-                update_by = #{updateBy},
+                update_by = #{updateBy}, 
             </if>
             <if test="status !=null">
                 status = #{status},
+            </if>
+            <if test="orgCode!=null and orgCode.length()!=0">
+            	org_code=#{orgCode}
             </if>
         </set>
         where id =#{id} and status=1
     </update>
 
     <select id="select" parameterType="SysOrganization" resultType="SysOrganization">
-        select * from sys_organization where
+        select * from sys_organization
         <where>
             <include refid="sql_column_where"/>
         </where>
@@ -234,6 +237,17 @@
                 WHERE status = 1 AND full_name = #{fullName}
         )
     </select>
+    
+    <select id="isExistOrgName" resultType="java.lang.Boolean">
+    	SELECT EXISTS(
+    		SELECT * 
+    		FROM sys_organization 
+    		WHERE sys_organization.`status`=1 
+    		AND sys_organization.`name`=#{name} 
+    		AND sys_organization.`parent_id`=#{parentId}
+    	)
+    </select>
+    
     <select id="isExistFullNameExcludeId" resultType="java.lang.Boolean">
         SELECT exists(
                 SELECT *
@@ -242,10 +256,36 @@
         )
     </select>
     
+    <select id="isExistNameExcludeParentId" resultType="java.lang.Boolean">
+        SELECT exists(
+                SELECT *
+                FROM sys_organization
+                WHERE status = 1 
+                AND sys_organization.`parent_id`=#{parentId} 
+                AND name = #{name}
+        )
+    </select>
+    
+    
+    
     <!--查询机构码 -->
     <select id="selectOrgCodeByParentId" resultType="java.lang.String">
-    	SELECT MAX(org_code) FROM sys_organization AS sys WHERE sys.`parent_id`=#{parentId}
+    	SELECT MAX(org_code) 
+    	FROM sys_organization 
+    	AS sys 
+    	WHERE sys.`parent_id`=#{parentId} 
+    	AND sys.`status`=1
     </select>
+    
+    <select id="selectByOrgCode" resultType="SysOrganization">
+    	SELECT * 
+    	FROM sys_organization 
+    	WHERE org_code 
+    	LIKE CONCAT(#{orgCode},"%") 
+    	AND sys_organization.`status`=1 
+    	ORDER BY org_code ASC
+    </select>
+    
     <!-- 根据用户id查找该用户所在的机构  -->
     <select id="selectIdByUserId" resultType="SysOrganization">
     	SELECT sys_organization.* FROM sys_organization 
@@ -257,7 +297,7 @@
 		AND sys_organization.`status`=1;
     </select>
     
-    
+
     
     
 </mapper>

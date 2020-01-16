@@ -3,13 +3,17 @@ package com.hunt.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.hunt.dao.*;
 import com.hunt.model.entity.*;
+import com.hunt.service.SysOrganizationService;
 import com.hunt.service.SysUserService;
+import com.hunt.service.SystemService;
 import com.hunt.util.BeanHelpUtils;
 import com.hunt.util.ListUtil;
 import com.hunt.util.PermissionUtil;
 import com.hunt.util.Result;
 import com.hunt.util.StringUtil;
 import com.hunt.util.UtReadCsv;
+import com.sun.xml.internal.bind.v2.TODO;
+import com.sun.xml.internal.ws.org.objectweb.asm.Label;
 import com.hunt.model.dto.LoginInfo;
 import com.hunt.model.dto.PageInfo;
 import com.hunt.model.dto.PerFeatureDto;
@@ -58,6 +62,14 @@ public class SysUserServiceImpl implements SysUserService {
     private SysOrganizationMapper mSysOrganizationMapper;
     @Autowired
     private SysUserPermissionMapper sysUserPermissionMapper;
+    
+    @Autowired
+    private SysUserRoleMapper mSysUserRoleMapper;
+    @Autowired
+    private SysUserInOrgMapper mSysUserInOrgMapper;
+    @Autowired
+    private SysUserOrganizationMapper mSysUserOrgnizationMapper;
+    
     @Autowired
     private SysPermissionMapper sysPermissionMapper;
     @Autowired
@@ -74,6 +86,10 @@ public class SysUserServiceImpl implements SysUserService {
     private SysDeviceCallLogMapper mSysDeviceCallLogMapper;
     @Autowired
     private SysDeviceRecordMapper mSysDeviceRecordMapper;
+    @Autowired
+    private SystemService mSystemService;
+    @Autowired
+    private SysOrganizationService mSysOrganizationService;
     
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
@@ -123,12 +139,84 @@ public class SysUserServiceImpl implements SysUserService {
         }
         return user.getId();
     }
+	
+	
+	
     
 
     
     
     
     @Override
+	public long insertUserOrgRole(SysUser user, String roleIds, SysOrganization sysOrganization,List<SysOrganization> listSysOrg) {
+    	 sysUserMapper.insert(user);
+         String[] roleArrays = roleIds.split(",");
+         for (String roleId : roleArrays) {			
+        	 	SysUserRole sysUserRole = new SysUserRole();
+        	 	sysUserRole.setSysUserId(user.getId());
+        	 	sysUserRole.setSysRoleId(Long.valueOf(roleId));
+        	 	mSysUserRoleMapper.insert(sysUserRole); 
+         }
+         if(sysOrganization!=null) {
+        	 SysUserInOrg sysUserInOrg = new SysUserInOrg();
+        	 sysUserInOrg.setSysOrgId(sysOrganization.getId());
+        	 sysUserInOrg.setSysUserId(user.getId());
+        	 sysUserInOrg.setSysOrgCode(sysOrganization.getOrgCode());
+        	 mSysUserInOrgMapper.insert(sysUserInOrg);
+         }
+         
+         
+        	 if(listSysOrg.size()>0) {
+//        		 List<Long> listOrgId=new ArrayList<>();   //  所持有的机构权限id
+        		 for(SysOrganization sysOrg:listSysOrg) {   
+        			 SysUserOrganization sysUserOrg = new SysUserOrganization();
+        			 sysUserOrg.setSysUserId(user.getId());
+        			 sysUserOrg.setSysOrgId(sysOrg.getId());
+        			 sysUserOrg.setSysOrgCode(sysOrg.getOrgCode()); 
+//        			 if(!listOrgId.contains(sysOrg.getId())) {
+//        				 listOrgId.add(sysOrg.getId());
+//        			 }
+        			 mSysUserOrgnizationMapper.insert(sysUserOrg);
+        		 }
+//        		 if(!listOrgId.contains(sysOrganization.getId())) {   // 所在机构权限是默认持有
+//        				SysUserOrganization sysUserOrg = new SysUserOrganization();
+//        				sysUserOrg.setSysUserId(user.getId());
+//        				sysUserOrg.setSysOrgId(sysOrganization.getId());
+//        				sysUserOrg.setSysOrgCode(sysOrganization.getOrgCode());
+//        				 mSysUserOrgnizationMapper.insert(sysUserOrg);
+//        		 }
+        	 }else {			//  添加用户默认的数据权限
+				SysUserOrganization sysUserOrg = new SysUserOrganization();
+				sysUserOrg.setSysUserId(user.getId());
+				sysUserOrg.setSysOrgId(sysOrganization.getId());
+				sysUserOrg.setSysOrgCode(sysOrganization.getOrgCode());
+				 mSysUserOrgnizationMapper.insert(sysUserOrg);
+			}
+         
+         
+       
+         
+         // TODO 考虑刷新权限   详见之前新增用户时的权限刷新规则
+         
+         // 通过用户id查找权限,有该权限则跳过,没有该权限则删除
+//         if (StringUtils.hasText(permissionIds)) {
+//             String[] permissionIdArray = permissionIds.split(",");
+//             for (String permissionId : permissionIdArray) {
+//                 SysUserPermission userPermission = new SysUserPermission();
+//                 userPermission.setSysUserId(user.getId());
+//                 userPermission.setSysPermissionId(Long.valueOf(permissionId));
+//                 userPermission.setIsFinal(1);
+//                 sysUserPermissionMapper.insert(userPermission);
+//             }
+//         }
+         return user.getId();
+	}
+
+
+
+
+
+	@Override
 	public long insertUserPermission(SysUser sysUser) {
     	 
     	SysPermissionGroup sysPermissionGroup = createPermissionGroup(sysUser);
@@ -142,7 +230,7 @@ public class SysUserServiceImpl implements SysUserService {
     	List<String> listPermissionCode=getPermissionCode(listPermission); 
     	System.out.println("listPermission-->"+listPermission.size()+"--->"+listPermission.toString());
     	long insertSuccess=0;
-    	if(permiGroupId!=0&&listPermission!=null&&listPermission.size()>0&&listPermissionCode!=null&&listPermissionCode.size()>0) {
+    	if(permiGroupId!=0&&listPermission.size()>0&&listPermissionCode.size()>0) {
     		sysPermissionMapper.inertDefaultPermission(listPermission);
      		List<SysPermission> listSysPermission = sysPermissionMapper.selectIdByCode(listPermissionCode);
     		System.out.println("insertUserPermission-->"+listSysPermission.toString());
@@ -548,7 +636,7 @@ public class SysUserServiceImpl implements SysUserService {
             List<Long> listPerId= ListUtil.getUpdate(listPd, asList);
             for(Long pId:listPerId) {
             	sysUserPermissionMapper.deleteByUserIdPid(userId, pId);
-            }
+            }   //  db [1,2,3,4,5]	asList[1,2,6,7,8]
             List<Long> listAsInsert = ListUtil.getInsert(listPd, asList);
             for (Long permissionId : listAsInsert) {
                 SysUserPermission userPermission = new SysUserPermission();
@@ -557,15 +645,12 @@ public class SysUserServiceImpl implements SysUserService {
                 userPermission.setIsFinal(1);
                 sysUserPermissionMapper.insert(userPermission);
             }
-            
         }else {					// 删除所有
              for(Long pId:listPd) {
              	sysUserPermissionMapper.deleteByUserIdPid(userId, pId);
              }
         }
-        
         List<Long> listSysRoleOrgId= sysUserRoleOrganizationMapper.selectRoleOrgIdByUserId(userId);
-        
         String[] jobIdArray = jobIds.split(",");
         List<String> asList = Arrays.asList(jobIdArray); 
         List<Long> listUpdate = ListUtil.getUpdate(listSysRoleOrgId,asList);
@@ -581,29 +666,157 @@ public class SysUserServiceImpl implements SysUserService {
              userRoleOrganization.setIsFinal(1);
              sysUserRoleOrganizationMapper.insert(userRoleOrganization);
         }
-        	
-//        for (String jobid : jobIdArray) {
-//            SysUserRoleOrganization userRoleOrganization = new SysUserRoleOrganization();
-//            userRoleOrganization.setSysUserId(user.getId());
-//            userRoleOrganization.setSysRoleOrganizationId(Long.valueOf(jobid));
-//            userRoleOrganization.setIsFinal(1);
-//            sysUserRoleOrganizationMapper.insert(userRoleOrganization);
-//        }
-        
-//        if (StringUtils.hasText(permissionIds)) {
-//            String[] permissionIdArray = permissionIds.split(",");
-//            for (String permissionId : permissionIdArray) {
-//                SysUserPermission userPermission = new SysUserPermission();
-//                userPermission.setSysUserId(user.getId());
-//                userPermission.setSysPermissionId(Long.valueOf(permissionId));
-//                userPermission.setIsFinal(1);
-//                sysUserPermissionMapper.insert(userPermission);
-//            }
-//        }
-
     }
     
-    public static void main(String[] args) {
+    @Override
+	public Result updateUserByOrgRole(SysUser user, String roleIds, String orgIds,String permiOrgIds) {
+    	  sysUserMapper.update(user);
+        Long userId = user.getId();
+        List<Long> listRoleId = mSysUserRoleMapper.selectRoleIdByUserId(userId);
+        // 用户角色表处理
+        if (StringUtils.hasText(roleIds)) {
+            String[] roleIdArray = roleIds.split(","); 
+            List<String> asList = Arrays.asList(roleIdArray);
+            List<Long> listPerId= ListUtil.getUpdate(listRoleId, asList);
+            for(Long roleId:listPerId) {
+            	mSysUserRoleMapper.updateByUserIdRoleId(userId,roleId);
+            }
+            List<Long> listAsInsert = ListUtil.getInsert(listRoleId, asList);
+            for (Long roleId : listAsInsert) {
+            	SysUserRole sysUserRole = new SysUserRole();
+        	 	sysUserRole.setSysUserId(userId);
+        	 	sysUserRole.setSysRoleId(roleId);
+        	 	mSysUserRoleMapper.insert(sysUserRole); 
+            }
+        }else {					// 删除不具有的用户角色
+             for(Long roleId:listRoleId) {
+            	 mSysUserRoleMapper.updateByUserIdRoleId(userId,roleId);
+             }
+        }
+        
+        // 用户机构表处理
+        List<Long> listSysUserOrgId= mSysUserOrgnizationMapper.selectOrgIdByUserId(userId);
+        String[] orgIdsArray = orgIds.split(",");
+        String[] permiOrgArray = permiOrgIds.split(",");
+        List<String> asList = Arrays.asList(orgIdsArray); 
+        List<Long> listUpdate = ListUtil.getUpdate(listSysUserOrgId,asList);
+        for(Long roleOrgId:listUpdate) {
+        	mSysUserOrgnizationMapper.updateByUserIdOrgId(userId, roleOrgId);
+        }
+         
+        List<Long> listOrgId = ListUtil.getInsert(listSysUserOrgId, asList);
+        for(Long orgId:listOrgId) { 
+        	if(permiOrgArray.length>0) {
+        		for(String permiOrgId:permiOrgArray) {
+            		SysUserOrganization sysUserOrg = new SysUserOrganization();
+            		sysUserOrg.setSysUserId(userId);
+            		sysUserOrg.setSysOrgId(Long.valueOf(orgId));
+            		sysUserOrg.setSysPermissionOrgId(Long.valueOf(permiOrgId));
+            		mSysUserOrgnizationMapper.insert(sysUserOrg);
+            	}
+        	}else {
+        		SysUserOrganization sysUserOrg = new SysUserOrganization();
+        		sysUserOrg.setSysUserId(userId);
+        		sysUserOrg.setSysOrgId(Long.valueOf(orgId));
+        		mSysUserOrgnizationMapper.insert(sysUserOrg);
+			}
+        	
+        }
+		return Result.success();
+	}
+    
+    
+    @Override
+    public Result updateUserDetail(SysUser user, String roleIds,SysOrganization sysOrganization,List<SysOrganization> listSysOrg) {
+    	sysUserMapper.update(user);
+    	Long userId = user.getId();
+    	List<Long> listRoleId = mSysUserRoleMapper.selectRoleIdByUserId(userId);
+    	// 用户角色表处理
+    	if (StringUtils.hasText(roleIds)) {
+    		String[] roleIdArray = roleIds.split(","); 
+    		List<String> asList = Arrays.asList(roleIdArray);
+    		List<Long> listPerId= ListUtil.getUpdate(listRoleId, asList);
+    		for(Long roleId:listPerId) {
+    			mSysUserRoleMapper.updateByUserIdRoleId(userId,roleId);
+    		}
+    		List<Long> listAsInsert = ListUtil.getInsert(listRoleId, asList);
+    		for (Long roleId : listAsInsert) {
+    			SysUserRole sysUserRole = new SysUserRole();
+    			sysUserRole.setSysUserId(userId);
+    			sysUserRole.setSysRoleId(roleId);
+    			mSysUserRoleMapper.insert(sysUserRole); 
+    		}
+    	}
+    	
+    	// 修改用户所在的机构   sys_user_in_org
+    	if(sysOrganization!=null) {
+    		SysUserInOrg sysUserInOrg = mSysUserInOrgMapper.selectByUserId(userId);
+    		
+    		sysUserInOrg.setSysOrgCode(sysOrganization.getOrgCode());
+    		sysUserInOrg.setSysOrgId(sysOrganization.getId());
+    		mSysUserInOrgMapper.update(sysUserInOrg);
+    	}
+    	// 修改用户机构表权限 sys_user_organization  数据库 1,2,3,4    前端数据1,2,3,4,5,6,7
+    	
+    	List<Long> listSysUserOrgId= mSysUserOrgnizationMapper.selectOrgIdByUserId(userId);
+    	List<Long> listOrgIdss=new ArrayList<>();
+    	for(SysOrganization sysOrg:listSysOrg) {
+    		Long lSysOrgId=sysOrg.getId();
+    		if(!listOrgIdss.contains(lSysOrgId)) {
+    			listOrgIdss.add(lSysOrgId);
+    		}
+    	}
+    	List<Long> listUpdate = ListUtil.getUpdate(listSysUserOrgId,listOrgIdss);
+    	System.out.println("listUpdate--->"+listSysUserOrgId.toString()+"--->"+listSysUserOrgId.toString()+"--->"+listOrgIdss.toString());
+    	for(Long sysOrgId:listUpdate) {
+    		mSysUserOrgnizationMapper.updateByUserIdOrgId(userId, sysOrgId);
+    	}
+    	List<Long> listOrgId = ListUtil.getInsert(listSysUserOrgId, listOrgIdss);
+    	for(Long orgId:listOrgId) { 
+    		for(SysOrganization sysOrg:listSysOrg) {
+    			if(sysOrg.getId()==orgId) {
+    				SysUserOrganization sysUserOrg = new SysUserOrganization();
+    				sysUserOrg.setSysUserId(userId);
+    				sysUserOrg.setSysOrgCode(sysOrg.getOrgCode());
+    				sysUserOrg.setSysOrgId(orgId);
+    				mSysUserOrgnizationMapper.insert(sysUserOrg);		
+    			}
+    		}
+    		
+    	}
+    	return Result.success();
+    }
+
+
+	@Override
+	public Result updateSuperUser(SysUser user, String roleIds) {
+	  	sysUserMapper.update(user);
+    	Long userId = user.getId();
+    	List<Long> listRoleId = mSysUserRoleMapper.selectRoleIdByUserId(userId);
+    	// 用户角色表处理
+    	if (StringUtils.hasText(roleIds)) {
+    		String[] roleIdArray = roleIds.split(","); 
+    		List<String> asList = Arrays.asList(roleIdArray);
+    		List<Long> listPerId= ListUtil.getUpdate(listRoleId, asList);
+    		for(Long roleId:listPerId) {
+    			mSysUserRoleMapper.updateByUserIdRoleId(userId,roleId);
+    		}
+    		List<Long> listAsInsert = ListUtil.getInsert(listRoleId, asList);
+    		for (Long roleId : listAsInsert) {
+    			SysUserRole sysUserRole = new SysUserRole();
+    			sysUserRole.setSysUserId(userId);
+    			sysUserRole.setSysRoleId(roleId);
+    			mSysUserRoleMapper.insert(sysUserRole); 
+    		}
+    	}
+    	return Result.success();
+	}
+
+
+
+
+
+	public static void main(String[] args) {
 		List<Long> listL=new ArrayList<>();
 		for(Long ll:listL) {
 			System.out.println("ll-->"+ll);
@@ -622,10 +835,63 @@ public class SysUserServiceImpl implements SysUserService {
 		System.out.println("update-->"+update+"insert-->"+insert); 
 	}
    
+	/**
+	 * 查询该用户下有哪些机构，该机构下有哪些用户
+	 * @param userId
+	 * @return
+	 */
+	private Set<Long> selectUserId(Long userId) {
+		List<Long> listOrgId = mSysUserOrgnizationMapper.selectOrgIdByUserId(userId);
+		 return mSysUserInOrgMapper.selectUserIdByListOrgId(listOrgId);
+	
+	}
+	
+	
+	
+	
 
     @Override
+	public PageInfo selectPage(int page, int rows, String sort, String order, String loginName, String zhName,
+			String email, String phone, String address, long userId) {
+    	Set<Long> selectUserId = selectUserId(userId);
+    	
+    	 PageHelper.startPage(page, rows);
+         List<SysUser> sysUsers = sysUserMapper.selectAllUserId(sort, order, loginName, zhName, email, phone, address,selectUserId);
+         System.out.println("selectPage--sysUsers-->"+sysUsers.toString()); 
+         
+         List<SysUserDto> sysUserDtos = new ArrayList<>();
+         for (SysUser user : sysUsers) {
+         	System.out.println("selectPage--sysUsers-->"+user.getZhName());
+             SysUserDto userDto = new SysUserDto();
+             BeanUtils.copyProperties(user, userDto);
+             userDto.setPassword("");
+             userDto.setPasswordSalt("");
+             //  查询用户所处的角色
+             List<SysUserRole> listSysUserRole = mSysUserRoleMapper.selectByUserId(user.getId());
+             // 查询用户所在的机构
+             SysUserInOrg sysUserInOrg = mSysUserInOrgMapper.selectByUserId(user.getId());
+             // 查询用户的机构权限
+             List<SysUserOrganization> listUserOrg = mSysUserOrgnizationMapper.selectByUserId(user.getId());
+             
+             userDto.setmSysUserInOrg(sysUserInOrg);
+             userDto.setListUserRole(listSysUserRole); 
+             userDto.setListUserOrg(listUserOrg);
+             
+             sysUserDtos.add(userDto);
+         }
+         PageInfo pageInfo = new PageInfo(sysUsers.size(), sysUserDtos);
+         return pageInfo;
+    	
+    	
+	}
+
+
+
+
+
+	@Override
     public PageInfo selectPage(int page, int rows, String sort, String order, String loginName, String zhName, String email, String phone, String address) {
-        System.out.println("page = [" + page + "], rows = [" + rows + "], sort = [" + sort + "], order = [" + order + "], loginName = [" + loginName + "], zhName = [" + zhName + "], email = [" + email + "], phone = [" + phone + "], address = [" + address + "]");
+        log.info("page = [" + page + "], rows = [" + rows + "], sort = [" + sort + "], order = [" + order + "], loginName = [" + loginName + "], zhName = [" + zhName + "], email = [" + email + "], phone = [" + phone + "], address = [" + address + "]");
         int counts = sysUserMapper.selectCounts();
         PageHelper.startPage(page, rows);
         List<SysUser> sysUsers = sysUserMapper.selectAll(sort, order, loginName, zhName, email, phone, address);
@@ -638,19 +904,31 @@ public class SysUserServiceImpl implements SysUserService {
             BeanUtils.copyProperties(user, userDto);
             userDto.setPassword("");
             userDto.setPasswordSalt("");
-            List<SysUserPermission> userPermissions = sysUserPermissionMapper.selectByUserId(user.getId());
-            List<SysPermission> permissions = new ArrayList<>();
-            for (SysUserPermission userPermission : userPermissions) {
-                SysPermission sysPermission = sysPermissionMapper.selectById(userPermission.getSysPermissionId());
-                if(sysPermission!=null) {
-                	permissions.add(sysPermission);
-                }
-//                String permissionCode=sysPermission.getCode();
-            }
-            List<SysUserRoleOrganization> userRoleOrganizations = sysUserRoleOrganizationMapper.selectByUserId(user.getId());
+            //  查询用户所处的角色
+            List<SysUserRole> listSysUserRole = mSysUserRoleMapper.selectByUserId(user.getId());
+            // 查询用户所在的机构
+            SysUserInOrg sysUserInOrg = mSysUserInOrgMapper.selectByUserId(user.getId());
+            // 查询用户的机构权限
+            List<SysUserOrganization> listUserOrg = mSysUserOrgnizationMapper.selectByUserId(user.getId());
+            
+//            List<SysUserPermission> userPermissions = sysUserPermissionMapper.selectByUserId(user.getId());
+//            List<SysPermission> permissions = new ArrayList<>();
+//            for (SysUserPermission userPermission : userPermissions) {
+//                SysPermission sysPermission = sysPermissionMapper.selectById(userPermission.getSysPermissionId());
+//                if(sysPermission!=null) {
+//                	permissions.add(sysPermission);
+//                }
+//            }
+            
+            
+//            List<SysUserRoleOrganization> userRoleOrganizations = sysUserRoleOrganizationMapper.selectByUserId(user.getId());
             //   TODO  最好是精细化权限管理，一个用户对另一个用户有管理权限，则加载该用户   
-            userDto.setPermissions(permissions);
-            userDto.setUserRoleOrganizations(userRoleOrganizations);
+//            userDto.setPermissions(permissions);
+            userDto.setmSysUserInOrg(sysUserInOrg);
+            userDto.setListUserRole(listSysUserRole); 
+            userDto.setListUserOrg(listUserOrg);
+            
+//            userDto.setUserRoleOrganizations(userRoleOrganizations);
             sysUserDtos.add(userDto);
         }
         PageInfo pageInfo = new PageInfo(counts, sysUserDtos);
@@ -663,31 +941,11 @@ public class SysUserServiceImpl implements SysUserService {
     
     @Override
 	public PageInfo selectUserByOrgId(Long sysOrgId) {
-    	SysOrganization organization = mSysOrganizationMapper.selectById(sysOrgId);
-    	List<SysOrganization> lisSysOrg=new ArrayList<>();
-    	lisSysOrg.add(organization);
-    	List<SysOrganization> listOrg = getChildOrg(sysOrgId,lisSysOrg);
-    	List<SysUserDto> sysUserDtos = new ArrayList<>();
-    	for(SysOrganization org:listOrg) {
-    		Long orgId = org.getId();
-    		List<Long> listRoleOrgId = mSysRoleOrganizationMapper.selectIdByOrgId(orgId);
-    		for(Long roleOrgId:listRoleOrgId) {
-    			List<SysUserRoleOrganization> listSysUsRog = sysUserRoleOrganizationMapper.selectByRoleOrgId(roleOrgId);
-        		
-        		for(SysUserRoleOrganization sysUserRoOrg:listSysUsRog) {
-        			SysUserDto sysUserDto = new SysUserDto();
-        			
-        			Long uId = sysUserRoOrg.getSysUserId();
-        			SysUser sysUser = sysUserMapper.selectById(uId); 
-        			BeanUtils.copyProperties(sysUser, sysUserDto);
-        			List<SysUserRoleOrganization> listUserRoOrg = sysUserRoleOrganizationMapper.selectByUserId(sysUser.getId());
-        			sysUserDto.setUserRoleOrganizations(listUserRoOrg);
-        			sysUserDtos.add(sysUserDto);
-        		}
-    		}
-    	}
-    	
-		return new PageInfo(sysUserDtos.size(), sysUserDtos); 
+    	//  查询当前机构下的人
+		List<Long> listOrgId=new ArrayList<>();
+		mSysOrganizationService.selectSysOrgIdList(sysOrgId,listOrgId,false);
+    	List<SysUserDto2> listSysUser = mSysUserInOrgMapper.selectUserByListOrgId(listOrgId);
+		return new PageInfo(listSysUser.size(), listSysUser); 
 	}
     
     
@@ -721,6 +979,19 @@ public class SysUserServiceImpl implements SysUserService {
     		}
     	}
 		return listUser;
+	}
+    
+    
+    
+
+
+
+
+
+	@Override
+	public List<SysUser> selectSysUserByOrganization(Long id) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 

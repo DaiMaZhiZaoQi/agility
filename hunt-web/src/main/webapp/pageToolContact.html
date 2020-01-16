@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<div id="contactPageTool" class="myPage" align="center" style="margin: 80px 0px 40px 0px; height: 30px;line-height: 30px;">
+				<select id="iEveryCount" style="height: 40px;margin-right: 10px;font-size: 20px;" onchange="contactPageTool.changePages()">
+					<option>5</option>
+					<option>10</option>
+					<option>30</option>
+				</select>
+				<span class="pageDisplay" id="currentPage">当前 1/2 页</span>
+				<span class="pageDisplay" id="totalPage">共21条</span>
+				&nbsp;&nbsp;
+				<a class="pageOption" href="javascript:void(0)" onclick="contactPageTool.firstPage()">首页</a>
+				&nbsp;
+				<a class="pageOption" href="javascript:void(0)" id="ipreviousPage" onclick="contactPageTool.prePage()">上一页</a>
+				<a class="pageOption" href="javascript:void(0)" id="inextPage" onclick="contactPageTool.nextPage()">下一页</a>
+				&nbsp;
+				<a class="pageOption" href="javascript:void(0)" onclick="contactPageTool.endPage()">尾页</a>
+				&nbsp;&nbsp;
+				<span class="pageDisplay">转到</span>
+				&nbsp;
+				<input type="text" maxlength="4" size="1" style="height: 30px;font-size: 20px;">
+				&nbsp;
+				<span class="pageDisplay">页</span>				
+				<a class="pageOption" href="javascript:void(0)" onclick="contactPageTool.jumpPage()">跳转</a>
+	</div>
+</body>
+</html>

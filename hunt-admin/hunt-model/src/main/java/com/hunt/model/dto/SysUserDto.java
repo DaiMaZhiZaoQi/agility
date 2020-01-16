@@ -1,7 +1,12 @@
 package com.hunt.model.dto;
 
 import com.hunt.model.entity.SysUserRoleOrganization;
+import com.hunt.model.entity.SysOrganization;
 import com.hunt.model.entity.SysPermission;
+import com.hunt.model.entity.SysRole;
+import com.hunt.model.entity.SysUserInOrg;
+import com.hunt.model.entity.SysUserOrganization;
+import com.hunt.model.entity.SysUserRole;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,37 +71,87 @@ public class SysUserDto {
 
     // is_final :是否能修改
     private Integer isFinal;
-
+    
+    private SysUserInOrg mSysUserInOrg;
+    // 用户角色
+    private List<SysUserRole> listUserRole=new ArrayList<>();
+    // 用户机构
+    private List<SysUserOrganization> listUserOrg=new ArrayList<>();
+    
     private List<SysPermission> permissions = new ArrayList<>();
     private List<SysUserRoleOrganization> userRoleOrganizations = new ArrayList<>();
 
-    @Override
-    public String toString() {
-        return "SysUserDto{" +
-                "id=" + id +
-                ", loginName='" + loginName + '\'' +
-                ", zhName='" + zhName + '\'' +
-                ", enName='" + enName + '\'' +
-                ", sex=" + sex +
-                ", birth='" + birth + '\'' +
-                ", email='" + email + '\'' +
-                ", phone='" + phone + '\'' +
-                ", address='" + address + '\'' +
-                ", password='" + password + '\'' +
-                ", passwordSalt='" + passwordSalt + '\'' +
-                ", rank=" + rank +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                ", createBy=" + createBy +
-                ", updateBy=" + updateBy +
-                ", status=" + status +
-                ", isFinal=" + isFinal +
-                ", permissions=" + permissions +
-                ", userRoleOrganizations=" + userRoleOrganizations +
-                '}';
-    }
+   
+    
+    
 
-    public List<SysPermission> getPermissions() {
+    
+
+
+	@Override
+	public String toString() {
+		return "SysUserDto [id=" + id + ", loginName=" + loginName + ", zhName=" + zhName + ", enName=" + enName
+				+ ", sex=" + sex + ", birth=" + birth + ", email=" + email + ", phone=" + phone + ", address=" + address
+				+ ", password=" + password + ", passwordSalt=" + passwordSalt + ", rank=" + rank + ", createTime="
+				+ createTime + ", updateTime=" + updateTime + ", createBy=" + createBy + ", updateBy=" + updateBy
+				+ ", status=" + status + ", isFinal=" + isFinal + ", listUserRole=" + listUserRole + ", listUserOrg="
+				+ listUserOrg + ", permissions=" + permissions + ", userRoleOrganizations=" + userRoleOrganizations
+				+ "]";
+	}
+
+
+
+
+
+	public SysUserInOrg getmSysUserInOrg() {
+		return mSysUserInOrg;
+	}
+
+
+
+
+
+	public void setmSysUserInOrg(SysUserInOrg mSysUserInOrg) {
+		this.mSysUserInOrg = mSysUserInOrg;
+	}
+
+
+
+
+
+	public List<SysUserRole> getListUserRole() {
+		return listUserRole;
+	}
+
+
+
+
+
+	public void setListUserRole(List<SysUserRole> listUserRole) {
+		this.listUserRole = listUserRole;
+	}
+
+
+
+
+
+	public List<SysUserOrganization> getListUserOrg() {
+		return listUserOrg;
+	}
+
+
+
+
+
+	public void setListUserOrg(List<SysUserOrganization> listUserOrg) {
+		this.listUserOrg = listUserOrg;
+	}
+
+
+
+
+
+	public List<SysPermission> getPermissions() {
         return permissions;
     }
 

@@ -1,5 +1,7 @@
 package com.hunt.model.entity;
 
+import java.util.List;
+
 /**
  * @Author: ouyangan
  * @Date: 2016-10-12 14:21
@@ -41,7 +43,7 @@ public class SysOrganization {
     private Long updateBy;
 
     // status :数据状态,1:正常,2:删除
-    private Integer status;
+    private Long status;
     
     //  系统  10
     //机构码 2位代表一个机构   ，xxx集团 11，
@@ -51,8 +53,12 @@ public class SysOrganization {
 
     /**结构类型 0：机构，1：个人*/
     private int orgType;
-  
-
+    
+    private List<SysOrganization> children;
+    private String state;
+    private String open;
+    private int checkState;
+    private Boolean checked;
   
 
 	@Override
@@ -256,7 +262,7 @@ public class SysOrganization {
      *
      * @return Integer
      */
-    public Integer getStatus() {
+    public Long getStatus() {
         return status;
     }
 
@@ -265,7 +271,7 @@ public class SysOrganization {
      *
      * @param status
      */
-    public void setStatus(Integer status) {
+    public void setStatus(Long status) {
         this.status = status;
     }
 
@@ -283,6 +289,50 @@ public class SysOrganization {
 
 	public void setOrgType(int orgType) {
 		this.orgType = orgType;
+	}
+
+	public List<SysOrganization> getChildren() {
+		return children;
+	}
+
+	public void setChildren(List<SysOrganization> children) {
+		this.children = children;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getOpen() {
+		return open;
+	}
+
+	public void setOpen(String open) {
+		this.open = open;
+	}
+
+	
+	
+	
+	
+	public int getCheckState() {
+		return checkState;
+	}
+
+	public void setCheckState(int checkState) {
+		this.checkState = checkState;
+	}
+
+	public Boolean getChecked() {
+		return checked;
+	}
+
+	public void setChecked(Boolean checked) {
+		this.checked = checked;
 	}
 
 	

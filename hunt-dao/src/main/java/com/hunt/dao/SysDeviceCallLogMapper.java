@@ -26,6 +26,15 @@ public interface SysDeviceCallLogMapper {
 	 */
 	public void update(SysDeviceCallLog sysDeviceCallLog);
 	
+
+	/**
+	 * 同步更新orgCode
+	 * @param sysOrgCode
+	 * @param oldOrgCode
+	 * @return
+	 */
+	Long updateByOrgCode(@Param("sysOrgCode")String sysOrgCode,@Param("oldOrgCode") String oldOrgCode);
+	
 	/**
 	 * 通话记录，删除或恢复正常
 	 * @param sysDeviceCallLog

@@ -5,6 +5,8 @@ import java.util.List;
 import com.hunt.model.dto.PageInfo;
 import com.hunt.model.entity.SysDevice;
 import com.hunt.model.entity.SysDeviceRoleOrg;
+import com.hunt.model.entity.SysUser;
+import com.hunt.model.entity.SysUserInOrg;
 import com.hunt.util.Result;
 import com.hunt.util.StringUtil;
 /**
@@ -54,10 +56,10 @@ public interface SystemDeviceService {
 	 * 添加设备到设备表，有sysUserId,则添加到sys_device_role_org表中
 	 * @param sysDevice
 	 * @param sysUserId
-	 * @param sysOrgId
+	 * @param sysUserInOrg
 	 * @return
 	 */
-	Long insertDevice(SysDevice sysDevice, Long sysUserId, Long sysOrgId);
+	Long insertDevice(SysDevice sysDevice, Long sysUserId, SysUserInOrg sysUserInOrg);
 	
 	/**
 	 * 修改设备 找到 这条记录后然后修改这条参数
@@ -78,7 +80,7 @@ public interface SystemDeviceService {
 	 * @param password
 	 * @return
 	 */
-	public Result autoBind(String deviceSerial,String deviceName,String userName,String password);
+	public Result autoBind(String deviceSerial,String deviceName,SysUser sysUser,SysUserInOrg sysUserInOrg);
 	/**
 	 * 解除设备绑定
 	 * @param sysOrgId

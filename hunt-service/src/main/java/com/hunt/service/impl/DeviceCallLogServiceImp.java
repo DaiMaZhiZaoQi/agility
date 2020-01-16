@@ -19,6 +19,9 @@ import com.hunt.dao.SysDeviceCallLogMapper;
 import com.hunt.dao.SysDeviceMapper;
 import com.hunt.dao.SysDeviceRecordMapper;
 import com.hunt.dao.SysDeviceTotalMapper;
+import com.hunt.model.dto.PageDto;
+import com.hunt.model.dto.PageInfo;
+import com.hunt.model.dto.SysCallLogDeviceRecoDto;
 import com.hunt.model.dto.SysDeviceCallLogAndRecordDto;
 import com.hunt.model.entity.SysDeviceCallLog;
 import com.hunt.model.entity.SysDeviceRecord;
@@ -66,10 +69,13 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 		 
 		
 //		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDeviceId(deviceId);    //  每天存一次，当天不存在则新建。
-		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDevIdCreateTime(deviceId);    //  每天存一次，当天不存在则新建。
+		Long sysOrgId = sysDeviceCallLog.getOrgId();
+//		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDevIdCreateTime(deviceId);    //  每天存一次，当天不存在则新建。
+		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByOrgIdCreateTime(sysOrgId,deviceId);    //  每天存一次，当天不存在则新建。
 		if(sysDeviceTotal==null) {		//设备统计不存在
 			sysDeviceTotal=new SysDeviceTotal();
 			sysDeviceTotal.setDeviceId(deviceId);
+			sysDeviceTotal.setOrgId(sysOrgId);
 			ResponseCode responseCode = fillCallType(sysDeviceTotal,sysDeviceCallLog);
 			if(responseCode==ResponseCode.missing_parameter) {
 				return Result.instance(responseCode.getCode(), "未知通话类型"); 
@@ -99,6 +105,22 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 	
 	
 	
+	
+	
+	@Override
+	public PageInfo listCallRecord(PageDto pageDto) {
+		Long id = pageDto.getId(); 			//  机构id
+		List<Long> listOrgId=new ArrayList<>();
+		mSysOrganization.selectSysOrgIdList(id, listOrgId, false);
+		 List<SysCallLogDeviceRecoDto> listCallLog = mSysDeviceTotalMapper.selectSearCallLogByUserSetN(listOrgId,pageDto);
+		
+		return new PageInfo(listCallLog.size(), listCallLog); 
+	}
+
+
+
+
+
 	/**
 	 * 判断呼入呼出类型参数是否正确
 	 * @param sysDeviceCallLog
@@ -137,31 +159,42 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 		
 		Long callLogCount = sysDeviceTotal.getCallLogCount(); 
 		switch(callType) {
-			case 0: 		//未接
+			case 0:{ 		//未接
 				Long callNoAccept = sysDeviceTotal.getCallNoAccept();
-				callNoAccept=callNoAccept==null?1:callNoAccept+1;
+				callNoAccept=callNoAccept==null?1:(callNoAccept+1);
 				sysDeviceTotal.setCallNoAccept(callNoAccept);
 				break;
-			case 1:			//呼入已接
+			}
+			case 1:{			//呼入已接
 				Long callAlreadyAcceptCount = sysDeviceTotal.getCallAlreadyAcceptCount();
-				callAlreadyAcceptCount=callAlreadyAcceptCount==null?1:callAlreadyAcceptCount+1;
+				callAlreadyAcceptCount=callAlreadyAcceptCount==null?1:(callAlreadyAcceptCount+1);
 				sysDeviceTotal.setCallAlreadyAcceptCount(callAlreadyAcceptCount);
 				break;
-			case 2:			//呼出
+			}
+			case 2:{			//呼出
 				Long callCallOut = sysDeviceTotal.getCallCallOut(); 
-				callCallOut=callCallOut==null?1:callCallOut+1;
+				callCallOut=callCallOut==null?1:(callCallOut+1);
 				sysDeviceTotal.setCallCallOut(callCallOut);
 				break;
-			case 3:			//拒接
-				Long callRefuseAccept = sysDeviceTotal.getCallRefuseAccept();
-				callRefuseAccept=callRefuseAccept==null?1:callRefuseAccept+1;
-				sysDeviceTotal.setCallRefuseAccept(callRefuseAccept);
+			}
+			case 3:{			//未接
+				Long callNoAccept = sysDeviceTotal.getCallNoAccept();
+				callNoAccept=callNoAccept==null?1:(callNoAccept+1);
+				sysDeviceTotal.setCallNoAccept(callNoAccept);
 				break;
-			case 4:			//未接留言
+			}
+			case 4:{			//未接留言
 				Long callNoAcceptLeave = sysDeviceTotal.getCallNoAcceptLeave();
-				callNoAcceptLeave=callNoAcceptLeave==null?1:callNoAcceptLeave+1;
+				callNoAcceptLeave=callNoAcceptLeave==null?1:(callNoAcceptLeave+1);
 				sysDeviceTotal.setCallNoAcceptLeave(callNoAcceptLeave);
 				break;
+			}
+			case 5:	{		// 拒接
+				Long callRefuseAccept = sysDeviceTotal.getCallRefuseAccept();
+				callRefuseAccept=callRefuseAccept==null?1:(callRefuseAccept+1);
+				sysDeviceTotal.setCallRefuseAccept(callRefuseAccept);
+				break;
+			}
 		}
 		sysDeviceTotal.setCallLogCount(callLogCount==null?1:(callLogCount+1));
 		sysDeviceTotal.setCreateBy(createBy);
@@ -334,9 +367,70 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 		}
 		
 	}
-	
-	
-	
+
+	@Override
+	public SysDeviceTotal selectDevTotalByPageDto(PageDto pageDto) {
+		Long id = pageDto.getId(); 			//  机构id
+		List<Long> listOrgId=new ArrayList<>();
+		mSysOrganization.selectSysOrgIdList(id, listOrgId, false);
+		String callNumber = pageDto.getCallNumber();
+		String orgName = pageDto.getOrgName();
+		if(!StringUtils.isEmpty(callNumber)||!StringUtils.isEmpty(orgName)||pageDto.getBeginTime()==null) {
+			List<SysCallLogDeviceRecoDto> listDeviceDto=null;
+			if(pageDto.getBeginTime()==null) {
+				listDeviceDto = mSysDeviceTotalMapper.selectTotalByUserSetNN(listOrgId,pageDto);
+			}else {
+				listDeviceDto = mSysDeviceTotalMapper.selectTotalByUserSetN(listOrgId,pageDto);
+			}
+		
+			SysDeviceTotal sysDeviceTotal = new SysDeviceTotal();
+			Long callLogCount=0l;		// 通话数量
+			Long callRecordCount=0l;	// 通话录音数量
+			Long callAlreadyAcceptCount=0l;	// 已接
+			Long callNoAccept=0l;		// 未接
+			Long callRefuseAccept=0l;	// 拒接
+			Long callCallOut=0l;		// 拨出
+			for(SysCallLogDeviceRecoDto dto:listDeviceDto) {
+				callLogCount++;
+				SysDeviceCallLogAndRecordDto sysDeviceRecord = dto.getSysDeviceRecord();
+				callRecordCount+= sysDeviceRecord.getCallHasRecord(); 
+				Integer callType = sysDeviceRecord.getCallType();
+				switch (callType) {
+				case 1:		// 呼入已接
+					callAlreadyAcceptCount++;
+					break;
+				case 2:		// 呼出
+					callCallOut++;
+					break;
+				case 3:		// 拒接
+					callRefuseAccept++;
+					break;
+				case 4:
+					callNoAccept++;
+					break;
+				case 5:
+					callNoAccept++;
+					break;
+				default:
+					break;
+				}
+			}
+			sysDeviceTotal.setCallLogCount(callLogCount);
+			sysDeviceTotal.setCallRecordCount(callRecordCount);
+			sysDeviceTotal.setCallAlreadyAcceptCount(callAlreadyAcceptCount);
+			sysDeviceTotal.setCallCallOut(callCallOut);
+			sysDeviceTotal.setCallRefuseAccept(callRefuseAccept);
+			sysDeviceTotal.setCallNoAccept(callNoAccept);
+			return sysDeviceTotal;
+		}
+//			List<SysDeviceTotal> listDeviceTo = mSysDeviceTotalMapper.selectTotalByPageDto(listOrgId, pageDto);
+			List<SysDeviceTotal> listDeviceTo = mSysDeviceTotalMapper.selectTotalByPageDtoN(listOrgId, pageDto);
+		 return calcu(listDeviceTo);
+	}
+
+
+
+
 
 	@Override
 	public Long selectTotalCount(Long orgId, Integer optType) {
@@ -360,7 +454,6 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 
 	@Override
 	public Long selectSearTotalCount(Long orgId, Integer optType, String sType, Long beginTime,Long endTime, String sContent,Integer callIsHaveRecord) {
-//		String callDate=StringUtil.getSRange(sTimeType);
 		String callNumber="";
 		String deviceSerial="";
 		String callName="";
@@ -382,17 +475,26 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 			for(SysOrganization sysOrganization:listOrganization) {
 				setId.add(sysOrganization.getId());
 			} 
-//			return  mSysDeviceTotalMapper.selectCallCount(setId); 
 			return  mSysDeviceTotalMapper.selectSearCallCount(setId,callNumber,callName,deviceSerial,beginTime,endTime,callIsHaveRecord);
 			
 		}else {
-//			return mSysDeviceTotalMapper.selectCountByUserId(orgId);
 			return mSysDeviceTotalMapper.selectSearCountByUserId(orgId,callNumber,deviceSerial,callName,beginTime,endTime,callIsHaveRecord);
 		}
-		
-		
-//		return null;
 	}
+	
+	@Override
+	public Long selectTotalCountByPageDto(PageDto pageDto) {
+		Long id = pageDto.getId(); 			//  机构id
+		List<Long> listOrgId=new ArrayList<>();
+		mSysOrganization.selectSysOrgIdList(id, listOrgId, false);
+		if(pageDto.getBeginTime()==null) {   
+			return mSysDeviceTotalMapper.selectSearCallCountN(listOrgId,pageDto);
+		}else {
+			return mSysDeviceTotalMapper.selectSearCallCountNN(listOrgId,pageDto);
+		}
+	}
+
+
 
 
 

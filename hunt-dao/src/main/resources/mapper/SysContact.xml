@@ -143,6 +143,10 @@
 	</update>
 	
 	<select id="selectById" resultType="sysContact">
+		SELECT * FROM sys_contact WHERE sys_contact.`id`=#{id} AND sys_contact.`status`=1	
+	</select>
+	 
+	<select id="selectByIdNoStatus" resultType="sysContact">
 		SELECT * FROM sys_contact WHERE sys_contact.`id`=#{id}	
 	</select>
 	 
@@ -162,6 +166,10 @@
 			FROM sys_contact WHERE sys_contact.`id`=#{id} and sys_contact.status=1
 	</select>
 	 
+	 
+	 <sql id="pageSql">
+	 ORDER BY sys_contact.`${pageDto.sort}` ${pageDto.order} limit ${(pageDto.page-1)*pageDto.rows},${pageDto.rows}
+	</sql>
 	<select id="selectByIds" resultType="java.lang.String">
 		SELECT sys_contact.`contact_code` 
 		FROM sys_contact 
@@ -171,6 +179,25 @@
 			#{id}
 		</foreach>
 		AND sys_contact.`contact_code`=#{contactCode} and status=1
+		
+	</select>
+	
+	<!--查询通讯录列表 -->
+	<select id="selectByListId" resultType="sysContact">
+		SELECT * FROM sys_contact WHERE sys_contact.`id` IN
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+		AND sys_contact.`status`=1	
+		<include refid="pageSql"/>
+	</select>
+	
+	<select id="selectCount" resultType="java.lang.Integer">
+		SELECT count(*) FROM sys_contact WHERE sys_contact.`id` IN
+		<foreach collection="list" item="id" open="(" close=")" separator=",">
+			#{id}
+		</foreach>
+		AND sys_contact.`status`=1	
 	</select>
 	
 	

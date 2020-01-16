@@ -21,6 +21,17 @@ public class DateUtil {
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmssSS");
 		return sdf.format(new Date(System.currentTimeMillis()));
 	}
+	
+	/**
+	 * 获得当前时间
+	 * @return yyyyMMddHHmmss
+	 */
+	public static String getTimeSimp() {
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyyMMddHHmmss");
+		return sdf.format(new Date(System.currentTimeMillis()));
+	}
+	
+	
 	/**
 	 * 格式化年月
 	 * @return
@@ -40,7 +51,7 @@ public class DateUtil {
 	 * @return
 	 */
 	public static String getTodayTime(long timeMinnute) {
-		SimpleDateFormat sdfHHmm = new SimpleDateFormat("HHmmssSS");
+		SimpleDateFormat sdfHHmm = new SimpleDateFormat("yyyyMMddHHmmssSS");
 	 return sdfHHmm.format(new Date(timeMinnute));
 	}
 	/**

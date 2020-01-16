@@ -1,11 +1,13 @@
 package com.hunt.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -19,7 +21,13 @@ import org.junit.jupiter.api.Test;
 
 import com.hunt.util.UtReadCsv.TTSecond;
 import com.hunt.util.UtReadCsv.TTestChild;
+
+import info.monitorenter.cpdetector.io.ASCIIDetector;
+import info.monitorenter.cpdetector.io.CodepageDetectorProxy;
+import info.monitorenter.cpdetector.io.JChardetFacade;
 //import com.sun.glass.ui.Timer;
+import info.monitorenter.cpdetector.io.ParsingDetector;
+import info.monitorenter.cpdetector.io.UnicodeDetector;
 
 public class UtReadCsv/*<T extends TTest>*/{
 	
@@ -51,6 +59,61 @@ public class UtReadCsv/*<T extends TTest>*/{
 		System.out.println("matches-->"+matches);
 	}
 
+    /**
+     * 方法三：比较准确，解决了实际问题
+     * @param filePath
+     * @return
+     */
+    public static String getFileEncode(String filePath) {
+        String charsetName = null;
+        try {
+            File file = new File(filePath);
+            CodepageDetectorProxy detector = CodepageDetectorProxy.getInstance();
+            detector.add(new ParsingDetector(false));
+            detector.add(ASCIIDetector.getInstance());
+            detector.add(JChardetFacade.getInstance());
+            detector.add(UnicodeDetector.getInstance());
+            java.nio.charset.Charset charset = null;
+            charset = detector.detectCodepage(file.toURI().toURL());
+            if (charset != null) {
+                charsetName = charset.name();
+            } else {
+                charsetName = "UTF-8";
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return charsetName;
+    }
+
+    public static String getFileEncode2(String fr) {
+        String encode = "utf-8";
+        try {
+            InputStream is = new FileInputStream(new File(fr));
+            byte[] buff = new byte[2048];
+            int retn = is.read(buff, 0, 2048);
+            if (retn>0) {
+                encode = getEncode(buff, retn);
+            }
+            is.close();
+        }
+        catch (IOException e) {}
+        return encode;
+    }
+    
+    public static String getEncode(byte[] buff, int length) {
+        try {
+            int len = (length==0 || length>buff.length) ? buff.length : length;
+            String gbk = new String(buff, 0, len, "gbk");
+            String utf = new String(buff, 0, len, "utf-8");
+            if (gbk.length()<utf.length()) return "gbk";
+        }
+        catch (IOException e) {}
+        return "utf-8";
+    }
+
+	
 	
 	public static void main(String[] args) {
 		File file=new File("C:\\Users\\williambai\\Desktop\\candelete\\qytxlmbtest.csv");

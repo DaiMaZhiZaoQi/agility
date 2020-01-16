@@ -61,7 +61,7 @@
             AND description = #{description}
         </if>
         <if test="ip !=null and ip.length() != 0">
-            AND ip = #{ip}
+           <![CDATA[AND ip = #{ip}]]>    
         </if>
     </sql>
 
@@ -180,7 +180,7 @@
     </update>
 
     <select id="select" parameterType="SysIpForbidden" resultType="SysIpForbidden">
-        select * from sys_ip_forbidden where
+        select * from sys_ip_forbidden
         <where>
             <include refid="sql_column_where"/>
         </where>

@@ -20,6 +20,15 @@ public interface SysRoleService {
     SysRole selectById(long id);
 
     PageInfo selectPage(int page, int row);
+    
+    /**
+     * 查询该用户的角色
+     * @param page
+     * @param row
+     * @param userId
+     * @return
+     */
+    PageInfo selectPageUserId(int page, int row,long userId);
 
     void deleteRole(SysRole sysRole);
 }

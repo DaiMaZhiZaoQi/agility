@@ -8,12 +8,12 @@ package com.hunt.util;
 public enum ResponseCode {
     success(10000, "操作成功"),
     error(20000, "服务器错误"),
-    unknown_account(20001, "账户不存在"),
+    unknown_account(20001, "账户不存在,或密码不存在"),
     forbidden_account(20002, "账户已禁用"),
-    password_incorrect(20003, "密码错误"),
+    password_incorrect(30015, "用户名不存在或密码错误"),
     verify_captcha_error(20004, "验证码错误,请重新刷新并滑动验证码!"),
     unauthorized(20005, "无操作权限"),
-    can_not_edit(20006, "该条记录无法编辑"),
+    can_not_edit(20006, "该条记录无法编辑"), 
     unauthenticated(20007, "未登录"),
     forbidden_ip(20008, "非法请求"),
     not_found_url(20009, "url不存在"),
@@ -24,6 +24,7 @@ public enum ResponseCode {
     login_name_already_exist(30005, "该登录名已存在"),
     code_already_exist(30006, "该编码已存在"),
     fullname_already_exist(30007, "该全称已存在"),
+    
 	
 	encode_fail(30008,"编码格式错误，支持UTF-8"),
 	missing_file_version(30009,"文件缺少版本号,请重新选择文件"),
@@ -31,7 +32,15 @@ public enum ResponseCode {
 	file_exist_err(30011,"该文件版本已存在同步密码不匹配，请检查"),
 	file_exist_code(30012,"该文件版本应大于之前的版本，请检查"),
 	no_permission(30013,"无修改权限"),
-	file_not_exist(30014,"文件不存在，请重新上传");
+	file_not_exist(30014,"文件不存在，请重新上传"),
+	    
+	name_no_exist(30015,"用户名不存在或密码错误"),
+	user_no_in_org(30016,"用户不在部门中,请把用户添加到部门"),
+	device_not_exist(30017,"设备不存在"),
+	device_not_bind(30018,"设备没绑定用户"),
+	
+	csv_password_incorrect(30019,"密码错误");
+	
 	
     private int code;
     private String msg;

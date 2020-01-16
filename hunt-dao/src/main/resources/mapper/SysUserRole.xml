@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hunt.dao.SysUserRoleMapper">
+	<resultMap type="com.hunt.model.entity.SysUserRole" id="baseResultMap">
+		<result column="id" property="id" jdbcType="BIGINT"/>
+		<result column="sys_user_id" property="sysUserId" jdbcType="BIGINT"/>
+		<result column="sys_role_id" property="sysRoleId" jdbcType="BIGINT"/>
+		<result column="rank" property="rank" jdbcType="INTEGER"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+		<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+		<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+		<result column="status" property="status" jdbcType="INTEGER"/>
+		<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+	</resultMap>
+	
+	<sql id="sql_column_where">
+		<if test="sysUserId!=null">
+			AND sys_user_id=#{sysUserId},
+		</if>   
+		<if test="sysRoleId!=null">
+			AND sys_role_id=#{sysRoleId},
+		</if>
+		<if test="status!=null">
+			AND status=#{status},
+		</if>
+		<if test="isFinal!=null">
+			AND is_final=#{isFinal},
+		</if>
+	</sql>
+	
+	<insert id="insert" parameterType="SysUserRole" keyProperty="id" useGeneratedKeys="true">
+		insert into sys_user_role
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="sysUserId!=null">
+				sys_user_id,
+			</if>
+			<if test="sysRoleId!=null">
+				sys_role_id,
+			</if>
+			<if test="rank!=null">
+				rank,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="sysUserId!=null">
+				#{sysUserId},
+			</if>
+			<if test="sysRoleId!=null">
+				#{sysRoleId},
+			</if>
+			<if test="rank!=null">
+				#{rank},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="updateByUserIdRoleId" useGeneratedKeys="true" keyProperty="id">
+		UPDATE sys_user_role 
+		SET sys_user_role.`status`=2 
+		WHERE sys_user_role.`sys_user_id`=#{sysUserId} 
+		AND sys_user_role.`sys_role_id`=#{sysRoleId}
+	</update>
+	
+	<delete id="deleteBy" parameterType="SysUserRole">
+		delete from sys_user_role 
+		<include refid="sql_column_where"/>
+	</delete>
+	
+	<select id="selectByUserId" resultType="SysUserRole">
+		SELECT * 
+		FROM sys_user_role 
+		WHERE sys_user_role.`sys_user_id`=#{sysUserId} 
+		AND sys_user_role.`status`=1
+	</select>
+	
+	<select id="selectRoleIdByUserId" resultType="java.lang.Long">
+		SELECT sys_user_role.`sys_role_id` 
+		FROM sys_user_role 
+		WHERE sys_user_role.`sys_user_id`=#{sysUserId} AND sys_user_role.`status`=1
+	</select>
+
+
+	<select id="selectPerIdByUserId" resultType="java.lang.Long">
+		SELECT DISTINCT sys_role_permission.`sys_permission_id` FROM sys_user_role 
+		LEFT JOIN sys_role_permission 
+		ON sys_role_permission.`sys_role_id`=sys_user_role.`sys_role_id` 
+		AND sys_role_permission.`status`=1 
+		WHERE sys_user_role.`sys_user_id`=#{sysUserId}
+		AND sys_user_role.`status`=1
+	</select>
+
+	<!-- <select id="selectPerCodeByUserId" resultType="java.lang.String">
+		SELECT DISTINCT sys_permission.`code` FROM sys_user_role 
+		LEFT JOIN sys_role_permission 
+		ON sys_role_permission.`sys_role_id`=sys_user_role.`sys_role_id` 
+		LEFT JOIN sys_permission ON sys_permission.`id`=sys_role_permission.`sys_permission_id` AND sys_permission.`status`=1
+		AND sys_role_permission.`status`=1 
+		WHERE sys_user_role.`sys_user_id`=#{sysUserId}
+		AND sys_user_role.`status`=1
+	</select> -->
+	
+	<select id="selectPerCodeByUserId" resultType="java.lang.String">
+		SELECT DISTINCT sys_permission.`code`
+		FROM sys_user_role 
+		LEFT JOIN sys_role_permission 
+		ON sys_role_permission.`sys_role_id`=sys_user_role.`sys_role_id` AND sys_role_permission.`status`=1 
+		LEFT JOIN sys_permission ON sys_permission.`id`=sys_role_permission.`sys_permission_id` 
+		AND sys_permission.`status`=1 WHERE sys_user_role.`sys_user_id`=#{sysUserId} AND sys_user_role.`status`=1
+	</select>
+
+
+</mapper> 

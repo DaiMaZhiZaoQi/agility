@@ -31,6 +31,7 @@ import com.hunt.model.entity.SysDevice;
 import com.hunt.model.entity.SysDeviceRoleOrg;
 import com.hunt.model.entity.SysOrganization;
 import com.hunt.model.entity.SysUser;
+import com.hunt.model.entity.SysUserInOrg;
 import com.hunt.model.entity.SysUserRoleOrganization;
 import com.hunt.service.SystemDeviceService;
 import com.hunt.util.ResponseCode;
@@ -64,34 +65,29 @@ public class SystemDeviceServiceImpl implements SystemDeviceService {
 	 
 	 
 	@Override
-	public Long insertDevice(SysDevice sysDevice, Long sysUserId, Long sysOrgId) {
-		log.info("insert-"+sysDevice.toEntityString()+"-sysUserId-->"+sysUserId+"-sysUserIdRoleOrgid-->"+sysOrgId);
+	public Long insertDevice(SysDevice sysDevice, Long sysUserId, SysUserInOrg userInOrg) {
+		log.info("insert-"+sysDevice.toEntityString()+"-sysUserId-->"+sysUserId+"-SysUserInOrg-->"+userInOrg);
 		SysDevice sysDevExit = mSysDeviceMapper.selectByDeviceSerial(sysDevice.getDeviceSerial());
-		if(sysDevExit==null) {			//  存在该设备
+		
+		if(sysDevExit==null) {			//  不存在该设备
+			sysDevice.setSysOrgId(userInOrg.getSysOrgId());
+			sysDevice.setSysOrgCode(userInOrg.getSysOrgCode()); 
 			mSysDeviceMapper.insert(sysDevice);
 		}else {
+			sysDevExit.setSysOrgId(userInOrg.getSysOrgId());
+			sysDevExit.setSysOrgCode(userInOrg.getSysOrgCode()); 
 			sysDevice.setId(sysDevExit.getId());
 			mSysDeviceMapper.update(sysDevice);
 		}
 		Long createBy = sysDevice.getCreateBy(); 
 		Long id = sysDevice.getId(); 
-		if(sysUserId!=null&&sysUserId>0) {
-			if(sysOrgId!=null&&sysOrgId!=0) {		//  机构id
-					SysDeviceRoleOrg sysDeviceRoleOrg = new SysDeviceRoleOrg();
-					sysDeviceRoleOrg.setSysDeviceId(id);
-					sysDeviceRoleOrg.setCreateBy(createBy); 
-					sysDeviceRoleOrg.setSysUserId(sysUserId);
-					sysDeviceRoleOrg.setSysOrgId(sysOrgId);
-//					sysDeviceRoleOrg.setSysRoleOrgId(sysUserIdRoleOrgid[i]);
-					insertDeviceRoleOrg(sysDeviceRoleOrg);
-			}else {
-				SysDeviceRoleOrg sysDeviceRoleOrg = new SysDeviceRoleOrg();
-				sysDeviceRoleOrg.setSysDeviceId(id);
-				sysDeviceRoleOrg.setCreateBy(createBy); 
-				sysDeviceRoleOrg.setSysUserId(sysUserId);
-				insertDeviceRoleOrg(sysDeviceRoleOrg);
-			}
-		}
+		SysDeviceRoleOrg sysDeviceRoleOrg = new SysDeviceRoleOrg();
+		sysDeviceRoleOrg.setSysDeviceId(id);
+		sysDeviceRoleOrg.setCreateBy(createBy); 
+		sysDeviceRoleOrg.setSysUserId(sysUserId);
+		sysDeviceRoleOrg.setSysOrgId(userInOrg.getSysOrgId());
+		insertDeviceRoleOrg(sysDeviceRoleOrg);
+
 		return id;
 	}
 
@@ -139,115 +135,27 @@ public class SystemDeviceServiceImpl implements SystemDeviceService {
 		   System.out.println("result-->"+result);
 		   return result;
 		}
-		
-		/*if(sysDeviceRoleOrgId!=null&&sysDeviceRoleOrgId.length>0) {			//	sys_device_role_ord存在该条记录
-			if(sysDeviceRoleOrgId.length<sysRoleOrgId.length) {				// 	修改并新增 sys_device_role_org
-				//   判断哪个sysRoleOrgId需要新增
-				for(int i=0;i<sysRoleOrgId.length;i++) {
-					Long lSysRoleOrgId=sysRoleOrgId[i];
-					if(i>=sysDeviceRoleOrgId.length) {								//   开始新增
-						SysDeviceRoleOrg sysDeviceRoleOrg = new SysDeviceRoleOrg();
-						sysDeviceRoleOrg.setSysRoleOrgId(lSysRoleOrgId);
-						sysDeviceRoleOrg.setSysDeviceId(id);
-						sysDeviceRoleOrg.setCreateBy(createBy); 
-						sysDeviceRoleOrg.setSysUserId(sysUserId);
-						insertDeviceRoleOrg(sysDeviceRoleOrg);
-					}else {															//	修改原来的
-						SysDeviceRoleOrg LSysDeviceRoleOrg = new SysDeviceRoleOrg();
-						LSysDeviceRoleOrg.setSysRoleOrgId(lSysRoleOrgId);
-						LSysDeviceRoleOrg.setId(sysDeviceRoleOrgId[i]);
-						LSysDeviceRoleOrg.setUpdateBy(updateBy); 
-						LSysDeviceRoleOrg.setSysUserId(sysUserId);
-						updateDeviceRoleOrg(LSysDeviceRoleOrg);
-					}
-				}
-			}else if(sysDeviceRoleOrgId.length==sysRoleOrgId.length){		// 	修改原来的
-				for(int i=0;i<sysRoleOrgId.length;i++) {
-					Long lSysRoleOrgId=sysRoleOrgId[i];
-					SysDeviceRoleOrg LSysDeviceRoleOrg = new SysDeviceRoleOrg();
-					LSysDeviceRoleOrg.setSysRoleOrgId(lSysRoleOrgId);
-					LSysDeviceRoleOrg.setId(sysDeviceRoleOrgId[i]);
-					LSysDeviceRoleOrg.setUpdateBy(updateBy); 
-					LSysDeviceRoleOrg.setSysUserId(sysUserId);
-					updateDeviceRoleOrg(LSysDeviceRoleOrg);
-				}
-			}else if(sysDeviceRoleOrgId.length>sysRoleOrgId.length) {		
-				for(int i=0;i<sysDeviceRoleOrgId.length;i++) {
-					if(i>=sysRoleOrgId.length) {							//	解绑
-						SysDeviceRoleOrg LSysDeviceRoleOrg = new SysDeviceRoleOrg();
-						LSysDeviceRoleOrg.setSysRoleOrgId(0l);
-						LSysDeviceRoleOrg.setId(sysDeviceRoleOrgId[i]);
-						LSysDeviceRoleOrg.setUpdateBy(updateBy); 
-						LSysDeviceRoleOrg.setSysUserId(0l);
-						LSysDeviceRoleOrg.setSysDeviceId(0L);
-						updateDeviceRoleOrg(LSysDeviceRoleOrg);
-					}else {													
-						Long lSysRoleOrgId=sysRoleOrgId[i];
-						SysDeviceRoleOrg LSysDeviceRoleOrg = new SysDeviceRoleOrg();
-						LSysDeviceRoleOrg.setSysRoleOrgId(lSysRoleOrgId);
-						LSysDeviceRoleOrg.setId(sysDeviceRoleOrgId[i]);
-						LSysDeviceRoleOrg.setUpdateBy(updateBy); 
-						LSysDeviceRoleOrg.setSysUserId(sysUserId);
-						updateDeviceRoleOrg(LSysDeviceRoleOrg);
-					}
-					
-				}
-			}
-			
-		}else {								//	在sys_device_role_org没有这条记录  添加记录
-			if(sysRoleOrgId!=null&&sysRoleOrgId.length>0) {
-				for(int i=0;i<sysRoleOrgId.length;i++) {
-					Long lSysRoleOrgId=sysRoleOrgId[i];
-					SysDeviceRoleOrg sysDeviceRoleOrg = new SysDeviceRoleOrg();
-					sysDeviceRoleOrg.setSysRoleOrgId(lSysRoleOrgId);
-					sysDeviceRoleOrg.setSysDeviceId(id);
-					sysDeviceRoleOrg.setCreateBy(createBy); 
-					sysDeviceRoleOrg.setSysUserId(sysUserId);
-					insertDeviceRoleOrg(sysDeviceRoleOrg);
-				}
-			}else {
-				SysDeviceRoleOrg sysDeviceRoleOrg = new SysDeviceRoleOrg();
-				sysDeviceRoleOrg.setSysDeviceId(id);
-				sysDeviceRoleOrg.setCreateBy(createBy); 
-				sysDeviceRoleOrg.setSysUserId(sysUserId);
-				insertDeviceRoleOrg(sysDeviceRoleOrg);
-			}
-		}*/
-//		return id;
 	}
 	
 
 	@Override
-	public Result autoBind(String deviceSerial, String deviceName, String userName, String password) {
-		// 基于权限，有该权限才能绑定该设备   错误  单个设备是不存在权限这个概念
-		// 查询该用户是否存在
-		SysUser sysUser = mSysUserMapper.selectUserByLoginName(userName);
-		if(sysUser==null) {
-			return Result.instance(ResponseCode.unknown_account.getCode(), ResponseCode.unknown_account.getMsg());
-		}
-		Long sysUserId= sysUser.getId(); 
-		String dbUserPassword = sysUser.getPassword();
-		String passwordSalt = sysUser.getPasswordSalt();
-		String createPassword = StringUtil.createPassword(password, passwordSalt, 2);
-		if(!createPassword.equals(dbUserPassword)){
-			return Result.instance(ResponseCode.password_incorrect.getCode(),ResponseCode.password_incorrect.getMsg());
-		}
+	public Result autoBind(String deviceSerial, String deviceName,SysUser sysUser,SysUserInOrg sysUserInOrg) {
 		// 查询该设备是否已经绑定，如果被其他绑定，则自动解绑其他，绑定自己
 		SysDevice sysDevice = mSysDeviceMapper.selectBindByDeviceSerial(deviceSerial);
 		
-		SysOrganization sysOrganization = mSysOrganizationMapper.selectIdByUserId(sysUserId);
+		SysOrganization sysOrganization = mSysOrganizationMapper.selectIdByUserId(sysUser.getId());
 		Long sysOrgId = sysOrganization.getId();
 		if(sysDevice==null) {
 			SysDevice sysDeviceN = new SysDevice();
 			sysDeviceN.setDeviceName(deviceName);
 			
-			sysDeviceN.setCreateBy(sysUserId);
-			sysDeviceN.setUpdateBy(sysUserId);
+			sysDeviceN.setCreateBy(sysUser.getId());
+			sysDeviceN.setUpdateBy(sysUser.getId());
 			sysDeviceN.setDeviceSerial(deviceSerial);
 			sysDeviceN.setStatus(1);
 			
 			
-			Long insertDevice = insertDevice(sysDeviceN,sysUserId,sysOrgId);
+			Long insertDevice = insertDevice(sysDeviceN,sysUser.getId(),sysUserInOrg);
 			if(insertDevice>0) {
 				return Result.instance(ResponseCode.success.getCode(), "绑定成功");
 			}
@@ -262,17 +170,17 @@ public class SystemDeviceServiceImpl implements SystemDeviceService {
 		 
 			SysDeviceRoleOrg sysDeviceRoleOrg = listSysDevRog.get(0); 
 			sysDeviceRoleOrg.setSysOrgId(sysOrgId);
-			sysDeviceRoleOrg.setSysUserId(sysUserId);
-			sysDeviceRoleOrg.setUpdateBy(sysUserId); 
+			sysDeviceRoleOrg.setSysUserId(sysUser.getId());
+			sysDeviceRoleOrg.setUpdateBy(sysUser.getId()); 
 			resultId = mSysDeviceRoleOrgMapper.update(sysDeviceRoleOrg);
 		}else {
 			// 新增绑定
 			SysDeviceRoleOrg sysDeviceRoleOrg = new SysDeviceRoleOrg();
 			sysDeviceRoleOrg.setSysOrgId(sysOrgId);
 			sysDeviceRoleOrg.setSysDeviceId(sysDeviceId);
-			sysDeviceRoleOrg.setSysUserId(sysUserId);
-			sysDeviceRoleOrg.setCreateBy(sysUserId);
-			sysDeviceRoleOrg.setUpdateBy(sysUserId);
+			sysDeviceRoleOrg.setSysUserId(sysUser.getId());
+			sysDeviceRoleOrg.setCreateBy(sysUser.getId());
+			sysDeviceRoleOrg.setUpdateBy(sysUser.getId());
 			resultId = mSysDeviceRoleOrgMapper.insert(sysDeviceRoleOrg);
 		}
 		if(!StringUtils.isEmpty(deviceName)) {

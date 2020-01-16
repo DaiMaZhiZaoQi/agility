@@ -29,8 +29,18 @@ public interface SysOrganizationMapper {
     List<SysOrganization> selectChildren(@Param("parentId") long parentId);
 
     boolean isExistFullName(@Param("fullName") String fullName);
+    
+    /**
+     * 查询同一机构下是否存在相同机构名
+     * @param name
+     * @param parentId
+     * @return
+     */
+    boolean isExistOrgName(@Param("name") String name,@Param("parentId") Long parentId);
 
     boolean isExistFullNameExcludeId(@Param("id") long id, @Param("fullName") String fullName);
+    
+    boolean isExistNameExcludeParentId(@Param("parentId")Long parId  ,@Param("name") String name);
     
     /**
      * 查询机构码集合
@@ -41,7 +51,12 @@ public interface SysOrganizationMapper {
     
     SysOrganization selectIdByUserId(@Param("sysUserId") Long sysUserId);
 
-  
+    /**
+     * 查询以orgCode开头的机构
+     * @param orgCode
+     * @return
+     */
+    List<SysOrganization> selectByOrgCode(@Param("orgCode")String orgCode);
     
     
 }

@@ -50,7 +50,7 @@ public class StringUtil {
     }
     
     public static void main(String[] args) {  //  E10ADC3949BA59ABBE56E057F20F883E
-		String createPassword = createPassword("111111", "109e0d4a996341439bb74898892a1ece", 2);
+		String createPassword = createPassword("111111", "0e1e5f9114dc4d60a7ea9e13c60bdff8", 2);
 		System.out.println("cratePassword--->"+createPassword.length()+"-->"+createPassword); 
 	}
 

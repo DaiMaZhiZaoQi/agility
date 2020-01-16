@@ -54,6 +54,10 @@ public class SysDevice extends BaseEntity {
 	
 	/**device_time:  设备时间*/
 	private Date deviceTime;
+	
+	
+	private Long sysOrgId;
+	private String sysOrgCode;
 
 	public Long getId() {
 		return id;
@@ -175,6 +179,23 @@ public class SysDevice extends BaseEntity {
 		this.deviceTime = deviceTime;
 	}
 
+	public Long getSysOrgId() {
+		return sysOrgId;
+	}
+
+	public void setSysOrgId(Long sysOrgId) {
+		this.sysOrgId = sysOrgId;
+	}
+
+	public String getSysOrgCode() {
+		return sysOrgCode;
+	}
+
+	public void setSysOrgCode(String sysOrgCode) {
+		this.sysOrgCode = sysOrgCode;
+	}
+
+	
 	
 	
 	

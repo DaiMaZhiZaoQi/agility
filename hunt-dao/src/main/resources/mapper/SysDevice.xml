@@ -17,6 +17,8 @@
 		<result column="description" property="description" jdbcType="VARCHAR"/>
 		<result column="device_msg" property="deviceMsg" jdbcType="VARCHAR"/>
 		<result column="device_time" property="deviceTime" jdbcType="TIMESTAMP"/>
+		<result column="sys_org_id" property="sysOrgId" jdbcType="BIGINT"/>
+		<result column="sys_org_code" property="sysOrgCode" jdbcType="VARCHAR"/>
 	</resultMap>
 	
 	<!-- 	/**排序字段,常用 create_time*/
@@ -95,8 +97,12 @@
 			<if test="deviceMsg!=null and deviceMsg.length()!=0">
 				device_msg,
 			</if>
-			<if test="deviceTime!=null">
 				device_time,
+			<if test="sysOrgId!=null">
+				sys_org_id,
+			</if>
+			<if test="sysOrgCode!=null">
+				sys_org_code,
 			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -134,8 +140,12 @@
 			<if test="deviceMsg!=null and deviceMsg.length()!=0">
 				#{deviceMsg},
 			</if>
-			<if test="deviceTime!=null">
-				#{deviceTime},
+				now(),
+			<if test="sysOrgId!=null">
+				#{sysOrgId},
+			</if>
+			<if test="sysOrgCode!=null">
+				#{sysOrgCode},
 			</if>
 		</trim>
 	</insert>
@@ -198,6 +208,7 @@
 			<if test="description!=null and description.length()!=0">
 				description=#{description},
 			</if>
+				device_time=now(),
 			<if test="deviceMsg!=null and deviceMsg.length()!=0">
 				device_msg=#{deviceMsg},
 			</if>
@@ -207,13 +218,18 @@
 			<if test="isFinal!=null">
 				is_final=#{isFinal},
 			</if>
-			<if test="deviceTime!=null">
-				device_time=#{deviceTime}
-			</if>
+			
 			
 		</set>
 		where id=#{id}
 		
+	</update>
+	
+	<!-- 同步更新orgCode -->
+	<update id="updateByOrgCode" useGeneratedKeys="true" keyProperty="id">
+		UPDATE sys_device
+		SET sys_org_code=#{sysOrgCode}
+		WHERE sys_org_code=#{oldOrgCode}
 	</update>
 	
 	<update id="updateDeviceTimeById" useGeneratedKeys="true" keyProperty="true">

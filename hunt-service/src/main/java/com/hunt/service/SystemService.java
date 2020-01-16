@@ -64,6 +64,11 @@ public interface SystemService {
     boolean isForbiddenIp(String remoteAddr);
 
     void openIpIntercept();
+    
+    /**
+     * 给指定ip设置拦截
+     */
+    void insertIpIntercept();
 
     void closeIpIntercept();
 

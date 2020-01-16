@@ -2,6 +2,8 @@ package com.hunt.service;
 
 import java.util.List;
 
+import com.hunt.model.dto.PageDto;
+import com.hunt.model.dto.PageInfo;
 import com.hunt.model.dto.SysDeviceCallLogAndRecordDto;
 import com.hunt.model.entity.SysDeviceCallLog;
 import com.hunt.model.entity.SysDeviceTotal;
@@ -46,7 +48,12 @@ public interface DeviceCallLogService {
 	public List<SysDeviceCallLogAndRecordDto> select(Long orgId,Integer selectType, String sort,String order,Integer page,Integer rows);
 	
 	
-	
+	/**
+	 * 查询所有通话记录
+	 * @param pageDto
+	 * @return
+	 */
+	public PageInfo listCallRecord(PageDto pageDto);
 	
 	/**
 	 * 更新通话记录
@@ -80,6 +87,16 @@ public interface DeviceCallLogService {
 	public SysDeviceTotal selectDevTotalByRoleOrg(Long orgId,Integer optType,String sType,Long beginTime,Long endTime,String sContent);
 	
 	/**
+	 * 查询通话统计
+	 * @param pageDto
+	 * @return
+	 */
+	public SysDeviceTotal selectDevTotalByPageDto(PageDto pageDto);
+	
+	
+	
+	
+	/**
 	 * 查询通话记录总数量
 	 * @param orgId 机构id 或者 userId
 	 * @param optType 操作类型0 机构id查询，1 用户id查询
@@ -96,7 +113,15 @@ public interface DeviceCallLogService {
 	 * @param sContent		查询内容
 	 * @return
 	 */
+	@Deprecated
 	public Long selectSearTotalCount(Long orgId,Integer optType,String sType,Long beginTime,Long endTime,String sContent,Integer callIsHaveRecord);
+	
+	/**
+	 * 查询通话数量
+	 * @param pageDto
+	 * @return
+	 */
+	public Long selectTotalCountByPageDto(PageDto pageDto);
 	
 
 }
