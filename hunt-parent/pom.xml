@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hunt-parent</artifactId>
     <packaging>pom</packaging>
-
+	
     <properties>
         <java.version>1.8</java.version>
         <spring.version>4.3.3.RELEASE</spring.version>
@@ -44,6 +44,7 @@
         <java.target.version>1.7</java.target.version>
         <file.encoding>UTF-8</file.encoding>
         <httpclient.version>4.5.2</httpclient.version>
+        <pinyin4j.version>2.5.1</pinyin4j.version>
     </properties>
 
     <dependencyManagement>
@@ -293,6 +294,12 @@
                 <artifactId>pagehelper</artifactId>
                 <version>${tk.pagehelper.version}</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/com.belerweb/pinyin4j -->
+		<dependency>
+		    <groupId>com.belerweb</groupId>
+		    <artifactId>pinyin4j</artifactId>
+		    <version>${pinyin4j.version}</version>
+		</dependency>
         </dependencies>
     </dependencyManagement>
     <!--阿里maven仓库-->

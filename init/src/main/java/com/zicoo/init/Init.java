@@ -23,7 +23,7 @@ public class Init {
 		System.out.println("初始化数据库");
 		InitSuper initSuper = new InitSuper();
 		initSuper.initPermission();
-		TeleManager.getInstance();
+//		TeleManager.getInstance();
 	}
 	
 	/**

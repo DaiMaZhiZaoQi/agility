@@ -19,6 +19,9 @@ public class PageDto extends BaseEntity{
 	/**通用id*/
 	private Long id;
 	private Long userId;
+	
+	private Long curUserId;
+	
 	/**开始时间 毫秒数*/
 	private Long beginTime;
 	/**结束时间 毫秒数*/
@@ -29,6 +32,12 @@ public class PageDto extends BaseEntity{
 	private String orgName;
 	/**是否只查录音*/
 	private Integer callIsHaveRecord;
+	/**备用状态字段*/
+	private Integer others;
+	
+	/**查询状态  0,只查某个状态,1,<=某个状态值,2,>=某个状态值(如查询已授权，和未授权的则包括 所有状态值)*/
+	private Integer selectStatus;
+	
 	
 	public PageDto() {
 		super();
@@ -80,6 +89,16 @@ public class PageDto extends BaseEntity{
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
+	
+	
+	
+	
+	public Long getCurUserId() {
+		return curUserId;
+	}
+	public void setCurUserId(Long curUserId) {
+		this.curUserId = curUserId;
+	}
 	public Long getBeginTime() {
 		return beginTime;
 	}
@@ -110,6 +129,19 @@ public class PageDto extends BaseEntity{
 	public void setCallIsHaveRecord(Integer callIsHaveRecord) {  
 		this.callIsHaveRecord = callIsHaveRecord;
 	}
+	public Integer getOthers() {
+		return others;
+	}
+	public void setOthers(Integer others) {
+		this.others = others;
+	}
+	public Integer getSelectStatus() {
+		return selectStatus;
+	}
+	public void setSelectStatus(Integer selectStatus) {
+		this.selectStatus = selectStatus;
+	}
+	
 	
 	
 	

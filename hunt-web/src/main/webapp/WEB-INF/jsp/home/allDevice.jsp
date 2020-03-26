@@ -26,7 +26,7 @@
 	            }
             	.hrindicate{
             	    height: 1.2px;
-				    width: 90px;
+				    width: 80px;
 				    padding: 0px;
 				    border: 0px;
 				    border-spacing: 0px;
@@ -50,10 +50,13 @@
 					<td rowspan="2">
 						<img alt="所有设备" class="deviceHeadImg" src="${pageContext.request.contextPath}/static/css/home/image/home.png">
 					</td>	
-					<td id="td_allDevice_title" style="padding-left: 20px; font-size: 24px;">所有设备</td>
+					<td id="td_allDevice_title" style="padding-left: 20px; font-size: 22px;">所有设备</td>
 				</tr>
 				<tr>
-					<td style="padding-left: 20px; color: #8A8A8A;font-size: 16px;">所有设备全部状态</td>
+					<td style="padding-left: 20px; color: #8A8A8A;font-size: 16px;">
+						<span id="curUserCount">在线用户数&nbsp;:</span><br/>
+						<span id="curdevideCount">在线设备数&nbsp;:</span>
+					</td>
 				</tr>
 			</table>
 			<hr class="horLine"/>
@@ -248,27 +251,72 @@
 				
 						
 					<script type="text/javascript">
-					
-						var allDeviceCount="<%=allDeviceCount%>";
-						console.log("所有设备"+allDeviceCount);
-						if(allDeviceCount>0){
-							var deviceOnLine="<%=onLineDeviceCount%>";
-							$("#idHomeTable a[id=aOnLineDevice]").text("在线设备 "+deviceOnLine+"/"+allDeviceCount);
+						var deviceOnLine=<%=onLineDeviceCount%>;
+						var allDeviceCount=<%=allDeviceCount%>;
+						<%int searchType= (int)request.getAttribute("searchType");%>
+					<%switch(searchType){
+						case 0:%>
+							let firstLoad=$("#idHomeTable a[id=aOnLineDevice]").attr("name");
+							console.log("name"+firstLoad);
+							if("firstLoad"==firstLoad){
+								$("#idHomeTable a[id=aOnLineDevice]").text("在线设备 "+deviceOnLine+"/"+allDeviceCount);
+							}
 							
+						
 							<%if(userIdSet!=null){%>
-									var userCount="<%=userIdSet.size()%>";
+								var userCount="<%=userIdSet.size()%>";
+								if("firstLoad"==firstLoad){
 									$("#idHomeTable a[id=userCount]").text("用户数量 "+userCount);
-								<%}else{%>
+								}
+								$("#curUserCount").text("用户数: "+userCount);
+							<%}else{%>
 								$("#idHomeTable a[id=userCount]").text("用户数量 "+1);
 							<%}%>
-						}
-						//$("#inscribe").css({ 'position': 'absolute', 'bottom': '15px','padding-top':'0px','padding-bottom':'0px'});
+							$("#curdevideCount").text("设备数: "+allDeviceCount);
+							$("#idHomeTable a[id=aOnLineDevice]").attr("name","seCondLoad");
+							<%break;
+						case 1:%>
+							<%if(userIdSet!=null){%>
+								var userCount="<%=userIdSet.size()%>";
+								$("#curUserCount").text("在线用户数: "+userCount);
+								var userCount="<%=userIdSet.size()%>";
+								$("#curdevideCount").text("在线设备数: "+deviceOnLine);	
+							
+							<%}else{%>
+								$("#curUserCount").text("在线用户数: "+0);
+								var userCount="<%=userIdSet.size()%>";
+								$("#curdevideCount").text("在线设备数: "+0);	
+							<%}
+							break;
+						case 2:%>
+								
+								<%if(userIdSet!=null){%>
+									var userCount="<%=userIdSet.size()%>";
+									$("#curdevideCount").text("离线用户数: "+userCount);    
+								<%}else{%>
+									$("#curdevideCount").text("离线用户数: "+0);
+								<%}%>
+								var allDeviceCount="<%=allDeviceCount%>";
+								$("#curUserCount").text("离线设备数: "+allDeviceCount);
+							<%break;
+						case 3:%>
+								<%if(userIdSet!=null){%>
+									var userCount="<%=userIdSet.size()%>";
+									$("#curUserCount").text("查询用户数: "+userCount);
+								<%}%>
+								$("#curdevideCount").text("查询设备数: "+allDeviceCount);
+							<%break;
+					}%>
+						
+						
 					</script>
 				 </c:if>
 				 <c:if test="${empty listDevice}">
 				 	<script type="text/javascript">
-					 	$("#idHomeTable a[id=aOnLineDevice]").text("在线设备 "+0+"/"+0);
-						$("#idHomeTable a[id=userCount]").text("用户数量 "+0);
+					 	/* $("#idHomeTable a[id=aOnLineDevice]").text("在线设备 "+0+"/"+0);
+						$("#idHomeTable a[id=userCount]").text("用户数量 "+0); */
+						$("#curUserCount").text("用户数: "+0);
+						$("#curdevideCount").text("设备数: "+0);
 					</script>
 				 </c:if>
 				</c:when>

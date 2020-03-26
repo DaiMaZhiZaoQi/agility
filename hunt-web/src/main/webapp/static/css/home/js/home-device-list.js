@@ -57,7 +57,7 @@
 //		    			 $("#searchContainer hr[id='hr_alldevice']").css("visibility","visible");
 		    		});	//加载失败时的处理，性能可以优化，放easyui tabs标签的使用
 		    	}
-		    	var clickDeviceState=$("#menu td[id=iDeviceState]");
+		    	var clickDeviceState=$("#menu ul[id=iDeviceState]");
 		    	homeDevic.setCssDefault(clickDeviceState);
 		    	homeDevic.displayManage("div_device_state");
 		    	comSpace.data.currDisplay="";
@@ -148,6 +148,14 @@
 		    	$("#div_device_manage").load(href);
 		    },
 		    	
+		    /**
+		     * 加载任务组
+		     */
+		    loadMyTask:function(){
+		    	var href=getRootPath()+"/task/myTask";
+		    	$("#div_myTask").load(href);
+		    },
+		    
 		    
 		    /**
 		     * 加载设备管理
@@ -176,8 +184,40 @@
 		    
 		    getGloOptType:function(){
 		    	return globOptType;
-		    }
-			
+		    },
+		    
+		    /**
+		     * 修改密码
+		     */
+		    update_password: function (id) {
+		    	let firstPass=$("#modify_password_form input[id=nPassword]").val();
+            	let secondPass=$("#modify_password_form input[id=rNewPassword]").val();
+		        $.ajax({
+		            data: {
+		                id: id,
+		                newPassword: firstPass,
+		                repeatNewPassword: secondPass,
+		            },
+		            traditional: true,
+		            method: 'post',
+		            url: getRootPath() + '/user/updatePassword',
+		            async: false,
+		            dataType: 'json',
+		            success: function (result) {
+		                if (result.code == 10000) {
+		                	common_tool.messager_show(result.msg);
+		                    $("#dialogModifyPass").dialog('close');
+//		                    user_tool.init_main_view();
+//		                    $("#user_grid").datagrid("reload");
+		                    window.location.href=getRootPath();
+		                    return false;
+		                }
+		                else {
+		                    common_tool.messager_show(result.msg);
+		                }
+		            },
+		        });
+		    },
 	}
 	
 	
@@ -192,6 +232,7 @@
 			console.log("text-->"+text);
 			$("#tt").tree({
 				method:"GET",
+				id:"id",
 				url:getRootPath() + '/organization/list?id='+userId+'&queryType=0',    //  不同id显示内容不同，在登录时注意接收不同的id
 				loadFilter: function(data){
 				
@@ -270,7 +311,8 @@
 				}
 			});
 			
-			$("#menu td[id=iDeviceState]").click(function() {
+			$("#menu ul[id=iDeviceState]").click(function() {
+				$("#idHomeTable a[id=aOnLineDevice]").attr("name","firstLoad");
 				homeDevic.displayManage("div_device_state");
 				homeDevic.displayStateManage("div_device_state_child");
 //				var stateTree= $("#div_device_manage_state div[id=div_device_state_one]");
@@ -282,22 +324,25 @@
 //				if(stateTree.prop("nodeName")==undefined){
 					homeDevic.menuDeviceStateClick();
 //				}else{
-					var clickDeviceState=$("#menu td[id=iDeviceState]");
+					var clickDeviceState=$("#menu ul[id=iDeviceState]");
 			    	homeDevic.setCssDefault(clickDeviceState);
 //				}
-				 $("#td_allDevice_title").text(comSpace.data.titleName);
+			    	
+			    var ttChecked=$("#div_device_manage_state ul[id=tt]").tree("getSelected");
+			    console.log(ttChecked);
+				 $("#td_allDevice_title").text(ttChecked.name);
 			});
 			
 			/**
 			 * 查看所有通话记录
 			 */
-			$("#menu td[id=iCallRecord]").click(function() {  
+			$("#menu ul[id=iCallRecord]").click(function() {  
 				console.log("点击事件执行中");
 				$("#div_device_manage_state div[id=div_device_state_child]").children().remove();
 				homeDevic.displayManage("div_device_state");   
 				homeDevic.displayStateManage("div_call_record");   
 //				var record=$("#div_device_manage_state div[id=div_container_callRecord]");
-				var callRecord= $("#menu td[id=iCallRecord]");
+				var callRecord= $("#menu ul[id=iCallRecord]");
 		    	homeDevic.setCssDefault(callRecord);
 		    	var isHidden=$("#div_device_manage_state div[id=div_call_record]").is(":hidden");
 		    	
@@ -316,16 +361,18 @@
 			/**
 			 * 通讯录
 			 */
-			$("#menu td[id=tdContact]").click(function(){
+			$("#menu ul[id=tdContact]").click(function(){
 				$("#div_device_manage_state div[id=div_device_state_child]").hide();
 				$("#div_device_manage_state div[id=div_call_record]").hide();
 				$("#div_device_manage_state div[id=abcTemp]").hide();
 				homeDevic.displayManage("div_contact_manage");
 				var divContactCont=$("#div_contact_manage div[id=div_contactManage_container]");
 				
-				var tdContact= $("#menu td[id=tdContact]");
+				var tdContact= $("#menu ul[id=tdContact]");
 				homeDevic.setCssDefault(tdContact);
 				if(divContactCont.prop("nodeName")==undefined){
+					homeDevic.loadContactManage();
+				}else{
 					homeDevic.loadContactManage();
 				}
 //				$("#inscribe").css({ 'position': 'absolute', 'bottom': '15px', 'padding-top':'0px','padding-bottom':'0px'});
@@ -334,24 +381,102 @@
 			/**
 			 * 设备管理
 			 */
-			$("#menu td[id=tdDeviceManage]").click(function(){
+			$("#menu ul[id=tdDeviceManage]").click(function(){
 				$("#div_device_manage_state div[id=div_device_state_child]").hide();
 				$("#div_device_manage_state div[id=div_call_record]").hide();
 				$("#div_device_manage_state div[id=abcTemp]").hide();
 				homeDevic.displayManage("div_device_manage"); 
-				var tdDeviceManage= $("#menu td[id=tdDeviceManage]");
+				var tdDeviceManage= $("#menu ul[id=tdDeviceManage]");
 				homeDevic.setCssDefault(tdDeviceManage);
 				var divDevice=$("#div_device_manage div[id=div_devmanage_container]");
 				if(divDevice.prop("nodeName")==undefined){
 					homeDevic.loadDeviceManage();
 				}
 			});
+			
+			/**
+			 * 我的任务
+			 */
+			$("#menu li[id=tdMyTask]").click(function(){
+				$("#div_device_manage_state div[id=div_device_state_child]").hide();
+				$("#div_device_manage_state div[id=div_call_record]").hide();
+				$("#div_device_manage_state div[id=abcTemp]").hide();
+				homeDevic.displayManage("div_myTask"); 
+				var tdMyTask= $("#menu li[id=tdMyTask]");
+				homeDevic.setCssDefault(tdMyTask);
+				var divDevice=$("#div_myTask div[id=div_task_container]");
+				if(divDevice.prop("nodeName")==undefined){
+					homeDevic.loadMyTask();
+				}else{
+					homeDevic.loadMyTask();
+					console.log("我的任务");
+				}
+			});
+			
 			/**
 			 * 去管理中心
 			 */
 			$("#idHomeTable a[id=goCenter]").click(function(){
 //				window.location.href=getRootPath()+"/system/welcome";
 				window.open (getRootPath()+"/system/welcome");
+			});
+			
+			/**
+			 * 修改管理密码
+			 */
+			$("#idHomeTable a[id=modifyPass]").click(function(){
+				$("#dialogModifyPass").dialog({
+				    title: '修改登录密码',
+				    width: 500,
+				    height: 400,
+				    closed: false,
+				    cache: false,
+//				    href: 'get_content.php',
+				    modal: true,
+				    onClose:function(){
+				        $("#modify_password_form").form('reset');
+				        $("#modify_password_form").form('clear');
+				        
+				    },
+				    onOpen:function(){
+				    	console.log("修改密码对话框打开");
+//				    	$("#modify_password_form input[id=nPassword]").textbox("setValue"," ");
+//                    	$("#modify_password_form input[id=rNewPassword]").textbox("setValue"," ");
+				    },
+					buttons:[
+						   {
+	                            text: '确认修改',
+	                            width: 100,
+//	                            iconCls: 'icon-add',
+	                            handler: function () {
+	                            	var firstPass=$("#modify_password_form input[id=nPassword]").val();
+	                            	var secondPass=$("#modify_password_form input[id=rNewPassword]").val();
+	                            	 let form_isValid = $("#modify_password_form").form('validate');
+	                            	    
+	                                 if (!form_isValid) {
+	                                     common_tool.messager_show("请输入必填参数");
+	                                     return;
+	                                 }
+	                            	if(firstPass==secondPass&&!strIsEmpty(secondPass)){
+	                            		console.log("firstPass"+firstPass);
+	                            		homeDevic.update_password(common_tool.getCurrUserId());
+	                            		return;
+	                            	}else{
+	                            		common_tool.messager_show("密码不一致，请重新输入");
+	                            	}
+	                            }
+	                        },
+						   {
+	                            text: '取消',
+	                            width: 100,
+//	                            iconCls: 'icon-add',
+	                            handler: function () {
+	                                $("#dialogModifyPass").dialog('close');
+	                            }
+	                        }
+					]
+				
+				});
 			});
 			
 			$("#idHomeTable a[id=goBack]").click(function(){

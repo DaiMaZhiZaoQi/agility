@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ import com.hunt.dao.SysDeviceCallLogMapper;
 import com.hunt.dao.SysDeviceMapper;
 import com.hunt.dao.SysDeviceRecordMapper;
 import com.hunt.dao.SysDeviceTotalMapper;
+import com.hunt.dao.SysTaskMapper;
+import com.hunt.dao.SysUserMapper;
 import com.hunt.model.dto.PageDto;
 import com.hunt.model.dto.PageInfo;
 import com.hunt.model.dto.SysCallLogDeviceRecoDto;
@@ -27,6 +31,7 @@ import com.hunt.model.entity.SysDeviceCallLog;
 import com.hunt.model.entity.SysDeviceRecord;
 import com.hunt.model.entity.SysDeviceTotal;
 import com.hunt.model.entity.SysOrganization;
+import com.hunt.model.entity.SysUser;
 import com.hunt.service.DeviceCallLogService;
 import com.hunt.service.DeviceRecordService;
 import com.hunt.service.SysOrganizationService;
@@ -37,9 +42,17 @@ import com.hunt.util.StringUtil;
 @Service
 @Transactional
 public class DeviceCallLogServiceImp implements DeviceCallLogService {
-
+	
+	static Logger log= LoggerFactory.getLogger(DeviceCallLogServiceImp.class);
+	
 	@Autowired
 	private SysDeviceCallLogMapper mSysDeviceCallLogMapper;
+	
+	@Autowired
+	private SysUserMapper mSysUserMapper;
+	
+	@Autowired
+	private SysTaskMapper mSysTaskMapper;
 	
 	@Autowired
 	private SysDeviceRecordMapper mSysDeviceRecordMapper;
@@ -72,6 +85,10 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 		Long sysOrgId = sysDeviceCallLog.getOrgId();
 //		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByDevIdCreateTime(deviceId);    //  每天存一次，当天不存在则新建。
 		SysDeviceTotal sysDeviceTotal = mSysDeviceTotalMapper.selectByOrgIdCreateTime(sysOrgId,deviceId);    //  每天存一次，当天不存在则新建。
+		Long userId = sysDeviceCallLog.getUserId();
+		SysUser sysUser = mSysUserMapper.selectById(userId);
+		sysDeviceCallLog.setUserName(sysUser.getZhName());
+		String callNumber = sysDeviceCallLog.getCallNumber();
 		if(sysDeviceTotal==null) {		//设备统计不存在
 			sysDeviceTotal=new SysDeviceTotal();
 			sysDeviceTotal.setDeviceId(deviceId);
@@ -81,6 +98,11 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 				return Result.instance(responseCode.getCode(), "未知通话类型"); 
 			}
 			mSysDeviceCallLogMapper.insert(sysDeviceCallLog);
+			
+			Long updateByCallNum = mSysTaskMapper.updateByCallNum(callNumber,userId+"");
+			if(updateByCallNum>0) {
+				log.info("更新成功");
+			}
 			Long insert = mSysDeviceTotalMapper.insert(sysDeviceTotal);
 			if(insert<0) {
 				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); //手动开启事务回滚
@@ -94,6 +116,10 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 				return Result.instance(responseCode.getCode(), "未知通话类型");
 			}
 			mSysDeviceCallLogMapper.insert(sysDeviceCallLog);
+			Long updateByCallNum = mSysTaskMapper.updateByCallNum(callNumber,userId+"");
+			if(updateByCallNum>0) {
+				log.info("更新成功");
+			}
 			Long update = mSysDeviceTotalMapper.update(sysDeviceTotal);
 			if(update<0) {
 				TransactionAspectSupport.currentTransactionStatus().setRollbackOnly(); //手动开启事务回滚
@@ -113,7 +139,7 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 		List<Long> listOrgId=new ArrayList<>();
 		mSysOrganization.selectSysOrgIdList(id, listOrgId, false);
 		 List<SysCallLogDeviceRecoDto> listCallLog = mSysDeviceTotalMapper.selectSearCallLogByUserSetN(listOrgId,pageDto);
-		
+		//	TODO  查询通话记录和录音
 		return new PageInfo(listCallLog.size(), listCallLog); 
 	}
 
@@ -239,8 +265,23 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 		return list;
 	}
 	
-	
-	
+
+	@Override
+	public PageInfo selectByNum(PageDto pageDto) {
+		
+		List<SysCallLogDeviceRecoDto> listCallLogReco = mSysDeviceCallLogMapper.selectByPageDto(pageDto);
+		Integer dataCount=0;
+		if(pageDto.getPage()==1) {		//  查询通话记录总数
+			dataCount=mSysDeviceCallLogMapper.selectByPageDtoCount(pageDto);
+		}else {
+			dataCount=listCallLogReco.size();
+		}
+		return new PageInfo(dataCount, listCallLogReco);
+	}
+
+
+
+
 
 	/**
 	 * 查询设备及通话记录，
@@ -315,7 +356,7 @@ public class DeviceCallLogServiceImp implements DeviceCallLogService {
 			
 			// 	一条通话记录最多仅有一条语音消息
 			SysDeviceRecord sysDeviceRecord = new SysDeviceRecord();
-			sysDeviceRecord.setCallLogId(sysDeviceCallLogId);
+			sysDeviceRecord.setCallLogId(sysDeviceCallLog.getId());
 			sysDeviceRecord.setStatus(2);
 			mSysDeviceRecordMapper.update(sysDeviceRecord);
 			Long result = mDeviceRecordService.updateDeviceTotalCallLogByDeviceId(sysDeviceCallLog.getDeviceId(), sysDeviceCallLog);

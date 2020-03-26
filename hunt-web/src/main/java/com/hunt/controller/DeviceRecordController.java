@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
@@ -60,7 +61,7 @@ import io.swagger.annotations.Api;
 @RequestMapping("deviceRecord")
 public class DeviceRecordController extends BaseController{
 
-	
+	Logger log=LoggerFactory.getLogger(SystemDeviceController.class);
 	
 	@Autowired
 	private DeviceRecordService mDeviceRecordService;
@@ -86,11 +87,28 @@ public class DeviceRecordController extends BaseController{
 	@RequestMapping(value="insert",method=RequestMethod.POST)
 	public Result insert(
 			@RequestParam(value="sysDeviceCallLog",required=false,defaultValue="")String sysDeviceCallLogJson,
-			@RequestParam(value="record",required=false) String recordStr, 
+			/*@RequestParam(value="record",required=false) String recordStr,*/ 
 			@RequestParam(value="file",required=false)MultipartFile[] uploadFile,   
 			@RequestParam(value="deviceSerial",required=false,defaultValue="")String deviceSerial,  
+			@RequestParam(value="args",required=false,defaultValue="")String args,
+			@RequestParam(value="sign",required=false,defaultValue="") String sign,
 			HttpServletRequest request) throws IllegalStateException, IOException {
-		System.out.println("------>"+Arrays.toString(uploadFile)+"sysDeviceRecord"+recordStr+"-->"+sysDeviceCallLogJson+"-sysDeviceRecord-->"+deviceSerial);  
+		System.out.println("------>"+Arrays.toString(uploadFile)+"-->"+sysDeviceCallLogJson+"-sysDeviceRecord-->"+deviceSerial);  
+		
+		try {
+			Map<String, String> decodParam = decodParam(args,sign);
+			if(decodParam.size()>0) {
+				sysDeviceCallLogJson=decodParam.get("sysDeviceCallLogJson");
+				sysDeviceCallLogJson=sysDeviceCallLogJson==null?"":sysDeviceCallLogJson;
+				deviceSerial=decodParam.get("deviceSerial");
+				deviceSerial=deviceSerial==null?"":deviceSerial;
+				log.info("deviceSerial--->"+deviceSerial);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Result.instance(ResponseCode.decode_err.getCode(), ResponseCode.decode_err.getMsg());
+		}
+		
 		if(StringUtils.isEmpty(deviceSerial)) {
 			return Result.instance(ResponseCode.missing_parameter.getCode(), "缺少机器序列号");
 		}
@@ -106,7 +124,7 @@ public class DeviceRecordController extends BaseController{
 				if(!mobileHasPermission(sysUserId, PermissionCode.CALLLOG_INSERT.pName)) {
 					return Result.instance(PermissionCode.CALLLOG_INSERT.pCode, PermissionCode.CALLLOG_INSERT.pMsg);
 				}
-				return	insertCallLogAndRecord(sysDeviceCallLogJson, recordStr, uploadFile, deviceSerial, request, sysDevice,sysDeviceRoleOrg);
+				return	insertCallLogAndRecord(sysDeviceCallLogJson, uploadFile, deviceSerial, request, sysDevice,sysDeviceRoleOrg);
 			}else {
 				return new Result(ResponseCode.data_not_exist.getCode(),ResponseCode.data_not_exist.getMsg());
 			}
@@ -115,7 +133,7 @@ public class DeviceRecordController extends BaseController{
 	}
 	
 	@Transactional
-	private Result insertCallLogAndRecord(String sysDeviceCallLogJson, String recordStr, MultipartFile[] uploadFile,
+	private Result insertCallLogAndRecord(String sysDeviceCallLogJson, MultipartFile[] uploadFile,
 			String deviceSerial, HttpServletRequest request, SysDevice sysDevice,SysDeviceRoleOrg sysDeviceRoleOrg) throws IOException {
 		Long id = sysDevice.getId();   
 		Long callLogId=null;
@@ -215,7 +233,8 @@ public class DeviceRecordController extends BaseController{
 						
 						File file=new File(realPathParent);
 						if(!file.exists()){
-							file.mkdirs();
+							boolean mkdirs = file.mkdirs();
+							if(!mkdirs)return Result.error(ResponseCode.file_config_fail.getMsg());
 						}
 						String currTime = DateUtil.getTodayTime(minTime); 		//  时间毫秒数当成文件名，保持文件唯一，重复上传不会被覆盖
 						String sdFileName=currTime+"."+fileType;

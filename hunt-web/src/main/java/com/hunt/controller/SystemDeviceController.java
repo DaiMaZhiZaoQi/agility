@@ -4,6 +4,7 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -92,10 +93,33 @@ public class SystemDeviceController extends BaseController{
 	public Result insert(@RequestParam(required=true,defaultValue="") String deviceName,
 						@RequestParam(required=true,defaultValue="")  String deviceSerial,
 						@RequestParam(required=false,defaultValue="我的话机")  String description,
-						@RequestParam(required=false) String userName,
-						@RequestParam(required=false) String password,
+						@RequestParam(required=false,defaultValue="") String userName,
+						@RequestParam(required=false,defaultValue="") String password,
+						@RequestParam(value="args",required=false,defaultValue="")String args,
+						@RequestParam(value="sign",required=false,defaultValue="") String sign,
 						HttpServletRequest request
 						) {
+		try {
+			Map<String, String> decodParam = decodParam(args,sign);
+			if(decodParam.size()>0) {
+				deviceName=decodParam.get("deviceName");
+				deviceName=deviceName==null?"":deviceName;
+				deviceSerial=decodParam.get("deviceSerial");
+				deviceSerial=deviceSerial==null?"":deviceSerial;
+				description=decodParam.get("description");
+				description=description==null?"我的话机":description;
+				userName=decodParam.get("userName");
+				userName=userName==null?"":userName;
+				password=decodParam.get("password");
+				password=password==null?"":password;
+				
+				log.info("deviceSerial--->"+deviceSerial);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Result.instance(ResponseCode.decode_err.getCode(), ResponseCode.decode_err.getMsg());
+		}
+	
 		String ip = request.getRemoteAddr();
 		SysDevice sysDevice= mSysDeviceMapper.selectByDeviceSerial(deviceSerial);
 		if(sysDevice!=null) {						//  存在该设备
@@ -180,18 +204,10 @@ public class SystemDeviceController extends BaseController{
 			
 			}
 		}
-		 return Result.instance(ResponseCode.success.getCode(), "连接成功");
+		 return Result.instance(ResponseCode.success.getCode(), "连接成功");  //  TODO 返回接口版本
 	}
 	
-	private Boolean checkPassWord(SysUser sysUser,String password) {
-		String passwordSalt = sysUser.getPasswordSalt();
-		String userDbPassWord = sysUser.getPassword();
-		String createPassword = StringUtil.createPassword(password, passwordSalt, 2);
-		if(!createPassword.equals(userDbPassWord)) { // 密码不正确
-			return false;
-		}	
-		return true;
-	}
+
 	
 	
 	/**

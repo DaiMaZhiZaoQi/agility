@@ -18,6 +18,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.ibatis.annotations.Param;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.junit.validator.PublicClassValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -71,12 +74,13 @@ import com.hunt.util.UtReadCsv;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import net.sf.jsqlparser.statement.select.Skip;
 
 @Controller
 @Api("通讯录管理")
 @RequestMapping("contact")
 public class DeviceContactControler extends BaseController{
-
+	 Logger log = LoggerFactory.getLogger(BaseController.class);
 	@Autowired
 	private SysUserMapper mSysUserMapper;
 	
@@ -148,12 +152,12 @@ public class DeviceContactControler extends BaseController{
 					fileName= mf[0].getOriginalFilename();
 					String fileType=fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase().trim();
 					if(!fileType.equals("csv"))return new Result(ResponseCode.missing_parameter.getCode(),"不支持的格式,请上传csv文件");
-					absoFile = createFile(fileTop, request, fileType);
+					absoFile = createFile(fileTop, request, fileType,mPropertiesUtil.getCsvFilePath());
 				}
 			
 				//  获取文件保存的真实路径
 				try { 
-					
+					if(absoFile==null)return Result.error(ResponseCode.file_config_fail.getMsg());
 					mf[0].transferTo(absoFile);
 					String enCodeType= UtReadCsv.getFileEncode2(absoFile.getAbsolutePath());
 					BufferedReader read =null;
@@ -281,8 +285,9 @@ public class DeviceContactControler extends BaseController{
 			String fileName= files[0].getOriginalFilename();
 			String fileType=fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase().trim();
 			if(!fileType.equals("csv"))return new Result(ResponseCode.missing_parameter.getCode(),"不支持的格式,请上传csv文件");
-			File absoFile = createFile(fileTop, request, fileType);
+			File absoFile = createFile(fileTop, request, fileType,mPropertiesUtil.getCsvFilePath());
 			try {
+				if(absoFile==null)return Result.error(ResponseCode.file_config_fail.getMsg());
 				files[0].transferTo(absoFile);
 				String contactName=absoFile.getName();
 				String filePath=absoFile.getAbsolutePath();
@@ -358,8 +363,23 @@ public class DeviceContactControler extends BaseController{
 						 @RequestParam(value="userId",required=false,defaultValue="0") Long userId,
 						 @RequestParam(value="password",required=false,defaultValue="") String password,
 						 @RequestParam(value="passwordOk",required=false,defaultValue="0") String passwordOk,
+							@RequestParam(value="args",required=false,defaultValue="")String args,
+							@RequestParam(value="sign",required=false,defaultValue="") String sign,
 						HttpServletRequest request,
 						HttpServletResponse resp) {
+		try {
+			Map<String, String> decodParam = decodParam(args,sign);
+			if(decodParam.size()>0) {
+				deviceSerial=decodParam.get("deviceSerial");
+				deviceSerial=deviceSerial==null?"":deviceSerial;
+				password=decodParam.get("password");
+				password=password==null?"":password;
+				log.info("deviceSerial--->"+password);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Result.instance(ResponseCode.decode_err.getCode(), ResponseCode.decode_err.getMsg());
+		}
 		//  判断文件下载权限
 		if(!"0".equals(deviceSerial)&&"0".equals(userId+"")) {		//   移动端
 			//  移动端下载
@@ -481,8 +501,22 @@ public class DeviceContactControler extends BaseController{
 	public PageInfo list(@RequestParam(value="userId",defaultValue="0") Long userId,
 						@RequestParam(value="deviceSerial",defaultValue="") String deviceSerial,
 						@RequestParam(value="pageDto",defaultValue="",required=false) String pageDtoJson,
+						@RequestParam(value="args",required=false,defaultValue="")String args,
+						@RequestParam(value="sign",required=false,defaultValue="") String sign,
 						HttpServletRequest request
 						) {
+		try {
+			Map<String, String> decodParam = decodParam(args,sign);
+			if(decodParam.size()>0) {
+				deviceSerial=decodParam.get("deviceSerial");
+				deviceSerial=deviceSerial==null?"":deviceSerial;
+				log.info("deviceSerial--->"+deviceSerial);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new PageInfo(ResponseCode.decode_err.getCode(), ResponseCode.decode_err.getMsg());
+		}
+		
 		int visiteTyep=1;
 		if(!StringUtils.isEmpty(deviceSerial)) {
 			SysDeviceRoleOrg sysDeviceRoleOrg = mDeviceManageService.selectBySerial(deviceSerial);
@@ -543,37 +577,6 @@ public class DeviceContactControler extends BaseController{
 		return new PageInfo(list.size(), list);
 	}
 	
-	/**
-	 * 创建一个 类似 webApp\loginName_userId\YYYYMM\dd\HHmmssSS.fileType 的文件夹
-	 * @param obj
-	 * @param request
-	 * @param mpt
-	 * @return
-	 */
-	private File createFile(String obj, HttpServletRequest request, String fileType) {
-		//  创建文件目录及路劲(创建文件目录及路径)
-		String path=request.getServletContext().getRealPath("/");	//  http 项目目录的根路径
-		Long currTime=System.currentTimeMillis();
-		String createFilePath = DateUtil.createFilePath(currTime);
-		String realPath=obj+createFilePath;
-		// 文件夹的结构 登录名称_userId/    
-		String realPathParent=null;
-		if(!StringUtils.isEmpty(mPropertiesUtil.getCsvFilePath())) {
-			realPathParent=mPropertiesUtil.getCsvFilePath()+File.separator+realPath;
-		} else {
-			realPathParent=new File(path).getParent()+File.separator+realPath;
-		}
-		
-		File file = new File(realPathParent);
-		if(!file.exists()) {
-			file.mkdirs();
-		}
-		String timeFileName = DateUtil.getUniqueTime(currTime);
-		String sdFileName=timeFileName+"."+fileType;
-		File absoFile = new File(realPathParent,sdFileName);
-		System.out.println("文件路径为-->"+absoFile.getAbsolutePath());
-		return absoFile;
-	}
 	
 
 //	@ResponseBody

@@ -141,7 +141,6 @@ device={
 		        	   {
 		                    text: '关闭',
 		                    width: 100,
-		                    iconCls: 'icon-add',
 		                    handler: function () {
 		                    	console.log("handler-->");
 		                        $("#recordDialog").dialog("close");

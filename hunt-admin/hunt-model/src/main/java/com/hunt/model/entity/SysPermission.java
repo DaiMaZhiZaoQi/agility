@@ -24,7 +24,7 @@ public class SysPermission implements Serializable {
     // sys_permission_group_id :分组id
     private Long sysPermissionGroupId;
 
-    // is_final :是否可删除
+    // is_final :是否可删除   1:可删除,2:不可删除
     private Integer isFinal;
 
     // rank :排序

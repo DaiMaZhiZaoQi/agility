@@ -72,7 +72,7 @@ public class SysUserDto {
     // is_final :是否能修改
     private Integer isFinal;
     
-    private SysUserInOrg mSysUserInOrg;
+    private SysUserInOrg mSysUserInOrg; 
     // 用户角色
     private List<SysUserRole> listUserRole=new ArrayList<>();
     // 用户机构

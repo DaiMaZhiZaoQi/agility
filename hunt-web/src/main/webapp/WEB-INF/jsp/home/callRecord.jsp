@@ -16,7 +16,7 @@
 	.inputDate{
 		    width: 220px;
 		    height: 30px;
-		    font-size: 18px;
+		    font-size: 17px;
 		    padding-left: 5px;
 		    margin-left: 5px;
 	}
@@ -140,7 +140,7 @@
 						<img alt="所有通话记录"  class="deviceHeadImg"  src="${pageContext.request.contextPath}/static/css/home/image/record-gray.png">
 						
 					</td>	
-					<td id="td_allDevice_title" style="padding-left: 20px; font-size: 24px;">
+					<td id="td_allDevice_title" style="padding-left: 20px; font-size: 22px;">
 						<span id="span_title">通话记录</span>
 					</td>
 				</tr>

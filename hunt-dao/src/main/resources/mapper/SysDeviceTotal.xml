@@ -807,13 +807,13 @@
 		</choose>
 	</select>
 	
-	<!-- 查询通话记录列表  -->
+	<!-- 查询通话记录列表  AND sys_device_record.`status`=1  -->
 	<select id="selectSearCallLogByUserSetN" resultMap="SysCallLogDeviceRecoDto2">
 		SELECT
 		sys_device_calllog.*,
 		sys_device_record.`reco_audio_length`
 		FROM sys_device_calllog
-		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` AND sys_device_record.`status`=1
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` 
 		WHERE sys_device_calllog.`org_id` IN
 		<foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
 	  		#{orgId}
@@ -851,13 +851,13 @@
 		<include refid="searTotalTimeN"></include>
 	</select>
 	
-	<!-- 统计分析通话记录列表  -->
+	<!-- 统计分析通话记录列表  AND sys_device_record.`status`=1 -->
 	<select id="selectTotalByUserSetN" resultMap="SysCallLogDeviceRecoDto2">
 		SELECT
 		sys_device_calllog.*,
 		sys_device_record.`reco_audio_length`
 		FROM sys_device_calllog
-		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` AND sys_device_record.`status`=1
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id`
 		WHERE sys_device_calllog.`org_id` IN
 		<foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
 	  		#{orgId}
@@ -878,13 +878,13 @@
 		</choose>
 	</select>
 	
-		<!-- 统计分析通话记录列表  -->
+		<!-- 统计分析通话记录列表 AND sys_device_record.`status`=1 -->
 	<select id="selectTotalByUserSetNN" resultMap="SysCallLogDeviceRecoDto2">
 		SELECT
 		sys_device_calllog.*,
 		sys_device_record.`reco_audio_length`
 		FROM sys_device_calllog
-		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` AND sys_device_record.`status`=1
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` 
 		WHERE sys_device_calllog.`org_id` IN
 		<foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
 	  		#{orgId}
@@ -917,13 +917,13 @@
 	</select>
 	
 	
-	<!-- 通话数量  -->
+	<!-- 通话数量 AND sys_device_record.`status`=1 -->
 	<select id="selectSearCallCountN" resultType="java.lang.Long">
 		select count(*) from (
 		SELECT
 		sys_device_calllog.id
 		FROM sys_device_calllog
-		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` AND sys_device_record.`status`=1
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id` 
 		WHERE sys_device_calllog.`org_id` IN
 		<foreach collection="orgIds" item="orgId" index="index" open="(" close=")" separator=",">
 	  		#{orgId}

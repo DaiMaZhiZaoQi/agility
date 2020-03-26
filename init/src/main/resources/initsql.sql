@@ -156,9 +156,14 @@ CREATE TABLE IF NOT EXISTS `sys_device_calllog` (
   `org_name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `org_code` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `user_id` bigint(20) DEFAULT NULL,
+  `user_name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '话机使用人员',
   `dev_serial` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `orgId` (`org_id`),
+  KEY `call_number` (`call_number`),
+  KEY `org_name` (`org_name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='记录电话机的每一条通话记录通话记录';
+
 
 /*Table structure for table `sys_device_record` */
 
@@ -528,6 +533,56 @@ CREATE TABLE IF NOT EXISTS `sys_user_role_organization` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+/*Table structure for table `sys_task_group` */
+CREATE TABLE IF NOT EXISTS `sys_task_group` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务组id',
+  `task_group_name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '任务组名称',
+  `task_code` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '任务文件码（文件名和文件码组成唯一标识）',
+  `task_pub_user_id` bigint(20) DEFAULT NULL COMMENT '任务发布人id',
+  `task_pub_user_name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '任务发布人名称',
+  `task_column` varchar(1000) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '任务栏',
+  `task_size` int(11) DEFAULT '0' COMMENT '任务发布总数',
+  `task_finish` int(11) DEFAULT '0' COMMENT '已完成数量',
+  `status` tinyint(4) DEFAULT '0' COMMENT '任务组状态（0，未进行，1，进行中，2，任务组已关闭）',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '任务发布时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '任务更新时间',
+  `task_rate` decimal(5,2) DEFAULT '0.00' COMMENT '任务进度比率',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='任务组';
+
+/*Table structure for table `sys_task_user` */
+CREATE TABLE IF NOT EXISTS `sys_task_user` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户任务表id',
+  `sys_user_id` bigint(20) DEFAULT NULL COMMENT '用户id',
+  `sys_user_name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '用户名称',
+  `sys_task_group` bigint(20) DEFAULT NULL COMMENT '用户所属任务组',
+  `status` tinyint(4) DEFAULT '0' COMMENT '我的任务状态(0，未授权，1，已授权，2，任务已结束)',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户任务，用户存在该表中，则用户能查看任务';
+
+/*Table structure for table `sys_task` */
+CREATE TABLE IF NOT EXISTS `sys_task` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '任务id',
+  `task_name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '任务名称',
+  `task_number` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '任务号码',
+  `task_msg` text COLLATE utf8mb4_unicode_ci COMMENT '任务信息',
+  `task_group_id` bigint(20) DEFAULT NULL COMMENT '任务所属任务组id',
+  `task_user_id` bigint(20) DEFAULT NULL COMMENT '任务所属的用户id',
+  `task_user_name` varchar(256) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '任务所属用户名称',
+  `task_count` bigint(20) DEFAULT '0' COMMENT '任务执行次数，执行一次即任务已开始',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '任务发布时间',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '任务更新时间',
+  `task_time_chain` text COLLATE utf8mb4_unicode_ci COMMENT '任务更新时间链',
+  `status` tinyint(4) DEFAULT '-1' COMMENT '任务状态(-1，任务未分配，0，未开始，1，正在进行，2，已完成，3，任务已重新分配,4,任务已删除)',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `num_group` (`task_number`,`task_group_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='任务详情';
+
+
+
+
 
 insert  into `sys_permission_group`(`id`,`name`,`description`,`parent_id`,`is_final`,`create_by`) 
 values 
@@ -591,7 +646,7 @@ INSERT INTO sys_user_organization(id,sys_user_id,sys_org_id,sys_org_code,is_fina
 /*添加角色*/
 INSERT INTO sys_role(description,NAME,is_final)
 VALUES
-('系统管理员','系统管理员','2'),('业务管理员','业务管理员','2'),('业务员','业务员','2'),('查询用户','查询用户','2');
+('系统管理员','系统管理员','2'),('业务管理员','业务管理员','1'),('业务员','业务员','1'),('查询用户','查询用户','1');
 
 
 /*添加角色权限*/

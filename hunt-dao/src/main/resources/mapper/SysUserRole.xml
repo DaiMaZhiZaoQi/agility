@@ -85,8 +85,9 @@
 		SELECT DISTINCT sys_role_permission.`sys_permission_id` FROM sys_user_role 
 		LEFT JOIN sys_role_permission 
 		ON sys_role_permission.`sys_role_id`=sys_user_role.`sys_role_id` 
-		AND sys_role_permission.`status`=1 
+		 
 		WHERE sys_user_role.`sys_user_id`=#{sysUserId}
+		AND sys_role_permission.`status`=1
 		AND sys_user_role.`status`=1
 	</select>
 

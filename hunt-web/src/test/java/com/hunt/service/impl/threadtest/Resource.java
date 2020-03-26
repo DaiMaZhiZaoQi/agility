@@ -15,13 +15,15 @@ public class Resource {
 	
 	public synchronized int getResult() {
 		age++;
+		System.out.println("run-->"+Thread.currentThread().getName()+"--->"+age);
 		return age;
 	}
-	public String getName() {
+	public  String getName() {
 		return name;
 	}
-	public void setName(String name) {
+	public synchronized void setName(String name) {
 		this.name = name;
+		System.out.println("setName-->"+Thread.currentThread().getName()+"--->"+age);
 	}
 	
 	
@@ -52,14 +54,14 @@ public class Resource {
 		@Override
 		public void run() {
 			while(true) {
-				int result = res.getResult();
-				System.out.println("run-->"+Thread.currentThread().getName()+"--->"+result);
+				 res.getResult();
 				try {
-					sleep(2000);
+					sleep(500);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				res.setName(this.getName());				
 			}
 		}
 		

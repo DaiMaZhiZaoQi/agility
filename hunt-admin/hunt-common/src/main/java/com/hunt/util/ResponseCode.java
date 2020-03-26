@@ -15,7 +15,7 @@ public enum ResponseCode {
     unauthorized(20005, "无操作权限"),
     can_not_edit(20006, "该条记录无法编辑"), 
     unauthenticated(20007, "未登录"),
-    forbidden_ip(20008, "非法请求"),
+    forbidden_ip(20008, "非法请求"), 
     not_found_url(20009, "url不存在"),
     param_format_error(30001, "参数格式错误"),
     missing_parameter(30002, "缺少参数"),
@@ -30,7 +30,7 @@ public enum ResponseCode {
 	missing_file_version(30009,"文件缺少版本号,请重新选择文件"),
 	file_sych_err(30010,"通讯录同步密码错误,请输入至少4位字符,字母,数字,下划线"),
 	file_exist_err(30011,"该文件版本已存在同步密码不匹配，请检查"),
-	file_exist_code(30012,"该文件版本应大于之前的版本，请检查"),
+	file_exist_code(30012,"该文件版本应大于之前的版本或者版本号不符合yyyyMMdd，请检查"),
 	no_permission(30013,"无修改权限"),
 	file_not_exist(30014,"文件不存在，请重新上传"),
 	    
@@ -39,8 +39,17 @@ public enum ResponseCode {
 	device_not_exist(30017,"设备不存在"),
 	device_not_bind(30018,"设备没绑定用户"),
 	
-	csv_password_incorrect(30019,"密码错误");
+	csv_password_incorrect(30019,"密码错误"),
 	
+	decode_err(30020,"参数解密错误"),
+	
+	task_exist(30021,"任务已存在或没有更新权限"),
+	task_num_exist(30022,"通话号码重复,列名不符合规则,请检查文件"),
+	task_num_exist2(30023,"通话号码重复,请检查文件"),
+	
+	task_num_0(30024,"没有未完成的任务"),
+	
+	file_config_fail(30025,"文件路径配置错误，请检查");
 	
     private int code;
     private String msg;

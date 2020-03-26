@@ -98,7 +98,10 @@ public class AmrToMP3Utils {
             //filePath ----> amr文件在临时文件夹中的地址
             //mp3FilePath  ----> 转换后的mp3文件地址
             if(StringUtils.hasLength(ffmpegPath)) {
-            	Process p = runtime.exec(ffmpegPath + "ffmpeg -i" + " " +filePath + " " + mp3FilePath);//执行ffmpeg.exe,前面是ffmpeg.exe的地址，中间是需要转换的文件地址，后面是转换后的文件地址。-i是转换方式，意思是可编码解码，mp3编码方式采用的是libmp3lame
+            	Process p = runtime.exec(ffmpegPath + "ffmpeg.exe -i" + " " +filePath + " " + mp3FilePath);//执行ffmpeg.exe,前面是ffmpeg.exe的地址，中间是需要转换的文件地址，后面是转换后的文件地址。-i是转换方式，意思是可编码解码，mp3编码方式采用的是libmp3lame
+//            	Process p = runtime.exec("ffmpeg -i" + " " +filePath + " " + mp3FilePath);//执行ffmpeg.exe,前面是ffmpeg.exe的地址，中间是需要转换的文件地址，后面是转换后的文件地址。-i是转换方式，意思是可编码解码，mp3编码方式采用的是libmp3lame
+//            	String cmd="cmd /G dir G:\\DevelopSoft\\ffmpeg-4.2.2-win64-static\\ffmpeg-4.2.2-win64-static\\bin"
+//            	Process p = runtime.exec("G:\\DevelopSoft\\ffmpeg-4.2.2-win64-static\\ffmpeg-4.2.2-win64-static\\bin\\ffmpeg.exe -i" + " " +filePath + " " + mp3FilePath);//执行ffmpeg.exe,前面是ffmpeg.exe的地址，中间是需要转换的文件地址，后面是转换后的文件地址。-i是转换方式，意思是可编码解码，mp3编码方式采用的是libmp3lame
             	log.info("filePath--->"+mp3FilePath);
             	//释放进程
             	p.getOutputStream().close();

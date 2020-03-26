@@ -15,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.alibaba.druid.support.logging.Log;
 import com.hunt.dao.SysDeviceMapper;
 import com.hunt.service.SystemService;
+import com.hunt.util.AesEncryptUtils;
 import com.hunt.util.ResponseCode;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +36,7 @@ public class ForbiddenIpAOP {
     @Autowired
     private SysDeviceMapper mSysDeviceMapper;
     @Before("@within(org.springframework.web.bind.annotation.RequestMapping)")
-    public void forbiddenIp() throws ForbiddenIpException {
+    public void forbiddenIp() throws Exception {
     	HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String remoteAddr = request.getRemoteAddr();
         String ua = request.getParameter("ua");

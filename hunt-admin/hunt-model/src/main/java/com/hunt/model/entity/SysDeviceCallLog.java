@@ -64,6 +64,8 @@ public class SysDeviceCallLog extends BaseEntity{
 	private String orgName;
 	private String orgCode;
 	private Long userId;
+	/**话机使用方*/
+	private String userName;
 	private String devSerial;
 	
 	
@@ -289,6 +291,17 @@ public class SysDeviceCallLog extends BaseEntity{
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	
+	
+	
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public String getDevSerial() {

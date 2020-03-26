@@ -1,15 +1,13 @@
 package com.hunt.controller;
 
-import static org.junit.Assert.fail;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +19,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.hunt.dao.SysDeviceMapper;
+import com.hunt.dao.SysUserInOrgMapper;
+import com.hunt.dao.SysUserMapper;
 import com.hunt.model.dto.PageInfo;
 import com.hunt.model.dto.SysDeviceAndCallDto;
 import com.hunt.model.entity.SysDevice;
-import com.hunt.model.entity.SysOrganization;
 import com.hunt.model.entity.SysUser;
+import com.hunt.model.entity.SysUserInOrg;
 import com.hunt.service.SysOrganizationService;
-import com.hunt.service.SysUserService;
 import com.hunt.service.impl.SysOrganizationServiceImpl;
 import com.hunt.service.impl.SysUserServiceImpl;
 import com.hunt.util.PermissionCode;
-import com.hunt.util.PermissionUtil;
 import com.hunt.util.ResponseCode;
 import com.hunt.util.Result;
-import com.hunt.util.StringUtil;
-import com.mysql.fabric.xmlrpc.base.Array;
-//import com.sun.tools.javac.comp.Todo;
 
 import io.swagger.annotations.Api;
 /**
@@ -55,19 +50,10 @@ import net.sf.jsqlparser.statement.select.Select;
 @Controller
 @RequestMapping("device")
 public class DeviceController extends BaseController{
-
-	private static Logger log = LoggerFactory.getLogger(RoleController.class);
-	/**
-	 * Spring 的 IOC用法
-	 */
-//	@Autowired
-//	private SysDeviceService sysDeviceService;
+	Logger log=LoggerFactory.getLogger(SystemDeviceController.class);
 	
 	  @Autowired
 	  private SysOrganizationServiceImpl mSysOrganizationServiceImpl;
-	
-	  @Autowired
-	  private SysOrganizationService sysOrganizationService;
 	  
 	  @Autowired 
 	  private SysUserServiceImpl mSysUserServiceImpl;
@@ -75,10 +61,11 @@ public class DeviceController extends BaseController{
 	  @Autowired
 	  private SysDeviceMapper mSysDeviceMapper;
 	  
+	  @Autowired
+	  private SysUserMapper mSysUserMapper;
 	  
-	  
-	  
-	  
+	  @Autowired
+	  private SysUserInOrgMapper mSysUserInOrgMapper;
 	  
 	/**
 	 * 待删除？？查询设备列表，只能查询该部门下的设备，身兼多职，需要考虑，根据权限对设备进行操作，员工只能查看上传自己的文件
@@ -109,6 +96,29 @@ public class DeviceController extends BaseController{
 		return pageInfo;
 	} 
 	
+	@ApiOperation(value="查看该组织所有设备",httpMethod="GET",produces="application/json")
+	@RequestMapping(value="device")
+	@ResponseBody
+	public PageInfo getAllDevice2(
+								@RequestParam(value="userName",defaultValue="",required=false) String userName,
+								HttpServletRequest request,
+								@RequestParam(value="searchType",required=false,defaultValue="0") Integer searchType,
+								@RequestParam(value="password",defaultValue="",required=false) String password) {
+		  SysUser sysUser = mSysUserMapper.selectUserByLoginName(userName);
+		  SysUser userDb = mSysUserMapper.selectById(sysUser.getId());
+			if (userDb.getLoginName().equals(userName)) {	// 用户已绑定
+				 Boolean checkPassWord = checkPassWord(userDb,password);
+				 if(!checkPassWord) {
+					 return new PageInfo(ResponseCode.password_incorrect.getCode(), ResponseCode.password_incorrect.getMsg());
+				 }
+			}
+			SysUserInOrg userInOrg = mSysUserInOrgMapper.selectByUserId(sysUser.getId());
+			
+		PageInfo pageInfo = mSysOrganizationServiceImpl.selectDeviceFromOrg(0, 0, userInOrg.getSysOrgId());
+		List<SysDeviceAndCallDto> listUserAndDevice=(List<SysDeviceAndCallDto>)pageInfo.getRows();
+		List<SysDeviceAndCallDto> listSearchSysDevice = searchSysDevice(listUserAndDevice, null,searchType,request);
+		return new PageInfo(listSearchSysDevice.size(), listSearchSysDevice);
+	}
 
 	
 	/**
@@ -117,6 +127,7 @@ public class DeviceController extends BaseController{
 	 *@param personalId	个人id
 	 *@param page	页码
 	 *@param row	加载条数
+	 *@param searchType 0:查找所有，1:查询在线，2：查询离线
 	 * @return  allDevice.jsp,根据不同参数加载不同数据
 	 */
 	@ApiOperation(value="查看该组织所有设备",httpMethod="GET",produces="text/html")
@@ -129,8 +140,13 @@ public class DeviceController extends BaseController{
 								@RequestParam(value="searchContent",required=false,defaultValue="") String searchContent,
 								@RequestParam(value="searchType",required=false,defaultValue="0") Integer searchType,
 								@RequestParam(value="userId",defaultValue="0",required=true)Long userId,
-								HttpServletRequest request) {
+								HttpServletRequest request) {   
 		System.out.println("getAllDevice-->"+orgId);
+		if("searchContent".equals(searchContent)||StringUtils.isEmpty(searchContent)) {
+			request.setAttribute("searchType", searchType);
+		}else {
+			request.setAttribute("searchType", 3);
+		}
 		if(!mobileHasPermission(userId, PermissionCode.DEVICE_SELECT.pName)) {
 			request.setAttribute("perMsg", PermissionCode.DEVICE_SELECT.pMsg);
 			return "system/noPermiss";
@@ -237,7 +253,7 @@ public class DeviceController extends BaseController{
 			System.out.println("集合数据-->"+listFilter.toString());
 			request.setAttribute("promptMsg", promptMsg);
 		}
-		return list;
+		return listFilter;
 	}
 
 	
@@ -246,7 +262,21 @@ public class DeviceController extends BaseController{
 	@ResponseBody
 	@RequestMapping(value="heart",method=RequestMethod.GET)
 	public Result deviceHeart(@RequestParam(value="deviceSerial",defaultValue="") String deviceSerial,
+			@RequestParam(value="args",required=false,defaultValue="")String args,
+			@RequestParam(value="sign",required=false,defaultValue="") String sign,
 								HttpServletRequest request) {
+		try {
+			Map<String, String> decodParam = decodParam(args,sign);
+			if(decodParam.size()>0) {
+				deviceSerial=decodParam.get("deviceSerial");
+				deviceSerial=deviceSerial==null?"":deviceSerial;
+				l.info("deviceSerial--->"+deviceSerial);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Result.instance(ResponseCode.decode_err.getCode(), ResponseCode.decode_err.getMsg());
+		}
+		
 		if(StringUtils.isEmpty(deviceSerial)) {
 			return Result.instance(ResponseCode.missing_parameter.getCode(), ResponseCode.missing_parameter.getMsg());
 		}
@@ -257,6 +287,31 @@ public class DeviceController extends BaseController{
 		}else {
 			return Result.instance(ResponseCode.device_not_exist.getCode(),ResponseCode.device_not_exist.getMsg());
 		}
+	}
+	
+	@ResponseBody
+	@RequestMapping(value="encode",method=RequestMethod.POST)
+	@SecurityParameter(inDecode=true)
+	public Result testEncodeParam(/*@RequestBody SysDevice sysDevice*/
+			@RequestParam(value="deviceSerial",required=false,defaultValue="")String deviceSerial,
+			@RequestParam(value="requestData",required=false,defaultValue="")String requestData,
+			@RequestParam(value="sign",required=false,defaultValue="") String sign) {
+		
+//		log.info("deviceSerial"+sysDevice.getDeviceSerial());
+		try {
+			Map<String, String> decodParam = decodParam(requestData,sign);
+			if(decodParam.size()>0) {
+				deviceSerial=decodParam.get("deviceSerial");
+				deviceSerial=deviceSerial==null?"":deviceSerial;
+				log.info("deviceSerial--->"+deviceSerial);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Result.instance(ResponseCode.decode_err.getCode(), ResponseCode.decode_err.getMsg());
+		}
+	
+		log.info("deviceSerial"+deviceSerial);
+		return Result.success(); 
 	}
 	
 	

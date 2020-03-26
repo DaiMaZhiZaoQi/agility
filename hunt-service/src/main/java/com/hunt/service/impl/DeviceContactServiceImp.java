@@ -107,7 +107,7 @@ public class DeviceContactServiceImp implements DeviceContactService{
 	public Result insertContact(SysContact sysContact,Long sysUserId,SysOrganization sysOrganization) {	  
 		String absolutePath = sysContact.getAbsolutePath();
 //		String contactCode = UtReadCsv.isCorrectFileVersion(absolutePath);
-		String[] strArr = UtReadCsv.isCorrectFileVersion(absolutePath);
+		String[] strArr = UtReadCsv.isCorrectFileVersion(absolutePath); 
 		if(strArr.length<2)return new Result(ResponseCode.missing_parameter.getCode(),"文件不完整");
 		String strOrgName=strArr[0];
 		boolean strCorrect = StringUtil.isStrCorrect(strOrgName);

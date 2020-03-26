@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<!-- <link rel="stylesheet" type="text/css" href="css/easyui.css"/>
+		<script type="text/javascript" src="js/easyui/jquery.min2.js"></script>
+		<script type="text/javascript" src="js/neweasyuijs/jquery.easyui.min.js"></script> -->
+		<!-- <script type="text/javascript" src="js/neweasyuijs/datagrid-groupview.js"></script> -->
+	</head>
+	<body>
+		<h2>Basic FileBox</h2>
+	<p>The filebox component represents a file field of the forms.</p>
+	<div style="margin:20px 0;"></div>
+	<div class="easyui-panel" title="Upload File" style="width:100%;max-width:400px;padding:30px 60px;">
+		<div style="margin-bottom:20px">
+			<input class="easyui-textbox" label="Name:" labelPosition="top" style="width:100%">
+		</div>
+		<div style="margin-bottom:20px">
+			<input class="easyui-filebox" label="File1:" labelPosition="top" data-options="prompt:'Choose a file...'" style="width:100%">
+		</div>
+		<div style="margin-bottom:40px">
+			<input class="easyui-filebox" label="File2:" labelPosition="top" data-options="prompt:'Choose another file...'" style="width:100%">
+		</div>
+		<div>
+			<a href="#" class="easyui-linkbutton" style="width:100%">Upload</a>
+		</div>
+	</div>
+	
+		<div style="margin-top:30px">
+			发布任务 <input class="easyui-filebox" name="file1" data-options="prompt:'Choose a file...'" style="width:50%">
+			<a href="javascript:void(0)" class="easyui-linkbutton" style="width:100%">确认</a>
+		</div>
+		<table id="dg"></table>
+		
+		 
+		 <form action="/" method="post" enctype="multipart/form-data">
+			 <!-- <input type="file" placeholder="选择要发布的任务"/>确定 -->
+			  <input id="fb" type="text" style="width:300px;">
+		 </form>
+		 
+		 
+		 <script type="text/javascript">
+			 // FormData formDa=new FormData();
+			 //   $('#fb').filebox({
+    //         buttonText: '发布任务',
+    //         buttonAlign: 'right',
+    //     })
+	
+		var str="{\"id\":11,\"taskGroupName\":\"万达地产\",\"taskCode\":\"20200318\",\"taskPubUserId\":1,\"taskPubUserName\":\"super\",\"taskColumn\":\"{\\\"xm\\\":\\\"姓名\\\",\\\"dhhm\\\":\\\"电话号码\\\",\\\"zz\\\":\\\"住址\\\",\\\"jg\\\":\\\"籍贯\\\",\\\"qt\\\":\\\"其他\\\"}\",\"taskSize\":3,\"status\":1,\"createTime\":1581682678000,\"updateTime\":1581845486000,\"taskRate\":0.00}";
+		var objJson=JSON.parse(str);
+		console.log("str--->"+objJson.id);
+		var taskColumn=objJson.taskColumn;
+		var taskCo=JSON.parse(taskColumn);
+		var arrsColumn=new Array();
+		for (var i in taskCo) {
+			var oj={field:i,title:taskCo[i],width:100,editor:'textbox'};
+			arrsColumn.push(oj);
+		}
+			var statusOpt={field:'status',title:'Status',width:50,align:'center',
+						editor:{
+							type:'checkbox',
+							options:{
+								on: 'P',
+								off: ''
+							}
+						}
+					
+					};
+					arrsColumn.push(statusOpt);
+		var options={field:'action',title:'Action',width:70,align:'center',
+					formatter:function(value,row,index){
+						if (row.editing){
+							var s = '<a href="#" onclick="saverow(this)">Save</a> ';
+							var c = '<a href="#" onclick="cancelrow(this)">Cancel</a>';
+							return s+c;
+						} else {
+							var e = '<a href="#" onclick="editrow(this)">Edit</a> ';
+							var d = '<a href="#" onclick="deleterow(this)">Delete</a>';
+							return e+d;
+						}
+					}
+				};
+				arrsColumn.push(options);
+		console.log(arrsColumn);
+		
+		var ddd1={"xm":"姓名","dhhm":"电话号码","zz":"住址","jg":"籍贯","qt":"其他"};
+		var ddd2={"xm":"姓名","dhhm":"电话号码","zz":"住址","jg":"籍贯","qt":"其他"};
+		var arrss=new Array();
+		arrss.push(ddd1);
+		arrss.push(ddd2);
+		var object1={field:'code',title:'Code',width:100};
+		
+		var object2={field:'name',title:'Name',width:100};
+		var object3={field:'price',title:'Price',width:100,align:'right',editor:'text',};
+		var arra=new Array();
+		arra.push(object1);
+		arra.push(object2);
+		arra.push(object3);
+		var str=JSON.stringify(arra);
+		console.log(str);
+		$('#dg').datagrid({
+			// url:'datagrid_data.json',
+			columns:[arrsColumn],
+			singleSelect: true,
+			// fit:true,
+			border: false,
+			striped: true,
+			rownumbers: true,
+			fitColumns: true,
+			animate: true,
+			// columns:[[{field:'code',title:'Code',width:100},
+			// {field:'name',title:'Name',width:100},
+			// {field:'price',title:'Price',width:100,align:'right'},
+			// 	]],
+			data:arrss,
+			onBeforeEdit:function(index,row){
+				row.editing = true;
+				updateActions(index);
+			},
+			onAfterEdit:function(index,row){
+				row.editing = false;
+				updateActions(index);
+			},
+			onCancelEdit:function(index,row){
+				row.editing = false;
+				updateActions(index);
+			}
+			// [
+			// 	ddd,
+			// 	// {code:'code1',name:'name1',price:100},
+			// 	// {"xm":"姓名","dhhm":"电话号码","zz":"住址","jg":"籍贯","qt":"其他"}
+			// 
+			// ],
+		});
+		// $('#dg').datagrid('loadData', arrss); //将数据绑定到datagrid  
+		function updateActions(index){
+			// $('#dg').datagrid('updateRow',{
+			// 	index: index,
+			// 	row:{}
+			// });
+			$('#dg').datagrid('refreshRow', index);
+		}
+	function getRowIndex(target){
+		var tr = $(target).closest('tr.datagrid-row');
+		return parseInt(tr.attr('datagrid-row-index'));
+	}
+	function editrow(target){
+		$('#dg').datagrid('beginEdit', getRowIndex(target));
+	}
+	function deleterow(target){
+		$.messager.confirm('Confirm','Are you sure?',function(r){
+			if (r){
+				$('#dg').datagrid('deleteRow', getRowIndex(target));
+			}
+		});
+	}
+	function saverow(target){
+		$('#dg').datagrid('endEdit', getRowIndex(target));
+	}
+	function cancelrow(target){
+		$('#dg').datagrid('cancelEdit', getRowIndex(target));
+	}
+		 </script>
+	</body>
+</html>

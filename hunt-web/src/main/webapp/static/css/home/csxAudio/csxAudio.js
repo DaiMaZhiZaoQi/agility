@@ -111,7 +111,7 @@ csxAudio={
 		
 		/**秒数转分钟*/    
 	    function secondToMinute(callDuration){
-	    	
+//	    	callDuration=callDuration+0.5;
 	    	if(callDuration<60){
 	    		callDuration=Math.round(callDuration);
 	    		return "00:"+(callDuration<10?("0"+callDuration):callDuration);
@@ -125,7 +125,7 @@ csxAudio={
 	    		}else{
 	    			var hour=callDuration/3600;
 	    			var m=callDuration%3600;
-	    			var minute=recordCommon.secondToMinute(m);
+	    			var minute=secondToMinute(m);
 	    			return Math.floor(hour)+":"+minute;
 	    		}
 	    	}

@@ -13,6 +13,9 @@ import com.hunt.dao.SysLoginStatusMapper;
 import com.hunt.dao.SysOrganizationMapper;
 import com.hunt.dao.SysPermissionGroupMapper;
 import com.hunt.dao.SysPermissionGroupTestMapper;
+import com.hunt.dao.SysTaskGroupMapper;
+import com.hunt.dao.SysTaskMapper;
+import com.hunt.dao.SysTaskUserMapper;
 import com.hunt.dao.SysUserMapper;
 import com.hunt.model.dto.PageDto;
 import com.hunt.model.dto.PageInfo;
@@ -25,10 +28,15 @@ import com.hunt.model.entity.SysContactUser;
 import com.hunt.model.entity.SysDevice;
 import com.hunt.model.entity.SysDeviceRoleOrg;
 import com.hunt.model.entity.SysDeviceTotal;
+import com.hunt.model.entity.SysIpForbidden;
 import com.hunt.model.entity.SysOrganization;
 import com.hunt.model.entity.SysPermission;
 import com.hunt.model.entity.SysPermissionGroup;
 import com.hunt.model.entity.SysPermissionGroupTest;
+import com.hunt.model.entity.SysTask;
+import com.hunt.model.entity.SysTaskGroup;
+import com.hunt.model.entity.SysTaskUser;
+import com.hunt.model.entity.SysTaskWithBLOBs;
 import com.hunt.model.entity.SysUser;
 
 import org.apache.http.client.methods.HttpGet;
@@ -43,31 +51,44 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.hunt.service.DeviceCallLogService;
 import com.hunt.service.SysOrganizationService;
+import com.hunt.service.SysOrganizationServiceTest;
 import com.hunt.service.SysPermissionService;
 import com.hunt.service.SysUserService;
 import com.hunt.service.SystemDeviceService;
+import com.hunt.util.AESCipher;
+import com.hunt.util.AesEncryptUtils;
 import com.hunt.util.AmrToMP3Utils;
+import com.hunt.util.ListUtil;
 import com.hunt.util.StringUtil;
 
 import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import junit.extensions.TestDecorator;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -114,6 +135,13 @@ public class SysPermissionServiceImplTest {
 	
 	@Autowired
 	SysUserMapper mSysUserMapper;
+	
+	@Autowired
+	SysTaskMapper mSysTaskMapper;
+	@Autowired
+	SysTaskGroupMapper mSysTaskGroupMapper;
+	@Autowired
+	SysTaskUserMapper mSysTaskUserMapper;
 	
 	@Autowired
 	SysPermissionGroupMapper mSysPermissionGroup;
@@ -303,6 +331,25 @@ public class SysPermissionServiceImplTest {
    	}
    	
    	@Test
+   	public void testCreateFile() {
+   		File file=new File("a:\\out\\testFile");
+   		if(!file.exists()) {
+   			boolean mkdirs = file.mkdirs();
+   			System.out.println("createFile--->"+mkdirs+"--->"+file.exists());
+   			try {
+				new BufferedReader(new FileReader(file));
+				new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+				new BufferedOutputStream(new FileOutputStream(file));
+				file.isFile();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+   		}
+   	}
+   	
+   	
+   	@Test
    	@Rollback(false)
    	public void testDevOrg() {
    		Set<Long> set=new HashSet();
@@ -320,6 +367,32 @@ public class SysPermissionServiceImplTest {
    		
 //   		System.out.println("json-->"+count);
    	}
+   	
+   	@Test
+   	@Rollback(false)
+   	public void insertSysTask() {
+   		List<SysTaskWithBLOBs> listTask=new ArrayList<>();
+   		SysTaskWithBLOBs sysTaskWithBLOBs = new SysTaskWithBLOBs();
+		sysTaskWithBLOBs.setTaskName("fsdaf");
+		sysTaskWithBLOBs.setTaskNumber("strMut");
+		sysTaskWithBLOBs.setTaskMsg("str");
+		listTask.add(sysTaskWithBLOBs);
+   		mSysTaskMapper.insertBatch(listTask,1l);
+   	}
+   	
+   	@Autowired
+   	private SysOrganizationServiceTest mSysOrgTest;
+   	
+   	@Test
+   	@Rollback(false)
+   	public void TestTransaction() {
+   		SysIpForbidden sysIpForbidden = new SysIpForbidden();
+   		sysIpForbidden.setId(1l);
+   		sysIpForbidden.setIsFinal(2);
+   		mSysOrgTest.updateSysOrg(sysIpForbidden);
+   	}
+   	
+   	
    	
    	@Test
    	@Rollback(false)
@@ -363,6 +436,37 @@ public class SysPermissionServiceImplTest {
    		PageInfo listCallRecord = mDeviceCallService.listCallRecord(pageDto);
    		System.out.println("json数据"+JsonUtils.toJSon(listCallRecord));
    	}
+	
+	@Test
+	@Rollback(false)
+	public void testSysTask() {
+		SysTask selectById = mSysTaskMapper.selectById();
+		log.info("testSysTask-->"+selectById.toEntityString());
+	}
+	
+	@Test
+	@Rollback(false)
+	public void testSysTaskGroup() {
+//		SysTaskGroup sysTaskGroup = new SysTaskGroup();
+//		sysTaskGroup.setTaskGroupName("锦绣香江项目");
+//		sysTaskGroup.setTaskPubUserId(12l);
+//		Long insert = mSysTaskGroupMapper.insert(sysTaskGroup);
+		
+		List<SysTaskGroup> sysTaskGroup = mSysTaskGroupMapper.selectById();
+		
+//		log.info("testSysTaskGroup-->"+insert+"--->"+sysTaskGroup.getId()+"--->"+sysTaskGroup.toEntityString());
+		for(SysTaskGroup group:sysTaskGroup) {
+			log.info("testSysTaskGroup--->"+group.toEntityString());
+		}
+		
+		SysTaskUser sysTaskUser = new SysTaskUser();
+		sysTaskUser.setSysUserId(1l);
+		sysTaskUser.setSysUserName("张三");
+		
+		Long insert = mSysTaskUserMapper.insert(sysTaskUser);
+		log.info("testSysTaskGroup-->"+insert+"--->"+sysTaskUser.getId()+"--->"+sysTaskUser.toEntityString());
+		
+	}
 	
 	@Test
 	@Rollback(false)
@@ -454,6 +558,25 @@ public class SysPermissionServiceImplTest {
 			e.printStackTrace();
 		}
    		
+   	}
+   	
+   	@Test
+   	public void testEncode() throws Exception {
+   	  Map map=new HashMap<String,String>();
+      map.put("key","value");
+      map.put("中文","汉字");
+      SysDevice sysDevice = new SysDevice();
+      sysDevice.setDeviceSerial("测试序列号");
+//      String content = JsonUtils.toJSon(sysDevice);
+//      String content = JsonUtils.toJSon(map);
+//      String content = JSONObject.toJSONString(map);
+//      System.out.println("加密前：" + content);
+      String content="deviceSerial=fasdf";  //  jZe6EE1RyyxOKiMY0vr07vNX0AEBjPPOkpZm5aPyZ10=
+      String encrypt =AesEncryptUtils.encrypt(content, AesEncryptUtils.KEY);
+      System.out.println("加密后：" + encrypt);
+  
+      String decrypt = AesEncryptUtils.decrypt(encrypt, AesEncryptUtils.KEY);
+      System.out.println("解密后：" + decrypt);
    	}
  
    	@Test

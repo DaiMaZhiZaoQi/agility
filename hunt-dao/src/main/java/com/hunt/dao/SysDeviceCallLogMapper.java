@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.hunt.model.dto.PageDto;
+import com.hunt.model.dto.SysCallLogDeviceRecoDto;
 import com.hunt.model.entity.SysDeviceCallLog;
 
 /**
@@ -69,6 +71,19 @@ public interface SysDeviceCallLogMapper {
 	 */
 	public List<SysDeviceCallLog> selectByDeviceId(@Param("deviceId") Long deviceId,@Param("sort") String sort,@Param("order") String order,@Param("page") Integer page,@Param("rows") Integer rows);
 	
+	/**
+	 * 根据号码查询通话记录
+	 * @param pageDto
+	 * @return
+	 */
+	public List<SysCallLogDeviceRecoDto> selectByPageDto(@Param("pageDto")PageDto pageDto);
+	
+	/**
+	 * 查询通话记录数量
+	 * @param pageDto
+	 * @return
+	 */
+	public Integer selectByPageDtoCount(@Param("pageDto")PageDto pageDto);
 	
 	/**
 	 * 查询通话记录

@@ -19,7 +19,7 @@
     height: 45px;
     border-radius: 18px;
     outline: none;
-    font-size:18px;
+    font-size:16px;
     border: 1px solid #888787;
     padding-left: 20px;
     background: url("../image/nsearch.png") no-repeat;
@@ -32,10 +32,10 @@
 /* 全部设备 */
 .alldevice{
 	margin-left:20px;
-	height:45px;
-	width:90px;
+	height:35px;
+	width:80px;
 	color:white;
-	font-size:19px;
+	font-size:16px;
 	border-radius:5px;
 	box-shadow:none;
 	background: #6dcdf3;
@@ -46,14 +46,14 @@
 
 .titleChild{
 	color: #8A8A8A;
-    font-size: 19px;
+    font-size: 17px;
 }
 #btn_green_alldevice{
 	margin-left:20px;
-	height:45px;
-	width:90px;
+	height:35px;
+	width:80px;
 	color:white;
-	font-size:18px;
+	font-size:16px;
 	border-radius:5px;
 	box-shadow:none;
 	background: #5abb71;
@@ -70,7 +70,7 @@
 }
 .btn-green-allDevice{
 	margin-left: 20px;
-    height: 45px;
+    height: 35px;
     width: 90px;
     color: white;
     font-size: 18px;
@@ -83,10 +83,10 @@
 
 #btn_red_alldevice{
 	margin-left:20px;
-	height:45px;
-	width:90px;
+	height:35px;
+	width:80px;
 	color:white;
-	font-size:18px;
+	font-size:16px;
 	border-radius:5px;
 	box-shadow:none;
 	background: #d75b5b;
@@ -124,11 +124,11 @@
 	cursor: pointer;
 }
 .pageDisplay{
-	font-size: 20px;
+	font-size: 19px;
 }
 .pageOption{
 	color: #007ad5;
-	font-size: 21px;
+	font-size: 19px;
 }
 
 .horLine{

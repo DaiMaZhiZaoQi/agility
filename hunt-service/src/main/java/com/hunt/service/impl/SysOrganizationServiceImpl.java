@@ -378,7 +378,7 @@ public class SysOrganizationServiceImpl implements SysOrganizationService {
 			 listDeviceAndCall.addAll(listUserAndDevice);
 		 }
     	
-    
+      
     	
     	PageInfo pageInfo=new PageInfo(listDeviceAndCall.size(), listDeviceAndCall);
     	return pageInfo;

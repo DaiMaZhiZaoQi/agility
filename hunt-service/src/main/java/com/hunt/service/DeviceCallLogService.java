@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.hunt.model.dto.PageDto;
 import com.hunt.model.dto.PageInfo;
+import com.hunt.model.dto.SysCallLogDeviceRecoDto;
 import com.hunt.model.dto.SysDeviceCallLogAndRecordDto;
 import com.hunt.model.entity.SysDeviceCallLog;
 import com.hunt.model.entity.SysDeviceTotal;
@@ -35,6 +36,14 @@ public interface DeviceCallLogService {
 	 */
 	public List<SysDeviceCallLogAndRecordDto> select(Long deviceId,String sort,String order,Integer page,Integer rows);
 	
+	
+	/**
+	 * 查询该号码的通话记录
+	 * @param pageDto
+	 * @return
+	 */
+	public PageInfo selectByNum(PageDto pageDto);
+	
 	/**
 	 * 查询通话记录
 	 * @param orgId   部门id	或    个人id
@@ -46,6 +55,7 @@ public interface DeviceCallLogService {
 	 * @return
 	 */
 	public List<SysDeviceCallLogAndRecordDto> select(Long orgId,Integer selectType, String sort,String order,Integer page,Integer rows);
+	
 	
 	
 	/**

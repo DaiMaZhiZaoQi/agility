@@ -1,9 +1,27 @@
 package com.hunt.controller;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.springframework.util.StringUtils;
 
+import com.alibaba.druid.support.json.JSONParser;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.internal.LinkedTreeMap;
+import com.hunt.controller.JsonUtils.TestObj;
+import com.sun.tools.doclint.Entity;
+import com.sun.xml.internal.xsom.impl.scd.Iterators.Map;
+
+import springfox.documentation.spring.web.json.Json;
 
 public class JsonUtils {
 	static ObjectMapper objectMapper;
@@ -68,4 +86,33 @@ public class JsonUtils {
 			return null;
 		}
 	}
+	public static class TestObj{
+		private HashMap<String, String> map;
+
+		public HashMap<String, String> getMap() {
+			return map;
+		}
+
+		public void setMap(HashMap<String, String> map) {
+			this.map = map;
+		}
+	}
+	public static void main(String[] args) {
+//		String json="{\"name\":\"zhangsan\"}";
+		String json="{map:{a:1, b:'Hello,world!'}}";
+//		String json="{map:{xm:'我的测试'}}";
+		TestObj fromJson=JsonUtils.readValue(json, TestObj.class);
+		Gson gson = new Gson();
+		JsonObject jsonObject = new JsonObject();
+//		GsonBuilder gsonBuilder = new GsonBuilder();
+//		TestObj fromJson = gson.fromJson(json, TestObj.class);
+		HashMap object =  fromJson.getMap();
+		 Iterator it = object.keySet().iterator();
+         while (it.hasNext()) {
+             String key = (String)it.next();
+             String value = (String)object.get(key);
+           System.out.println("key: " + key + ", value: " + value);
+         }
+	}
+	
 }

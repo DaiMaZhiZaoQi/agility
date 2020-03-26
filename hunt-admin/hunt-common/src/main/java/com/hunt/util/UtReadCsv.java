@@ -244,7 +244,7 @@ public class UtReadCsv/*<T extends TTest>*/{
 	
 	@Test
 	public void testDate() {
-		String time="20190932";
+		String time="20190930";
 		boolean correct = isCorrect(time);
 		System.out.println("时间格式-->"+correct);
 	}

@@ -59,6 +59,8 @@ public class DeviceManageControler extends BaseController{
 		return Result.success(count);
 	}
 	
+	
+	
 	@ApiOperation(value="查询该用户下已绑定的设备",produces="application/json",httpMethod="GET")
 	@ResponseBody
 	@RequestMapping(value="listRegis",method=RequestMethod.GET)

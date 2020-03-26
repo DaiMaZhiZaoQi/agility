@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hunt.dao.SysTaskGroupMapper">
+	<resultMap type="com.hunt.model.entity.SysTaskGroup" id="TaskResultMap">
+		<id column="id" property="id" jdbcType="BIGINT"/>
+		<result column="task_group_name" property="taskGroupName" jdbcType="VARCHAR"/>
+		<result column="task_code" property="taskCode" jdbcType="VARCHAR"/>
+		<result column="task_pub_user_id" property="taskPubUserId" jdbcType="BIGINT"/>
+		<result column="task_pub_user_name" property="taskPubUserName" jdbcType="VARCHAR"/>
+		<result column="task_column" property="taskColumn" jdbcType="VARCHAR"/>
+		<result column="task_finish" property="taskFinish" jdbcType="INTEGER"/>
+		<result column="task_size" property="taskSize" jdbcType="INTEGER"/>
+		<result column="status" property="status" jdbcType="TINYINT"/> 
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+		<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+		<result column="task_rate" property="taskRate" jdbcType="DECIMAL"/>
+	</resultMap>
+	
+		
+	
+	<insert id="insert" keyProperty="id" useGeneratedKeys="true" parameterType="SysTaskGroup">
+		insert into sys_task_group
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="taskGroupName!=null and taskGroupName.length()!=0">
+				task_group_name,
+			</if>
+			<if test="taskCode!=null and taskCode.length()!=0">
+				task_code,
+			</if>
+			<if test="taskPubUserId!=null">
+				task_pub_user_id,
+			</if>
+			<if test="taskPubUserName!=null and taskPubUserName.length()!=0">
+				task_pub_user_name,
+			</if>
+			<if test="taskColumn!=null and taskColumn.length()!=0">
+				task_Column,
+			</if>
+			<if test="taskSize!=null">
+				task_size,
+			</if>
+			<if test="status!=null">
+				status,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+		   <if test="taskGroupName!=null and taskGroupName.length()!=0">
+				#{taskGroupName},
+			</if>
+			<if test="taskCode!=null and taskCode.length()!=0">
+				#{taskCode},
+			</if>
+			<if test="taskPubUserId!=null">
+				#{taskPubUserId},
+			</if>
+			<if test="taskPubUserName!=null and taskPubUserName.length()!=0">
+				#{taskPubUserName},
+			</if>
+			<if test="taskColumn!=null and taskColumn.length()!=0">
+				#{taskColumn},
+			</if>
+			<if test="taskSize!=null">
+				#{taskSize},
+			</if>
+			<if test="status!=null">
+				#{status},
+			</if>
+		</trim>
+	</insert>
+	
+	<update id="deleteBy" useGeneratedKeys="true" keyProperty="id">
+		update sys_task_group
+		<set>
+			<if test="sysTaskGroup.status!=null">
+				status=#{sysTaskGroup.status}
+			</if>
+		</set>
+		WHERE id=#{sysTaskGroup.id} AND task_pub_user_id=#{sysTaskGroup.taskPubUserId}
+	</update>
+	
+	<update id="updateById" useGeneratedKeys="true" keyProperty="id">
+		update sys_task_group
+		<set>
+			<if test="sysTaskGroup.taskGroupName!=null and sysTaskGroup.taskGroupName.length()!=0">
+				task_group_name=#{sysTaskGroup.taskGroupName},
+			</if>
+			<if test="sysTaskGroup.taskCode!=null and sysTaskGroup.taskCode.length()!=0">
+				task_code=#{sysTaskGroup.taskCode},
+			</if>
+			<if test="sysTaskGroup.taskPubUserId!=null">
+				task_pub_user_id=#{sysTaskGroup.taskPubUserId},
+			</if>
+			<if test="sysTaskGroup.taskPubUserName!=null and sysTaskGroup.taskPubUserName.length()!=0">
+				task_pub_user_name=#{sysTaskGroup.taskPubUserName},
+			</if>
+			<if test="sysTaskGroup.taskColumn!=null and sysTaskGroup.taskColumn.length()!=0">
+				task_column=#{sysTaskGroup.taskColumn},
+			</if>
+			<if test="sysTaskGroup.taskFinish!=null">
+				task_finish=IF(task_finish>=0,task_finish+#{sysTaskGroup.taskFinish},task_finish),
+				task_finish=<![CDATA[IF(task_finish<0,0,task_finish),]]>
+			</if>
+			<if test="sysTaskGroup.taskSize!=null">
+				task_size=#{sysTaskGroup.taskSize}
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	
+	<select id="selectById" resultMap="TaskResultMap">
+		select * from sys_task_group
+	</select>
+	
+	
+	<select id="selectByPageDto" resultMap="TaskResultMap">
+				
+		SELECT sys_task_group.* 
+		FROM sys_task_group 
+		LEFT JOIN sys_task_user ON sys_task_user.`sys_task_group`=sys_task_group.`id` 
+		WHERE sys_task_group.`status`=1
+		AND sys_task_user.`sys_user_id`=#{pageDto.userId} AND sys_task_user.`status`=1 
+		ORDER BY sys_task_group.`create_time` DESC LIMIT ${(pageDto.page-1)*pageDto.rows},${pageDto.rows}
+		
+		
+	</select>
+	
+	<select id="selectByIdUserId" resultMap="TaskResultMap">
+		SELECT sys_task_group.* FROM sys_task_group
+		LEFT JOIN sys_task_user ON sys_task_user.`sys_task_group`=sys_task_group.`id`
+		WHERE sys_task_user.`sys_user_id`=${userId}
+		AND sys_task_user.`status`=1
+		AND sys_task_group.`id`=${id}
+	</select>
+	
+	<select id="selectByIdUserIdAuth" resultMap="TaskResultMap">
+		SELECT sys_task_group.* FROM sys_task_group
+		WHERE sys_task_group.`task_pub_user_id`=${userId}
+		AND sys_task_group.`id`=${id}
+		AND sys_task_group.`status`=1		
+	</select>
+	
+	<select id="selectTaskGroupByUserId" resultMap="TaskResultMap">
+		SELECT * FROM sys_task_group WHERE task_pub_user_id=#{userId}
+	</select>
+	
+	<select id="selectTaskGroupByGroupName" resultMap="TaskResultMap">
+		SELECT * FROM sys_task_group WHERE task_group_name=#{taskGroupName} AND status!=2
+	</select>
+	
+
+</mapper>

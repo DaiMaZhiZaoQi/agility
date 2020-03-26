@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.hunt.dao.SysDeviceCallLogMapper;
 import com.hunt.dao.SysDeviceMapper;
 import com.hunt.model.dto.LoginInfo;
+import com.hunt.model.dto.PageDto;
 import com.hunt.model.dto.PageInfo;
+import com.hunt.model.dto.SysCallLogDeviceRecoDto;
 import com.hunt.model.dto.SysDeviceCallLogAndRecordDto;
 import com.hunt.model.entity.SysDevice;
 import com.hunt.model.entity.SysDeviceCallLog;
@@ -61,7 +63,8 @@ public class DeviceCallLogController extends BaseController{
 	 */
 	@ResponseBody
 	@RequestMapping(value="insert",method=RequestMethod.POST)
-	public Result insert(@RequestParam("sysDeviceCallLog")String sysDeviceCallLogJson,@RequestParam("deviceSerial") String deviceSerial) {
+	public Result insert(@RequestParam("sysDeviceCallLog")String sysDeviceCallLogJson,
+						@RequestParam("deviceSerial") String deviceSerial) {
 		SysDeviceCallLog sysDeviceCallLog=JsonUtils.readValue(sysDeviceCallLogJson, SysDeviceCallLog.class);
 		if(sysDeviceCallLog==null) {
 			return Result.instance(ResponseCode.missing_parameter.getCode(), "缺少参数"); 
@@ -93,6 +96,13 @@ public class DeviceCallLogController extends BaseController{
 		return result;
 	}
 	
+	@ApiOperation(value="根据号码查询通话记录",httpMethod="POST",produces="application/json")
+	@ResponseBody
+	@RequestMapping(value="listByNum",method=RequestMethod.POST)
+	public PageInfo listByNum(@RequestBody PageDto pageDto) {
+		return mDeviceCallLogService.selectByNum(pageDto);
+		 
+	}   
 	
 	/**
 	 * 加载通话列表
@@ -123,6 +133,9 @@ public class DeviceCallLogController extends BaseController{
 		return pageInfo;
 		
 	}
+	
+	
+	
 	@ApiOperation(value="修改通话记录",httpMethod="POST",produces="text/json")
 	@ResponseBody
 	@RequestMapping(value="update",method=RequestMethod.POST)

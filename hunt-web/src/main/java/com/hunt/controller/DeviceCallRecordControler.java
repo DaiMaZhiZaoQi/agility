@@ -191,7 +191,6 @@ public class DeviceCallRecordControler extends BaseController {
 	 * @return sType=0,默认搜索方式,什么搜索内容为空，sType=1 查询通话号码，sType=2  查询设备号
 	 */
 	private String getSType(String sContent,String searchType) {
-//		String sType="3";
 		if(StringUtils.isEmpty(sContent)) {
 			return "3";
 		}else {
@@ -201,23 +200,6 @@ public class DeviceCallRecordControler extends BaseController {
 	
 	
 	
-//	@ApiOperation(value="查询设备统计",produces="text/json",httpMethod="GET")
-//	@ResponseBody
-//	@RequestMapping(value="deviceTotal",method=RequestMethod.GET)
-//	public Result selectTotalByOrg(@RequestParam("id") Long id,
-//									@RequestParam(value="optType",defaultValue="0") Integer optType,
-////									@RequestParam(value="sTimeType",required=false,defaultValue="2") String sTimeType,
-//									@RequestParam(value="sContent",required=false) String sContent,
-//									@RequestParam(value="beginTime",defaultValue="0") Long beginTime,
-//									@RequestParam(value="endTime",defaultValue="0") Long endTime,
-//									@RequestParam(value="searchType",defaultValue="0") String searchType) {
-//			String sType=getSType(sContent,searchType);
-//			beginTime=getBeginTime(beginTime);
-//			endTime=getEndTime(endTime);
-//			SysDeviceTotal sysDeviceTotal = mDeviceCallLogService.selectDevTotalByRoleOrg(id,optType,sType,beginTime,endTime,sContent); 
-//			return Result.success(sysDeviceTotal);   		 
-//	} 
-//	
 	@ApiOperation(value="查询设备统计",produces="text/json",httpMethod="POST")   
 	@ResponseBody
 	@RequestMapping(value="deviceTotal",method=RequestMethod.POST)
@@ -231,25 +213,6 @@ public class DeviceCallRecordControler extends BaseController {
 		return Result.success(sysDeviceTotal);   		 
 	}     
 	
-//	@ApiOperation(value="查询全部通话记录数量",produces="text/json",httpMethod="GET")
-//	@ResponseBody
-//	@RequestMapping(value="callTotal",method=RequestMethod.GET)
-//	public Result selectTotalCall(@RequestParam("id") Long id,
-//								@RequestParam(value="optType",defaultValue="0") Integer optType,
-//								@RequestParam(value="sTimeType",required=false,defaultValue="2") String sTimeType,
-//								@RequestParam(value="sContent",required=false) String sContent,
-//								@RequestParam(value="beginTime",defaultValue="0") Long beginTime,
-//								@RequestParam(value="endTime",defaultValue="0") Long endTime,
-//								@RequestParam(value="callIsHaveRecord",required=false,defaultValue="0")Integer callIsHaveRecord,
-//								@RequestParam(value="searchType",defaultValue="0") String searchType) {
-//		String sType=getSType(sContent,searchType);  
-//		beginTime=getBeginTime(beginTime); 
-//		endTime=getEndTime(endTime);
-////		Long selectCallCount = mDeviceCallLogService.selectTotalCount(id,optType);
-//		Long selectCallCount = mDeviceCallLogService.selectSearTotalCount(id,optType,sType,beginTime,endTime,sContent,callIsHaveRecord);
-//		  
-//		return Result.success(selectCallCount==null?0:selectCallCount);
-//	}
 	
 	@ApiOperation(value="查询全部通话记录数量",produces="text/json",httpMethod="POST")
 	@ResponseBody

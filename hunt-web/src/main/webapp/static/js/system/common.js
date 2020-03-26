@@ -194,6 +194,7 @@ common_tool = {
   
     /**秒数转分钟*/    
     secondToMinute:function(callDuration){
+//    	callDuration=callDuration+0.3;
 	   	if(callDuration<60){
 	   		callDuration=Math.round(callDuration);
 	   		return "00:"+(callDuration<10?("0"+callDuration):callDuration);
@@ -207,15 +208,59 @@ common_tool = {
 	   		}else{
 	   			var hour=callDuration/3600;
 	   			var m=callDuration%3600;
-	   			var minute=recordCommon.secondToMinute(m);
+	   			var minute=common_tool.secondToMinute(m);
 	   			return Math.floor(hour)+":"+minute;
 	   		}
 	   	}
    },
     
-    
-    /**毫秒数转时间*/
+   /**毫秒数转时间*/
 	getMoth:function(str){  
+		var dateTime=new Date(str);
+		var year=dateTime.getFullYear();
+		var month=dateTime.getMonth() + 1;
+		month=month<10?("0"+month):month;
+		var day=dateTime.getDate();
+		day=day<10?("0"+day):day;
+		var hour=dateTime.getHours();
+		hour=hour<10?("0"+hour):hour;
+		var minute=dateTime.getMinutes();
+		minute=minute<10?("0"+minute):minute;
+		var second=dateTime.getSeconds(); 
+		second=second<10?("0"+second):second;
+		return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;
+   },
+   
+   /**毫秒数转时间*/
+	getSimMoth:function(str,leve){  
+		var dateTime=new Date(str);
+		var year=dateTime.getFullYear();
+		var month=dateTime.getMonth() + 1;
+		month=month<10?("0"+month):month;
+		var day=dateTime.getDate();
+		day=day<10?("0"+day):day;
+		var hour=dateTime.getHours();
+		hour=hour<10?("0"+hour):hour;
+		var minute=dateTime.getMinutes();
+		minute=minute<10?("0"+minute):minute;
+		var second=dateTime.getSeconds(); 
+		second=second<10?("0"+second):second;
+		if(leve==1){
+			return month+'-'+day+' '+hour+':'+minute+':'+second;
+		}else if (leve==2) {
+			return month+'-'+day+' '+hour+':'+minute;
+		}
+  },
+   
+   
+   /**验证是否为毫秒数，毫秒数转换为秒数*/
+   secondIsValid:function(second){
+   	var regex=/^\d{13}$/;
+   	return regex.test(second);
+   	
+   },
+    /**毫秒数转时间*/
+	/*getMoth:function(str){  
 		var dateTime=new Date(str);
 		var year=dateTime.getFullYear();
 		var month=dateTime.getMonth() + 1;
@@ -225,7 +270,7 @@ common_tool = {
 		var second=dateTime.getSeconds(); 
 		minute=minute<10?("0"+minute):minute;
 		return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;
-    },
+    },*/
     
     /**
      * 通话类型 
@@ -434,7 +479,7 @@ function getRootPath() {
  */
 function strIsEmpty(str){
 	var regex=/^[\u4E00-\u9FA5A-Za-z0-9_]+$/;
-	return str==null||str.length==0||str.trim().length==0||!(regex.test(str)); 	
+	return str==null||str.length==0||str.trim().length==0||str.toLowerCase()=="null"||!(regex.test(str)); 	
 }
 
 /**
@@ -454,6 +499,15 @@ function getTimeStamp(date){
 	}
 	var time=new Date(date).getTime();
 	return time;
+}
+
+/**
+ * 判断字符串是否为null
+ * @param str
+ * @returns
+ */
+function strIsEmpty(str){
+	return str==null||str.length==0||str=="null"||str==undefined;
 }
 
 

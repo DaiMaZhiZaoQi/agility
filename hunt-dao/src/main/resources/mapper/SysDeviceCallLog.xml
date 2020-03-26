@@ -35,6 +35,7 @@
 		<result column="org_name" property="orgName" jdbcType="VARCHAR"/>
 		<result column="org_code" property="orgCode" jdbcType="VARCHAR"/>
 		<result column="user_id" property="userId" jdbcType="BIGINT"/>
+		<result column="user_name" property="userName" jdbcType="VARCHAR"/> 
 		<result column="dev_serial" property="devSerial" jdbcType="VARCHAR"/>
 		
 	</resultMap>
@@ -118,6 +119,10 @@
 			<if test="userId!=null">
 				user_id,
 			</if>
+			<if test="userName!=null and userName.length()!=0">
+				user_name,
+			</if>
+			
 			<if test="devSerial!=null and devSerial.length()!=0">
 				dev_serial,
 			</if>
@@ -189,6 +194,9 @@
 			</if>
 			<if test="userId!=null">
 				#{userId},
+			</if>
+			<if test="userName!=null and userName.length()!=0">
+				#{userName},
 			</if>
 			<if test="devSerial!=null and devSerial.length()!=0">
 				#{devSerial},
@@ -284,10 +292,127 @@
 	</select>
 	
 	<select id="selectByDeviceId" resultType="SysDeviceCallLog">
-		SELECT * FROM sys_device_calllog WHERE device_id=#{deviceId} and status=1 ORDER BY ${sort} ${order} limit ${(page-1)*rows},${rows}
-	
+		SELECT * FROM sys_device_calllog 
+		WHERE device_id=#{deviceId} and status=1 
+		ORDER BY ${sort} ${order} limit ${(page-1)*rows},${rows}
 	</select>
 	
+	<resultMap type="com.hunt.model.dto.SysCallLogDeviceRecoDto" id="SysCallLogDeviceRecoDto2">
+		<id column="id" property="callId"/>
+		<result column="org_name" property="orgName"/> 
+		<result column="org_id" property="orgId"/>
+		<result column="dev_serial" property="devSerial"/>
+		<result column="device_id" property="deviceId"/>
+		<!-- <result column="dev_rolg_id" property="devRolgId"/>
+		<result column="dev_rolg_id" property="devRolgId"/> -->
+		<result column="user_id" property="userId"/>
+		<result column="user_name" property="userName"/>
+		<association property="sysDeviceRecord" javaType="com.hunt.model.dto.SysDeviceCallLogAndRecordDto">
+			<id column="id" property="id" jdbcType="BIGINT"/>
+			<result column="device_id" property="deviceId" jdbcType="BIGINT"/>
+			<result column="call_name" property="callName" jdbcType="VARCHAR"/>
+			<result column="call_type" property="callType" jdbcType="INTEGER"/>
+			<result column="call_duration" property="callDuration" jdbcType="VARCHAR"/>
+			<result column="call_number" property="callNumber" jdbcType="VARCHAR"/>
+			<result column="call_date" property="callDate" jdbcType="BIGINT"/>
+			<result column="call_subscription_id" property="callSubscriptionId" jdbcType="INTEGER"/>
+			<result column="call_has_record" property="callHasRecord" jdbcType="INTEGER"/>
+			<result column="call_record_ms" property="callRecordMs" jdbcType="INTEGER"/>
+			<result column="call_description" property="callDescription" jdbcType="VARCHAR"/>
+			<result column="call_address" property="callAddress" jdbcType="VARCHAR"/>
+			
+			<result column="call_out_phone" property="callOutPhone" jdbcType="VARCHAR"/>
+			<result column="call_in_phone" property="callInPhone" jdbcType="VARCHAR"/>
+			<result column="call_end_time" property="callEndTime" jdbcType="VARCHAR"/>
+			<result column="call_date" property="callDate" jdbcType="BIGINT"/>
+			<result column="call_duration" property="callDuration" jdbcType="BIGINT"/>
+			<result column="call_iscollect" property="callIsCollect" jdbcType="INTEGER"/>
+			<result column="call_other" property="callOther" jdbcType="VARCHAR"/>
+			<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+			<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+			<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+			<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+			<result column="status" property="status" jdbcType="INTEGER"/>
+			<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+			<result column="reco_audio_length" property="recoAudioLength"/>
+		</association>
+		
+	</resultMap>
+	
+	
+	
+	<!-- 
+	<resultMap type="com.hunt.model.dto.SysCallLogDeviceRecoDto" id="SysCallLogDeviceRecoDto2">
+		<id column="id" property="callId"/>
+		<result column="org_name" property="orgName"/> 
+		<result column="org_id" property="orgId"/>
+		<result column="dev_serial" property="devSerial"/>
+		<result column="device_id" property="deviceId"/>
+		<result column="user_id" property="userId"/>
+		
+			<result column="call_name" property="callName" jdbcType="VARCHAR"/>
+			<result column="call_type" property="callType" jdbcType="INTEGER"/>
+			<result column="call_duration" property="callDuration" jdbcType="VARCHAR"/>
+			<result column="call_number" property="callNumber" jdbcType="VARCHAR"/>
+			<result column="call_date" property="callDate" jdbcType="BIGINT"/>
+			<result column="call_subscription_id" property="callSubscriptionId" jdbcType="INTEGER"/>
+			<result column="call_has_record" property="callHasRecord" jdbcType="INTEGER"/>
+			<result column="call_record_ms" property="callRecordMs" jdbcType="INTEGER"/>
+			<result column="call_description" property="callDescription" jdbcType="VARCHAR"/>
+			<result column="call_address" property="callAddress" jdbcType="VARCHAR"/>
+			
+			<result column="call_out_phone" property="callOutPhone" jdbcType="VARCHAR"/>
+			<result column="call_in_phone" property="callInPhone" jdbcType="VARCHAR"/>
+			<result column="call_end_time" property="callEndTime" jdbcType="VARCHAR"/>
+			<result column="call_date" property="callDate" jdbcType="BIGINT"/>
+			<result column="call_duration" property="callDuration" jdbcType="BIGINT"/>
+			<result column="call_iscollect" property="callIsCollect" jdbcType="INTEGER"/>
+			<result column="call_other" property="callOther" jdbcType="VARCHAR"/>
+			<result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+			<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+			<result column="create_by" property="createBy" jdbcType="BIGINT"/>
+			<result column="update_by" property="updateBy" jdbcType="BIGINT"/>
+			<result column="status" property="status" jdbcType="INTEGER"/>
+			<result column="is_final" property="isFinal" jdbcType="INTEGER"/>
+			<result column="reco_audio_length" property="recoAudioLength"/>
+		
+		<association property="sysDeviceRecord" javaType="com.hunt.model.dto.SysDeviceCallLogAndRecordDto">
+			
+		</association>
+		
+	</resultMap> -->
+	<!--  AND sys_device_calllog.`call_has_record`=1  -->	
+	
+	<!-- 
+		SELECT sys_device_calllog.*,sys_device_record.`reco_audio_length`
+		FROM sys_device_calllog
+		LEFT JOIN sys_device_record ON sys_device_record.`call_log_id`=sys_device_calllog.`id`
+		WHERE sys_device_calllog.`call_number`=#{pageDto.callNumber}
+		AND sys_device_calllog.`status`=1
+		AND sys_device_record.`status`=1
+		ORDER BY
+		sys_device_calllog.`${pageDto.sort}` ${pageDto.order} limit ${(pageDto.page-1)*pageDto.rows},${pageDto.rows}
+	 -->
+	 
+	<select id="selectByPageDto" resultMap="SysCallLogDeviceRecoDto2">
+		SELECT sys_device_calllog.*,
+		(SELECT sys_device_record.`reco_audio_length` FROM sys_device_record WHERE sys_device_record.`call_log_id`=sys_device_calllog.`id`) AS reco_audio_length 
+		FROM sys_device_calllog
+		WHERE sys_device_calllog.`call_number`=#{pageDto.callNumber} 
+		AND sys_device_calllog.`status`=1
+		AND sys_device_calllog.`user_id`=#{pageDto.userId}
+		ORDER BY 
+		sys_device_calllog.`${pageDto.sort}` ${pageDto.order} limit ${(pageDto.page-1)*pageDto.rows},${pageDto.rows}
+	</select>
+	
+	<select id="selectByPageDtoCount" resultType="java.lang.Integer">
+		SELECT COUNT(*)
+		FROM sys_device_calllog
+		WHERE sys_device_calllog.`call_number`=#{pageDto.callNumber} 
+		AND sys_device_calllog.`status`=1
+		AND sys_device_calllog.`user_id`=#{pageDto.userId}
+	</select>
+			
 	<select id="selectByUserId" resultType="SysDeviceCallLog">
 		SELECT  sys_device_role_org.`sys_role_org_id` 
 		AS device_role_org_id,sys_device_calllog.* 

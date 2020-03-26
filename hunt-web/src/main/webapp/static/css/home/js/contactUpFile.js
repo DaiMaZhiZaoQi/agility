@@ -990,7 +990,6 @@
 	                {
 	                    text: '保存',
 	                    width: 100,
-	                    iconCls: 'icon-save',
 	                    handler: function () {
 	                    	contact.updateAuth(checkContactId,orgUserData);
 	                    				
@@ -999,7 +998,6 @@
 	                {
 	                    text: '取消',
 	                    width: 100,
-	                    iconCls: 'icon-add',
 	                    handler: function () {
 	                    	contact.form_clear();
 	                        $("#update_auth_dialog").dialog('close');

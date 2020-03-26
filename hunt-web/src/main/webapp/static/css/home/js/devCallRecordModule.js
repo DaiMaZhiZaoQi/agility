@@ -125,29 +125,9 @@ recordCommon={
 		testFunTest:function(){
 			alert("方法调用成功");
 		},
-		/**毫秒数转时间*/
-		getMoth:function(str){  
-			var dateTime=new Date(str);
-			var year=dateTime.getFullYear();
-			var month=dateTime.getMonth() + 1;
-			month=month<10?("0"+month):month;
-			var day=dateTime.getDate();
-			day=day<10?("0"+day):day;
-			var hour=dateTime.getHours();
-			hour=hour<10?("0"+hour):hour;
-			var minute=dateTime.getMinutes();
-			minute=minute<10?("0"+minute):minute;
-			var second=dateTime.getSeconds(); 
-			second=second<10?("0"+second):second;
-			return year+'-'+month+'-'+day+' '+hour+':'+minute+':'+second;
-	    },
+		
 	  
-	    /**验证是否为毫秒数，毫秒数转换为秒数*/
-	    secondIsValid:function(second){
-	    	var regex=/^\d{13}$/;
-	    	return regex.test(second);
-	    	
-	    },
+	   
 	
 	  
 	    
@@ -387,14 +367,14 @@ recordModult={
 			    var callNumber=row.callNumber==""?"无":row.callNumber;
 			    
 			    var callHasRecord=row.callHasRecord==1?"下载录音":"无";
-			    var callDate=recordCommon.getMoth((row.callDate)+500);
+			    var callDate=common_tool.getMoth((row.callDate)+500);
 			    var callDuration=row.callDuration==0?"0":row.callDuration;
 //			    callDuration=202900;
 			    console.log("填充表格"+row.recoAudioLength);
-			    var secondIsValid=recordCommon.secondIsValid(callDuration+500);
+			    var secondIsValid=common_tool.secondIsValid(callDuration+500);
 			    var callDuration=common_tool.secondToMinute(secondIsValid==true?(callDuration/1000):callDuration);
 			    
-			    var recoAudioLength=row.recoAudioLength==null?0:row.recoAudioLength;
+			    var recoAudioLength=row.recoAudioLength==null?0:(row.recoAudioLength);
 				var recoAudioLength=common_tool.secondToMinute(recoAudioLength/1000);
 				callName=callName==""?"无":callName;
 				tr.append("<td style='padding:0px;'>"+(index++)+"</td>");
@@ -404,9 +384,9 @@ recordModult={
 				    tr.append("<td><img style='vertical-align:middle;' width='18px' height='18px' src='static/image/out_phone.png'/><span style='vertical-align:middle;'>&nbsp;"+type+"</span></td>");
 				}else if(row.callType==1){	// 呼入
 					tr.append("<td><img style='vertical-align:middle;' width='18px' height='18px' src='static/image/in_phone.png'/><span style='vertical-align:middle;'>&nbsp;"+type+"</span></td>");
-				}else if(row.callType==3){	// 拒接
+				}else if(row.callType==3){	// 未接
 					tr.append("<td><img style='vertical-align:middle;' width='18px' height='18px' src='static/image/no_accept.png'/><span style='vertical-align:middle;'>&nbsp;"+type+"</span></td>");
-				}else if(row.callType==5||row.callType==4){	// 1,未接  4,未接留言
+				}else if(row.callType==5||row.callType==4){	// 1,拒接  4,未接留言
 					tr.append("<td><img style='vertical-align:middle;' width='18px' height='18px' src='static/image/resu_accept.png'/><span style='vertical-align:middle;'>&nbsp;"+type+"</span></td>");
 				}else{
 					tr.append("<td><span>"+type+"<span></td>");
@@ -471,7 +451,8 @@ recordModult={
 				var callDuration=dataObj.sysDeviceRecord.callDuration;
 				var status=dataObj.sysDeviceRecord.status;
 				var createTime=dataObj.sysDeviceRecord.createTime;
-				var data={id:callLogId,deviceId:deviceId,callType:callType,callDuration:callDuration,status:status,createTime:createTime};
+				var callHasRecord=dataObj.sysDeviceRecord.callHasRecord;
+				var data={id:callLogId,deviceId:deviceId,callType:callType,callDuration:callDuration,callHasRecord:callHasRecord,status:status,createTime:createTime};
 				data=JSON.stringify(data);
 				$.ajax({
 					data:data,
@@ -715,6 +696,9 @@ $(document).ready(function() {
 		recordCommon.selectCallDate();
 		common_tool.set_beginTime(beginTime);
 	});
+	/**
+	 * 只查录音checkBox切换
+	 */
 	$("#searchTable input[id=cbHaveRecord]").change(function(){
 		var check=$(this).prop("checked");
 		NameSpace.data.set_callIsHaveRecord(check==true?1:0);

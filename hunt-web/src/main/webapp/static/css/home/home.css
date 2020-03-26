@@ -37,7 +37,7 @@
 a{
 	color:	black;
 	text-decoration:none;
-	font-size: 19px;
+	font-size: 16px;
 }
 
 #menu table{
@@ -65,7 +65,7 @@ a{
 	height:20px;
 	width: 20px;
 	margin-right: 6px;
-	vertical-align: top;
+	vertical-align: inherit;
 }
 .deviceHeadImg{
 	height:40px;
@@ -83,7 +83,7 @@ a{
     padding-bottom: 20px;
 }
 #tt .tree-title,#tt .tree-title a{   
-	font-size: 18px;
+	font-size: 17px;
 	padding-top:10px;
 	padding-bottom:10px;
 }
@@ -222,6 +222,10 @@ a{
 		cursor: pointer;
 	}
 	
+	.taskInsert,.taskSelect,.taskDelete{
+		display: none;
+	}
+	
 	
 	.inscribe a{
 		font-size: 14px;
@@ -240,6 +244,55 @@ a{
 	}
 	
 	
+	/** menu */
+	
+	  #menu ul,#menu a{
+            font-size: 18px;
+            list-style: none;
+            text-decoration: none;
+            background-color: #007ad5;
+            color: #FFFFFF;
+            cursor:pointer;
+          /*   width: 100px;
+            text-align: center; */
+            /* border: 0px solid black;
+            border-radius: 5px; */
+            margin-top: 1px;
+        }
+        .nav> li{
+        	padding-left: 20px;
+    		padding-right: 20px;
+        }
+        #menu a{
+        	
+            display: block;
+        }
+
+        #menu .plat {
+            display: none;
+            padding: 0px;
+            margin: 0px;
+        }
+     /*     .plat>li{
+        	padding-left: 8px;
+    		padding-right: 8px;
+        } */
+        .plat a{
+        	padding-left: 33px;
+    		padding-right: 33px;
+        }
+        #menu .nav{
+             float: right;
+             padding: 0px;
+    		margin: 0px;
+         }
+        #menu .nav:hover .plat{
+            display: block;
+            clear: both;
+        }
+        #menu .plat li:hover>a{
+            background-color: #49a1e2;
+        }
 	
 	
 	
