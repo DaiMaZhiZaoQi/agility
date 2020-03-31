@@ -33,7 +33,7 @@
         <tk.mybatis.version>3.3.9</tk.mybatis.version>
         <tk.pagehelper.version>4.1.6</tk.pagehelper.version>
         <common.io.version>1.3.2</common.io.version>
-        <commons.fileupload.version>1.3</commons.fileupload.version>
+        <commons.fileupload.version>1.3.3</commons.fileupload.version>
         <swagger2.version>2.6.0</swagger2.version>
         <!--maven properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
