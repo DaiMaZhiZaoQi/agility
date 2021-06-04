@@ -43,7 +43,7 @@
         <java.source.version>1.7</java.source.version>
         <java.target.version>1.7</java.target.version>
         <file.encoding>UTF-8</file.encoding>
-        <httpclient.version>4.5.2</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <pinyin4j.version>2.5.1</pinyin4j.version>
     </properties>
 
